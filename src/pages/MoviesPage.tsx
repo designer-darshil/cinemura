@@ -113,7 +113,7 @@ export const MoviesPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#0B0B0D] text-[#F2F0EC] pt-24 pb-16 px-4 sm:px-8 max-w-site mx-auto space-y-8">
+    <div className="min-h-screen bg-[#0B0B0D] text-[#F2F0EC] pt-24 pb-16 px-4 sm:px-8 mx-auto space-y-8">
       
       <SectionHeader
         label="CATALOG"

@@ -57,7 +57,7 @@ export const HomePage: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#0B0B0D] text-[#F2F0EC] pt-24 pb-16 px-4 sm:px-8 max-w-site mx-auto">
+      <div className="min-h-screen bg-[#0B0B0D] text-[#F2F0EC] pt-24 pb-16 px-4 sm:px-8 mx-auto">
         <DetailHeroSkeleton />
       </div>
     );
@@ -65,7 +65,7 @@ export const HomePage: React.FC = () => {
 
   if (error || !activeHero) {
     return (
-      <div className="min-h-screen bg-[#0B0B0D] text-[#F2F0EC] pt-24 pb-16 px-4 sm:px-8 max-w-site mx-auto">
+      <div className="min-h-screen bg-[#0B0B0D] text-[#F2F0EC] pt-24 pb-16 px-4 sm:px-8 mx-auto">
         <ErrorState
           title="SERVICE OFFLINE"
           message="Unable to fetch live media catalog. Please check your network connection."
@@ -81,7 +81,7 @@ export const HomePage: React.FC = () => {
       {/* ==================================================
           SECTION 01 — REIMAGINED COMPACT CINEMATIC HERO (~75vh)
          ================================================== */}
-      <section className="relative min-h-[70vh] lg:min-h-[75vh] flex flex-col justify-end pt-20 pb-8 px-4 sm:px-8 max-w-site mx-auto overflow-hidden border-b border-white/10">
+      <section className="relative min-h-[70vh] lg:min-h-[75vh] flex flex-col justify-end pt-20 pb-8 px-4 sm:px-8 mx-auto overflow-hidden border-b border-white/10">
         
         {/* Background Image */}
         <div className="absolute inset-0 z-0">
@@ -153,7 +153,7 @@ export const HomePage: React.FC = () => {
           SECTION 02 — TRENDING MOVIES (HORIZONTAL RAIL)
          ================================================== */}
       {trendingMovies.length > 0 && (
-        <section className="max-w-site mx-auto px-4 sm:px-8">
+        <section className="mx-auto px-4 sm:px-8">
           <SectionHeader
             label="TRENDING"
             title="TRENDING MOVIES"
@@ -168,7 +168,7 @@ export const HomePage: React.FC = () => {
           SECTION 03 — TRENDING TV SHOWS (HORIZONTAL RAIL)
          ================================================== */}
       {trendingSeries.length > 0 && (
-        <section className="max-w-site mx-auto px-4 sm:px-8">
+        <section className="mx-auto px-4 sm:px-8">
           <SectionHeader
             label="TRENDING"
             title="TRENDING TV SHOWS"
@@ -183,7 +183,7 @@ export const HomePage: React.FC = () => {
           SECTION 04 — EDITORIAL FEATURE CARD
          ================================================== */}
       {editorialFeatureItem && (
-        <section className="max-w-site mx-auto px-4 sm:px-8">
+        <section className="mx-auto px-4 sm:px-8">
           <MediaCard item={editorialFeatureItem} variant="editorial" />
         </section>
       )}
@@ -192,7 +192,7 @@ export const HomePage: React.FC = () => {
           SECTION 05 — POPULAR MOVIES (DENSER 5-6 COLUMNS GRID)
          ================================================== */}
       {popularMovies.length > 0 && (
-        <section className="max-w-site mx-auto px-4 sm:px-8 space-y-6">
+        <section className="mx-auto px-4 sm:px-8 space-y-6">
           <SectionHeader
             label="DISCOVERY"
             title="POPULAR MOVIES"
@@ -212,7 +212,7 @@ export const HomePage: React.FC = () => {
           SECTION 06 — POPULAR TV SHOWS (DENSER 5-6 COLUMNS GRID)
          ================================================== */}
       {popularSeries.length > 0 && (
-        <section className="max-w-site mx-auto px-4 sm:px-8 space-y-6">
+        <section className="mx-auto px-4 sm:px-8 space-y-6">
           <SectionHeader
             label="DISCOVERY"
             title="POPULAR TV SHOWS"
@@ -231,7 +231,7 @@ export const HomePage: React.FC = () => {
       {/* ==================================================
           SECTION 07 — GENRE DISCOVERY
          ================================================== */}
-      <section className="max-w-site mx-auto px-4 sm:px-8">
+      <section className="mx-auto px-4 sm:px-8">
         <GenreDiscovery />
       </section>
 

@@ -45,9 +45,6 @@ export default {
         widest: '0.20em',
         mega: '0.30em',
       },
-      maxWidth: {
-        'site': '1320px',
-      },
     },
   },
   plugins: [],

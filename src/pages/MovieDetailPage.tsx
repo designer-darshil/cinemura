@@ -41,7 +41,7 @@ export const MovieDetailPage: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#0B0B0D] text-[#F2F0EC] pt-28 pb-20 px-4 sm:px-8 max-w-site mx-auto">
+      <div className="min-h-screen bg-[#0B0B0D] text-[#F2F0EC] pt-28 pb-20 px-4 sm:px-8 mx-auto">
         <DetailHeroSkeleton />
       </div>
     );
@@ -49,7 +49,7 @@ export const MovieDetailPage: React.FC = () => {
 
   if (error || !movie) {
     return (
-      <div className="min-h-screen bg-[#0B0B0D] text-[#F2F0EC] pt-28 pb-20 px-4 sm:px-8 max-w-site mx-auto">
+      <div className="min-h-screen bg-[#0B0B0D] text-[#F2F0EC] pt-28 pb-20 px-4 sm:px-8 mx-auto">
         <ErrorState
           title="MOVIE NOT FOUND"
           message="Could not load the requested feature film details from the live database."
@@ -67,7 +67,7 @@ export const MovieDetailPage: React.FC = () => {
     <div className="min-h-screen bg-[#0B0B0D] text-[#F2F0EC] pb-24 space-y-16">
       
       {/* HERO SECTION */}
-      <section className="relative min-h-[75vh] flex flex-col justify-end pt-28 pb-12 px-4 sm:px-8 max-w-site mx-auto overflow-hidden">
+      <section className="relative min-h-[75vh] flex flex-col justify-end pt-28 pb-12 px-4 sm:px-8 mx-auto overflow-hidden">
         
         <div className="absolute inset-0 z-0">
           <img
@@ -177,7 +177,7 @@ export const MovieDetailPage: React.FC = () => {
       </section>
 
       {/* MOVIE DETAILS PANEL */}
-      <section className="max-w-site mx-auto px-4 sm:px-8">
+      <section className="mx-auto px-4 sm:px-8">
         <div className="bg-[#111114] border border-white/10 p-6 sm:p-8 grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6 text-xs font-mono">
           <div className="space-y-1">
             <span className="type-label text-[#929298] block">DIRECTOR</span>
@@ -216,7 +216,7 @@ export const MovieDetailPage: React.FC = () => {
       </section>
 
       {/* OVERVIEW / SYNOPSIS */}
-      <section className="max-w-site mx-auto px-4 sm:px-8 space-y-4">
+      <section className="mx-auto px-4 sm:px-8 space-y-4">
         <SectionHeader
           label="OVERVIEW"
           title="ABOUT THE MOVIE"
@@ -234,7 +234,7 @@ export const MovieDetailPage: React.FC = () => {
 
       {/* COLLECTION / FRANCHISE */}
       {movie.collection && (
-        <section className="max-w-site mx-auto px-4 sm:px-8 space-y-4">
+        <section className="mx-auto px-4 sm:px-8 space-y-4">
           <SectionHeader
             label="COLLECTION"
             title={movie.collection.name.toUpperCase()}
@@ -267,7 +267,7 @@ export const MovieDetailPage: React.FC = () => {
 
       {/* CAST & CREW */}
       {movie.cast && movie.cast.length > 0 && (
-        <section className="max-w-site mx-auto px-4 sm:px-8 space-y-6">
+        <section className="mx-auto px-4 sm:px-8 space-y-6">
           <SectionHeader
             label="CAST"
             title="CAST & CREW"
@@ -292,7 +292,7 @@ export const MovieDetailPage: React.FC = () => {
 
       {/* PRODUCTION INFORMATION */}
       {(movie.productionCompanies && movie.productionCompanies.length > 0) && (
-        <section className="max-w-site mx-auto px-4 sm:px-8 space-y-4">
+        <section className="mx-auto px-4 sm:px-8 space-y-4">
           <SectionHeader
             label="PRODUCTION"
             title="STUDIOS & PRODUCTION COMPANIES"
@@ -316,7 +316,7 @@ export const MovieDetailPage: React.FC = () => {
 
       {/* KEYWORDS */}
       {movie.keywords && movie.keywords.length > 0 && (
-        <section className="max-w-site mx-auto px-4 sm:px-8 space-y-3">
+        <section className="mx-auto px-4 sm:px-8 space-y-3">
           <SectionHeader
             label="TAGS"
             title="KEYWORDS & THEMES"
@@ -336,7 +336,7 @@ export const MovieDetailPage: React.FC = () => {
 
       {/* OFFICIAL TRAILER / PREVIEW */}
       {movie.trailerUrl && (
-        <section className="max-w-site mx-auto px-4 sm:px-8 space-y-6">
+        <section className="mx-auto px-4 sm:px-8 space-y-6">
           <SectionHeader
             label="PREVIEW"
             title="OFFICIAL TRAILER"
@@ -367,7 +367,7 @@ export const MovieDetailPage: React.FC = () => {
 
       {/* RECOMMENDED & SIMILAR MOVIES */}
       {relatedMovies.length > 0 && (
-        <section className="max-w-site mx-auto px-4 sm:px-8 space-y-6">
+        <section className="mx-auto px-4 sm:px-8 space-y-6">
           <SectionHeader
             label="RECOMMENDATIONS"
             title="RELATED MOVIES"

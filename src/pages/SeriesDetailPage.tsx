@@ -79,7 +79,7 @@ export const SeriesDetailPage: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#0B0B0D] text-[#F2F0EC] pt-28 pb-20 px-4 sm:px-8 max-w-site mx-auto">
+      <div className="min-h-screen bg-[#0B0B0D] text-[#F2F0EC] pt-28 pb-20 px-4 sm:px-8 mx-auto">
         <DetailHeroSkeleton />
       </div>
     );
@@ -87,7 +87,7 @@ export const SeriesDetailPage: React.FC = () => {
 
   if (error || !series) {
     return (
-      <div className="min-h-screen bg-[#0B0B0D] text-[#F2F0EC] pt-28 pb-20 px-4 sm:px-8 max-w-site mx-auto">
+      <div className="min-h-screen bg-[#0B0B0D] text-[#F2F0EC] pt-28 pb-20 px-4 sm:px-8 mx-auto">
         <ErrorState
           title="TV SHOW NOT FOUND"
           message="Unable to retrieve the requested TV series record from the live database."
@@ -106,7 +106,7 @@ export const SeriesDetailPage: React.FC = () => {
       {/* ==================================================
           SECTION 01 — SERIES IDENTITY HERO
          ================================================== */}
-      <section className="relative min-h-[75vh] flex flex-col justify-end pt-28 pb-12 px-4 sm:px-8 max-w-site mx-auto overflow-hidden border-b border-white/10">
+      <section className="relative min-h-[75vh] flex flex-col justify-end pt-28 pb-12 px-4 sm:px-8 mx-auto overflow-hidden border-b border-white/10">
         
         {/* Background Backdrop */}
         <div className="absolute inset-0 z-0">
@@ -260,7 +260,7 @@ export const SeriesDetailPage: React.FC = () => {
       {/* ==================================================
           SECTION 02 — OVERVIEW & SERIES DETAILS
          ================================================== */}
-      <section className="max-w-site mx-auto px-4 sm:px-8">
+      <section className="mx-auto px-4 sm:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           
           {/* LEFT: Overview */}
@@ -350,7 +350,7 @@ export const SeriesDetailPage: React.FC = () => {
           SECTION 03 — CREATORS (CREATED BY)
          ================================================== */}
       {((series.creatorDetails && series.creatorDetails.length > 0) || (series.creators && series.creators.length > 0)) && (
-        <section className="max-w-site mx-auto px-4 sm:px-8 space-y-6">
+        <section className="mx-auto px-4 sm:px-8 space-y-6">
           <SectionHeader
             label="SHOWRUNNERS"
             title="CREATED BY"
@@ -385,7 +385,7 @@ export const SeriesDetailPage: React.FC = () => {
           SECTION 04 — CAST
          ================================================== */}
       {series.cast && series.cast.length > 0 && (
-        <section className="max-w-site mx-auto px-4 sm:px-8 space-y-6">
+        <section className="mx-auto px-4 sm:px-8 space-y-6">
           <SectionHeader
             label="ENSEMBLE"
             title="CAST"
@@ -411,7 +411,7 @@ export const SeriesDetailPage: React.FC = () => {
           SECTION 05 — SEASONS (PRIMARY TV EXPERIENCE)
          ================================================== */}
       {series.seasons && series.seasons.length > 0 && (
-        <section id="seasons-section" className="max-w-site mx-auto px-4 sm:px-8 space-y-8 scroll-mt-24">
+        <section id="seasons-section" className="mx-auto px-4 sm:px-8 space-y-8 scroll-mt-24">
           
           <SectionHeader
             label="SEASON ARCHIVE"
@@ -572,7 +572,7 @@ export const SeriesDetailPage: React.FC = () => {
           SECTION 06 — OFFICIAL TRAILER / VIDEO
          ================================================== */}
       {series.trailerUrl && (
-        <section className="max-w-site mx-auto px-4 sm:px-8 space-y-4">
+        <section className="mx-auto px-4 sm:px-8 space-y-4">
           <SectionHeader
             label="PREVIEW"
             title="OFFICIAL TRAILER"
@@ -606,7 +606,7 @@ export const SeriesDetailPage: React.FC = () => {
           SECTION 07 — NETWORKS & PRODUCTION
          ================================================== */}
       {((series.networks && series.networks.length > 0) || (series.productionCompanies && series.productionCompanies.length > 0)) && (
-        <section className="max-w-site mx-auto px-4 sm:px-8 space-y-4">
+        <section className="mx-auto px-4 sm:px-8 space-y-4">
           <SectionHeader
             label="NETWORKS & STUDIOS"
             title="BROADCAST NETWORKS & PRODUCTION"
@@ -644,7 +644,7 @@ export const SeriesDetailPage: React.FC = () => {
 
       {/* KEYWORDS */}
       {series.keywords && series.keywords.length > 0 && (
-        <section className="max-w-site mx-auto px-4 sm:px-8 space-y-3">
+        <section className="mx-auto px-4 sm:px-8 space-y-3">
           <SectionHeader
             label="TAGS"
             title="KEYWORDS & THEMES"
@@ -666,7 +666,7 @@ export const SeriesDetailPage: React.FC = () => {
           SECTION 08 — RELATED TV SHOWS
          ================================================== */}
       {relatedSeries.length > 0 && (
-        <section className="max-w-site mx-auto px-4 sm:px-8 space-y-6">
+        <section className="mx-auto px-4 sm:px-8 space-y-6">
           <SectionHeader
             label="RECOMMENDATIONS"
             title="RELATED SHOWS"

@@ -111,7 +111,7 @@ export const PeoplePage: React.FC = () => {
   if (slug) {
     if (loading) {
       return (
-        <div className="min-h-screen bg-[#0B0B0D] text-[#F2F0EC] pt-28 pb-20 px-4 sm:px-8 max-w-site mx-auto">
+        <div className="min-h-screen bg-[#0B0B0D] text-[#F2F0EC] pt-28 pb-20 px-4 sm:px-8 mx-auto">
           <CardGridSkeleton count={6} />
         </div>
       );
@@ -119,7 +119,7 @@ export const PeoplePage: React.FC = () => {
 
     if (error || !personDetail) {
       return (
-        <div className="min-h-screen bg-[#0B0B0D] text-[#F2F0EC] pt-28 pb-20 px-4 sm:px-8 max-w-site mx-auto">
+        <div className="min-h-screen bg-[#0B0B0D] text-[#F2F0EC] pt-28 pb-20 px-4 sm:px-8 mx-auto">
           <ErrorState
             title="PROFILE NOT FOUND"
             message="Unable to retrieve the requested cast or crew record from the live database."
@@ -130,7 +130,7 @@ export const PeoplePage: React.FC = () => {
     }
 
     return (
-      <div className="min-h-screen bg-[#0B0B0D] text-[#F2F0EC] pt-28 pb-20 px-4 sm:px-8 max-w-site mx-auto space-y-12">
+      <div className="min-h-screen bg-[#0B0B0D] text-[#F2F0EC] pt-28 pb-20 px-4 sm:px-8 mx-auto space-y-12">
         
         <Link
           to="/people"
@@ -270,7 +270,7 @@ export const PeoplePage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-[#0B0B0D] text-[#F2F0EC] pt-24 pb-16 px-4 sm:px-8 max-w-site mx-auto space-y-8">
+    <div className="min-h-screen bg-[#0B0B0D] text-[#F2F0EC] pt-24 pb-16 px-4 sm:px-8 mx-auto space-y-8">
       
       <SectionHeader
         label="DIRECTORY"

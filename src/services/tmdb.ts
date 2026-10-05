@@ -217,6 +217,12 @@ export function transformTmdbTv(item: any): Series {
     network: networks[0]?.name || '',
     networks,
     creators: item.created_by ? item.created_by.map((c: any) => c.name) : [],
+    creatorDetails: item.created_by ? item.created_by.map((c: any) => ({
+      id: c.id.toString(),
+      name: c.name,
+      portrait: getImageWithFallback(c.profile_path, 'profile', 'h632'),
+      slug: c.id.toString()
+    })) : [],
     cast: item.credits?.cast?.slice(0, 12).map((c: any) => ({
       id: c.id.toString(),
       name: c.name,

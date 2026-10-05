@@ -30,7 +30,7 @@ export const MediaCard: React.FC<MediaCardProps> = ({
   // Variant 3: Large Editorial Feature Card
   if (variant === 'editorial') {
     return (
-      <div className="group relative bg-[#111114] border border-white/10 hover:border-[#E43D3D] transition-all duration-300 transform hover:-translate-y-1 grid grid-cols-1 lg:grid-cols-12 overflow-hidden">
+      <div className="hidden group relative bg-[#111114] border border-white/10 hover:border-[#E43D3D] transition-all duration-300 transform hover:-translate-y-1 grid grid-cols-1 lg:grid-cols-12 overflow-hidden">
         <div className="lg:col-span-7 relative min-h-[300px] bg-black overflow-hidden">
           <img
             src={item.backdrop || item.poster}

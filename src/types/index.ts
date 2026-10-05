@@ -137,6 +137,7 @@ export interface Series {
   network?: string;
   networks?: ProductionCompany[];
   creators: string[];
+  creatorDetails?: { id: string; name: string; portrait: string; slug: string }[];
   cast: CastMember[];
   crew?: CrewMember[];
   productionCompanies?: ProductionCompany[];

@@ -202,7 +202,7 @@ export const MoviesPage: React.FC = () => {
 
             <button
               onClick={resetFilters}
-              className="btn-link text-[#929298] hover:text-[#E43D3D] text-[11px]"
+              className="btn-link inline-flex items-center gap-2 text-white text-md fw-bold uppercase text-[#929298] hover:text-[#E43D3D] text-[11px]"
             >
               <RotateCcw className="w-3 h-3" />
               <span>RESET</span>

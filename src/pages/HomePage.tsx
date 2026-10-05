@@ -138,7 +138,7 @@ export const HomePage: React.FC = () => {
 
               <Link
                 to={activeHero.type === 'movie' ? `/movie/${activeHero.id}` : `/tv/${activeHero.id}`}
-                className="btn-link text-xs"
+                className="btn-link inline-flex items-center gap-2 text-white text-md fw-bold uppercase"
               >
                 <span>EXPLORE TITLE</span>
                 <ArrowRight className="w-3.5 h-3.5 text-[#E43D3D]" />

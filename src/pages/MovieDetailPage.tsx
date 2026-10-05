@@ -80,7 +80,7 @@ export const MovieDetailPage: React.FC = () => {
         </div>
 
         <div className="relative z-10 w-full mb-8">
-          <Link to="/movie" className="btn-link text-[#929298] hover:text-[#E43D3D]">
+          <Link to="/movie" className="btn-link inline-flex items-center gap-2 text-white text-md fw-bold uppercase text-[#929298] hover:text-[#E43D3D]">
             <ArrowLeft className="w-4 h-4" />
             <span>BACK TO MOVIES DIRECTORY</span>
           </Link>

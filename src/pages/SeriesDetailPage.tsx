@@ -122,7 +122,7 @@ export const SeriesDetailPage: React.FC = () => {
 
         {/* Back Link */}
         <div className="relative z-10 w-full mb-6">
-          <Link to="/tv" className="btn-link text-[#929298] hover:text-[#E43D3D] text-xs">
+          <Link to="/tv" className="btn-link inline-flex items-center gap-2 text-white text-md fw-bold uppercase text-[#929298] hover:text-[#E43D3D] text-xs">
             <ArrowLeft className="w-4 h-4" />
             <span>BACK TO TV SHOWS DIRECTORY</span>
           </Link>
@@ -243,7 +243,7 @@ export const SeriesDetailPage: React.FC = () => {
                   href={`https://www.imdb.com/title/${series.imdbId}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="btn-link text-xs text-[#929298] hover:text-white ml-2"
+                  className="btn-link inline-flex items-center gap-2 text-white text-md fw-bold uppercase text-xs text-[#929298] hover:text-white ml-2"
                 >
                   <ExternalLink className="w-3.5 h-3.5 text-[#E43D3D]" />
                   <span>IMDB PROFILE</span>

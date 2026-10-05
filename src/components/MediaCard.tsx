@@ -86,7 +86,7 @@ export const MediaCard: React.FC<MediaCardProps> = ({
           </div>
 
           <div className="pt-3 border-t border-white/10">
-            <Link to={detailPath} className="btn-link">
+            <Link to={detailPath} className="btn-link inline-flex items-center gap-2 text-white text-md fw-bold uppercase">
               <span>EXPLORE TITLE →</span>
             </Link>
           </div>

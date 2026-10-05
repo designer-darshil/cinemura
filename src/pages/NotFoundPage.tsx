@@ -42,7 +42,7 @@ export const NotFoundPage: React.FC = () => {
 
           <Link
             to="/movie"
-            className="btn-link text-xs text-[#929298] hover:text-[#E43D3D] flex items-center gap-1.5"
+            className="btn-link inline-flex items-center gap-2 text-white text-md fw-bold uppercase text-xs text-[#929298] hover:text-[#E43D3D] flex items-center gap-1.5"
           >
             <span>EXPLORE MOVIES</span>
             <ArrowRight className="w-3.5 h-3.5" />

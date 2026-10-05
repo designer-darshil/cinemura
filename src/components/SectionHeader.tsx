@@ -23,7 +23,7 @@ export const SectionHeader: React.FC<SectionHeaderProps> = ({
 }) => {
   return (
     <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-white/10 pb-6 mb-8">
-      <div className="space-y-2 max-w-2xl">
+      <div className="space-y-2">
         <div className="flex items-center gap-3">
           {number && (
             <span className="type-label text-[#E43D3D] font-mono font-extrabold">
@@ -52,7 +52,7 @@ export const SectionHeader: React.FC<SectionHeaderProps> = ({
         <div className="flex items-center gap-4">
           {rightElement}
           {viewAllLink && (
-            <Link to={viewAllLink} className="btn-link">
+            <Link to={viewAllLink} className="btn-link inline-flex items-center gap-2 text-white text-md fw-bold uppercase">
               <span>{viewAllText}</span>
               <ArrowRight className="w-4 h-4 text-[#E43D3D]" />
             </Link>

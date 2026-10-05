@@ -174,7 +174,7 @@ export const InfiniteErrorState: React.FC<{ onRetry: () => void }> = ({ onRetry 
       <span className="type-label text-[#929298]">COULDN'T LOAD MORE RESULTS</span>
       <button
         onClick={onRetry}
-        className="btn-link text-[#E43D3D] text-xs font-mono uppercase"
+        className="btn-link inline-flex items-center gap-2 text-white text-md fw-bold uppercase"
       >
         RETRY →
       </button>

@@ -288,6 +288,18 @@ export async function getTrendingMedia(): Promise<MediaItem[] | null> {
   );
 }
 
+export async function getTrendingMovies(timeWindow: 'day' | 'week' = 'day'): Promise<Movie[] | null> {
+  const data = await fetchFromTmdb<any>(`/trending/movie/${timeWindow}`);
+  if (!data || !data.results) return null;
+  return data.results.map(transformTmdbMovie);
+}
+
+export async function getTrendingTv(timeWindow: 'day' | 'week' = 'day'): Promise<Series[] | null> {
+  const data = await fetchFromTmdb<any>(`/trending/tv/${timeWindow}`);
+  if (!data || !data.results) return null;
+  return data.results.map(transformTmdbTv);
+}
+
 export async function getMoviesList(genreId?: string, sortBy: string = 'popularity.desc', page: number = 1): Promise<Movie[] | null> {
   const endpoint = genreId ? `/discover/movie` : `/movie/popular`;
   const params: Record<string, string> = { page: page.toString() };

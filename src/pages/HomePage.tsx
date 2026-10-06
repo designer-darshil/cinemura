@@ -1,7 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Play, ArrowRight, Star } from 'lucide-react';
-import { getTrendingMedia, getMoviesList, getTvList } from '../services/tmdb';
+import {
+  getTrendingMovies,
+  getTrendingTv,
+  getMovieDetail,
+  getTvDetail,
+  getMoviesList,
+  getTvList
+} from '../services/tmdb';
 import { MediaItem, Movie, Series } from '../types';
 import { MediaCard } from '../components/MediaCard';
 import { HorizontalRail } from '../components/HorizontalRail';
@@ -9,11 +16,16 @@ import { SectionHeader } from '../components/SectionHeader';
 import { GenreDiscovery } from '../components/GenreDiscovery';
 import { useApp } from '../context/AppContext';
 import { DetailHeroSkeleton, ErrorState } from '../components/StateViews';
+import { selectPrimaryVideo, sortVideosWithPrimaryFirst, getVideoButtonLabel } from '../utils/trailer';
+
+const LAST_HERO_SESSION_KEY = 'cinemura_last_hero_id';
 
 export const HomePage: React.FC = () => {
-  const { openTrailer } = useApp();
+  const { openVideoPlayer } = useApp();
 
-  const [trendingMedia, setTrendingMedia] = useState<MediaItem[]>([]);
+  const [heroItem, setHeroItem] = useState<Movie | Series | null>(null);
+  const [trendingMovies, setTrendingMovies] = useState<Movie[]>([]);
+  const [trendingSeries, setTrendingSeries] = useState<Series[]>([]);
   const [popularMovies, setPopularMovies] = useState<Movie[]>([]);
   const [popularSeries, setPopularSeries] = useState<Series[]>([]);
 
@@ -24,19 +36,79 @@ export const HomePage: React.FC = () => {
     setLoading(true);
     setError(false);
     try {
-      const [trending, movies, series] = await Promise.all([
-        getTrendingMedia(),
+      // 1 & 2. Fetch real TMDb Trending Movies and Trending TV results in parallel
+      const [tMovies, tSeries, popMovies, popSeries] = await Promise.all([
+        getTrendingMovies('day'),
+        getTrendingTv('day'),
         getMoviesList(),
         getTvList()
       ]);
 
-      if (!trending && !movies && !series) {
+      const validMovies = tMovies || [];
+      const validSeries = tSeries || [];
+
+      // 3. Combine both result sets into one candidate collection
+      const combinedCandidates: MediaItem[] = [...validMovies, ...validSeries];
+
+      if (combinedCandidates.length === 0 && !popMovies && !popSeries) {
         setError(true);
-      } else {
-        setTrendingMedia(trending || []);
-        setPopularMovies(movies || []);
-        setPopularSeries(series || []);
+        setLoading(false);
+        return;
       }
+
+      // Prioritize valid candidates that have backdrop, title, overview, and rating
+      const eligibleCandidates = combinedCandidates.filter(c =>
+        c &&
+        c.id &&
+        c.backdrop &&
+        !c.backdrop.includes('placeholder') &&
+        c.title &&
+        c.synopsis &&
+        c.rating !== undefined
+      );
+
+      // Prevent selecting the immediate previous hero ID from session on refresh
+      const prevHeroId = sessionStorage.getItem(LAST_HERO_SESSION_KEY);
+      let candidatePool = eligibleCandidates.filter(c => c.id !== prevHeroId);
+      if (candidatePool.length === 0) {
+        candidatePool = eligibleCandidates.length > 0 ? eligibleCandidates : combinedCandidates;
+      }
+
+      // 4. Randomly select ONE candidate on this fresh page load
+      const selectedCandidate = candidatePool.length > 0
+        ? candidatePool[Math.floor(Math.random() * candidatePool.length)]
+        : (validMovies[0] || popMovies?.[0] || null);
+
+      // 5 & 6. Determine whether Movie or TV Show and fetch full detail data
+      let fullHeroDetail: Movie | Series | null = null;
+      if (selectedCandidate) {
+        try {
+          if (selectedCandidate.type === 'movie') {
+            fullHeroDetail = await getMovieDetail(selectedCandidate.id);
+          } else {
+            fullHeroDetail = await getTvDetail(selectedCandidate.id);
+          }
+        } catch (detailErr) {
+          console.warn('Could not fetch full detail for hero candidate, using candidate data', detailErr);
+        }
+
+        // Fallback to candidate if detail call returned null
+        if (!fullHeroDetail) {
+          fullHeroDetail = selectedCandidate;
+        }
+
+        // Remember selected hero ID for the session to prevent immediate repeats
+        if (fullHeroDetail?.id) {
+          sessionStorage.setItem(LAST_HERO_SESSION_KEY, fullHeroDetail.id);
+        }
+      }
+
+      // 7. Store states; render happens once with full detail
+      setHeroItem(fullHeroDetail);
+      setTrendingMovies(validMovies);
+      setTrendingSeries(validSeries);
+      setPopularMovies(popMovies || []);
+      setPopularSeries(popSeries || []);
     } catch (err) {
       console.error('Failed to load homepage live data', err);
       setError(true);
@@ -49,12 +121,6 @@ export const HomePage: React.FC = () => {
     loadLiveData();
   }, []);
 
-  const activeHero = trendingMedia[0] || popularMovies[0];
-  const editorialFeatureItem = trendingMedia[3] || popularMovies[1];
-
-  const trendingMovies = trendingMedia.filter(m => m.type === 'movie');
-  const trendingSeries = trendingMedia.filter(m => m.type === 'tv');
-
   if (loading) {
     return (
       <div className="min-h-screen bg-[#0B0B0D] text-[#F2F0EC] pt-24 pb-16 px-4 sm:px-8 mx-auto">
@@ -63,7 +129,7 @@ export const HomePage: React.FC = () => {
     );
   }
 
-  if (error || !activeHero) {
+  if (error || !heroItem) {
     return (
       <div className="min-h-screen bg-[#0B0B0D] text-[#F2F0EC] pt-24 pb-16 px-4 sm:px-8 mx-auto">
         <ErrorState
@@ -75,70 +141,117 @@ export const HomePage: React.FC = () => {
     );
   }
 
+  // Pick an editorial feature item distinct from the hero
+  const editorialCandidateList = [...trendingMovies, ...trendingSeries, ...popularMovies];
+  const editorialFeatureItem = editorialCandidateList.find(item => item.id !== heroItem.id) || editorialCandidateList[1];
+
+  // Resolve official trailer using prioritized trailer-selection algorithm
+  const heroPrimaryVideo = selectPrimaryVideo(heroItem.videos, heroItem.language) || heroItem.primaryVideo || null;
+  const heroTrailerLabel = getVideoButtonLabel(heroPrimaryVideo);
+  const heroPlayableVideos = sortVideosWithPrimaryFirst(heroItem.videos, heroItem.language);
+
+  // Runtime or season count display
+  const heroDurationOrSeasons = heroItem.type === 'movie'
+    ? (heroItem.runtime && heroItem.runtime !== 'N/A' ? heroItem.runtime : null)
+    : ((heroItem as Series).seasonsCount ? `${(heroItem as Series).seasonsCount} ${(heroItem as Series).seasonsCount === 1 ? 'SEASON' : 'SEASONS'}` : null);
+
   return (
-    <div className="min-h-screen bg-[#0B0B0D] text-[#F2F0EC] space-y-16 lg:space-y-24 pb-16">
+    <div className="min-h-screen bg-[#0B0B0D] text-[#F2F0EC] space-y-16 lg:space-y-24 pb-16 selection:bg-[#E43D3D] selection:text-white">
       
       {/* ==================================================
-          SECTION 01 — REIMAGINED COMPACT CINEMATIC HERO (~75vh)
+          SECTION 01 — DYNAMIC CINEMATIC HERO (REFRESH-DRIVEN)
          ================================================== */}
       <section className="relative min-h-[70vh] lg:min-h-[75vh] flex flex-col justify-end pt-20 pb-8 px-4 sm:px-8 mx-auto overflow-hidden border-b border-white/10">
         
-        {/* Background Image */}
+        {/* Real Backdrop Background Field */}
         <div className="absolute inset-0 z-0">
           <img
-            src={activeHero.backdrop}
-            alt={activeHero.title}
-            className="w-full h-full object-cover opacity-40 filter brightness-90 contrast-110"
+            src={heroItem.backdrop}
+            alt={heroItem.title}
+            className="w-full h-full object-cover opacity-45 filter brightness-90 contrast-110"
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-[#0B0B0D] via-[#0B0B0D]/75 to-transparent" />
-          <div className="absolute inset-0 film-grain pointer-events-none" />
+          <div className="absolute inset-0 bg-gradient-to-r from-[#0B0B0D] via-[#0B0B0D]/80 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#0B0B0D] via-transparent to-transparent" />
+          <div className="absolute inset-0 film-grain pointer-events-none opacity-30" />
         </div>
 
-        {/* Hero Content */}
+        {/* Hero Content Canvas */}
         <div className="relative z-10 w-full grid grid-cols-1 lg:grid-cols-12 gap-8 items-end pb-4">
           <div className="lg:col-span-8 space-y-4">
-            <div className="flex items-center gap-2">
-              <span className="type-label bg-[#E43D3D] text-white px-2 py-0.5">
+            
+            {/* Type & Certification Badges */}
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="type-label bg-[#E43D3D] text-white px-2 py-0.5 font-bold">
                 FEATURED
               </span>
-              <span className="type-label text-[#929298]">
-                {activeHero.type === 'tv' ? 'TELEVISION' : 'MOVIE'}
+              <span className="type-label text-[#8E8E93] bg-white/5 border border-white/10 px-2 py-0.5">
+                {heroItem.type === 'tv' ? 'TELEVISION' : 'FEATURE FILM'}
               </span>
+              {heroItem.certification && (
+                <span className="type-label text-[#8E8E93] border border-white/15 px-1.5 py-0.5">
+                  {heroItem.certification}
+                </span>
+              )}
             </div>
 
-            <h1 className="type-display-l text-white leading-none">
-              {activeHero.title}
+            {/* Real Title */}
+            <h1 className="text-3xl sm:text-5xl lg:text-6xl font-serif font-bold text-white tracking-tight uppercase leading-none">
+              {heroItem.title}
             </h1>
 
-            <div className="flex items-center gap-4 text-xs font-mono text-[#929298]">
-              <span>{activeHero.year}</span>
-              <span>•</span>
-              <span className="text-[#F2F0EC]">{activeHero.genres.slice(0, 2).join(' / ')}</span>
-              <span>•</span>
-              <span className="flex items-center gap-1 text-[#E43D3D] font-bold">
-                <Star className="w-3.5 h-3.5 fill-[#E43D3D]" />
-                {activeHero.rating.toFixed(1)}
-              </span>
+            {/* Essential Metadata Row */}
+            <div className="flex flex-wrap items-center gap-3 text-xs font-mono text-[#8E8E93]">
+              <span>{heroItem.year}</span>
+              {heroDurationOrSeasons && (
+                <>
+                  <span>•</span>
+                  <span className="text-[#F2F0EC]">{heroDurationOrSeasons}</span>
+                </>
+              )}
+              {heroItem.genres.length > 0 && (
+                <>
+                  <span>•</span>
+                  <span className="text-[#F2F0EC] uppercase">{heroItem.genres.slice(0, 3).join(' / ')}</span>
+                </>
+              )}
+              {heroItem.rating > 0 && (
+                <>
+                  <span>•</span>
+                  <span className="flex items-center gap-1 text-[#E43D3D] font-bold">
+                    <Star className="w-3.5 h-3.5 fill-[#E43D3D]" />
+                    {heroItem.rating.toFixed(1)}
+                  </span>
+                </>
+              )}
             </div>
 
-            <p className="type-body text-sm text-[#F2F0EC]/80 max-w-lg line-clamp-2 font-light">
-              {activeHero.synopsis}
-            </p>
+            {/* Synopsis Excerpt */}
+            {heroItem.synopsis && (
+              <p className="type-body text-sm sm:text-base text-[#F2F0EC]/85 max-w-2xl line-clamp-3 font-light leading-relaxed">
+                {heroItem.synopsis}
+              </p>
+            )}
 
+            {/* Actions: Watch Trailer CTA & Explore Title Link */}
             <div className="flex flex-wrap items-center gap-4 pt-2">
-              {activeHero.trailerUrl && (
+              {heroPrimaryVideo && (
                 <button
-                  onClick={() => openTrailer(activeHero.trailerUrl!, activeHero.title)}
-                  className="btn-primary h-10 px-5 text-[10px]"
+                  type="button"
+                  onClick={() => openVideoPlayer(
+                    heroPlayableVideos.length > 0 ? heroPlayableVideos : [heroPrimaryVideo],
+                    0,
+                    heroItem.title
+                  )}
+                  className="bg-[#E43D3D] hover:bg-[#c02e2e] text-white px-6 py-3 text-xs font-mono font-bold tracking-widest uppercase flex items-center gap-2.5 transition-all transform hover:-translate-y-0.5 shadow-lg"
                 >
-                  <Play className="w-3.5 h-3.5 fill-current" />
-                  <span>WATCH TRAILER</span>
+                  <Play className="w-3.5 h-3.5 fill-white" />
+                  <span>{heroTrailerLabel}</span>
                 </button>
               )}
 
               <Link
-                to={activeHero.type === 'movie' ? `/movie/${activeHero.id}` : `/tv/${activeHero.id}`}
-                className="btn-link inline-flex items-center gap-2 text-white text-md fw-bold uppercase"
+                to={heroItem.type === 'movie' ? `/movie/${heroItem.id}` : `/tv/${heroItem.id}`}
+                className="btn-link inline-flex items-center gap-2 text-white text-sm font-mono font-bold tracking-wider uppercase hover:text-[#E43D3D] transition-colors"
               >
                 <span>EXPLORE TITLE</span>
                 <ArrowRight className="w-3.5 h-3.5 text-[#E43D3D]" />
@@ -189,7 +302,7 @@ export const HomePage: React.FC = () => {
       )}
 
       {/* ==================================================
-          SECTION 05 — POPULAR MOVIES (DENSER 5-6 COLUMNS GRID)
+          SECTION 05 — POPULAR MOVIES (GRID)
          ================================================== */}
       {popularMovies.length > 0 && (
         <section className="mx-auto px-4 sm:px-8 space-y-6">
@@ -209,7 +322,7 @@ export const HomePage: React.FC = () => {
       )}
 
       {/* ==================================================
-          SECTION 06 — POPULAR TV SHOWS (DENSER 5-6 COLUMNS GRID)
+          SECTION 06 — POPULAR TV SHOWS (GRID)
          ================================================== */}
       {popularSeries.length > 0 && (
         <section className="mx-auto px-4 sm:px-8 space-y-6">

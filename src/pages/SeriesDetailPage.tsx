@@ -111,7 +111,7 @@ export const SeriesDetailPage: React.FC = () => {
       {/* ==================================================
           1. TV SERIES HERO — INFORMATION-DENSE IMMERSIVE COVER
          ================================================== */}
-      <section className="relative min-h-[85vh] flex flex-col justify-between pt-24 pb-12 px-4 sm:px-8 md:px-12 mx-auto overflow-hidden">
+      <section className="relative min-h-[85vh] flex flex-col justify-between pt-24 pb-12 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 w-full overflow-hidden">
         
         {/* Backdrop Background Field */}
         <div className="absolute inset-0 z-0">
@@ -120,8 +120,7 @@ export const SeriesDetailPage: React.FC = () => {
             alt={series.title}
             className="w-full h-full object-cover filter brightness-50 contrast-110 scale-105 transition-transform duration-1000"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-[#0B0B0D] via-[#0B0B0D]/80 to-black/60" />
-          <div className="absolute inset-0 bg-gradient-to-r from-[#0B0B0D] via-[#0B0B0D]/70 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-r from-[#0B0B0D] via-[#0B0B0D]/50 to-transparent" />
           <div className="absolute inset-0 film-grain pointer-events-none opacity-40" />
         </div>
 
@@ -273,7 +272,7 @@ export const SeriesDetailPage: React.FC = () => {
       {/* ==================================================
           2. NARRATIVE SYNOPSIS & SPECIFICATIONS
          ================================================== */}
-      <section id="overview-section" className="mt-12 sm:mt-16 px-4 sm:px-8 md:px-12 mx-auto max-w-7xl scroll-mt-28">
+      <section id="overview-section" className="w-full mt-12 sm:mt-16 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 scroll-mt-28">
         
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start border-t border-white/10 pt-10">
           
@@ -369,7 +368,7 @@ export const SeriesDetailPage: React.FC = () => {
           3. TV CREATORS (SHOWRUNNERS)
          ================================================== */}
       {((series.creatorDetails && series.creatorDetails.length > 0) || (series.creators && series.creators.length > 0)) && (
-        <section className="mt-20 sm:mt-28 px-4 sm:px-8 md:px-12 mx-auto max-w-7xl space-y-6">
+        <section className="w-full mt-20 sm:mt-28 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 space-y-6">
           <SectionHeader
             label="SHOWRUNNERS"
             title="CREATED BY"
@@ -404,7 +403,7 @@ export const SeriesDetailPage: React.FC = () => {
           4. CAST — HORIZONTAL CONTENT CAROUSEL
          ================================================== */}
       {series.cast && series.cast.length > 0 && (
-        <section id="cast-section" className="mt-20 sm:mt-28 px-4 sm:px-8 md:px-12 mx-auto max-w-7xl scroll-mt-28">
+        <section id="cast-section" className="w-full mt-20 sm:mt-28 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 scroll-mt-28">
           <CastCarousel cast={series.cast} title="CAST" />
         </section>
       )}
@@ -413,7 +412,7 @@ export const SeriesDetailPage: React.FC = () => {
           5. TV EPISODES — SEASON SELECTOR & DENSE GRID
          ================================================== */}
       {series.seasons && series.seasons.length > 0 && (
-        <div className="mt-20 sm:mt-28 px-4 sm:px-8 md:px-12 mx-auto max-w-7xl">
+        <div className="w-full mt-20 sm:mt-28 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16">
           <SeriesEpisodesSection
             id="episodes-section"
             seriesId={series.id}
@@ -427,7 +426,7 @@ export const SeriesDetailPage: React.FC = () => {
           6. TV VIDEOS — REAL TMDB MEDIA GRID + TYPE FILTER
          ================================================== */}
       {playableVideos.length > 0 && (
-        <div className="mt-20 sm:mt-28 px-4 sm:px-8 md:px-12 mx-auto max-w-7xl">
+        <div className="w-full mt-20 sm:mt-28 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16">
           <MediaVideosSection id="videos-section" videos={playableVideos} parentTitle={series.title} />
         </div>
       )}
@@ -436,7 +435,7 @@ export const SeriesDetailPage: React.FC = () => {
           7. TV PHOTOS — BACKDROPS & POSTERS GALLERIES
          ================================================== */}
       {totalPhotosCount > 0 && (
-        <div className="mt-20 sm:mt-28 px-4 sm:px-8 md:px-12 mx-auto max-w-7xl">
+        <div className="w-full mt-20 sm:mt-28 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16">
           <MediaPhotosSection
             id="photos-section"
             backdrops={backdropImages}
@@ -450,7 +449,7 @@ export const SeriesDetailPage: React.FC = () => {
           8. NETWORKS & PRODUCTION COMPANIES
          ================================================== */}
       {((series.networks && series.networks.length > 0) || (series.productionCompanies && series.productionCompanies.length > 0)) && (
-        <section className="mt-20 sm:mt-28 px-4 sm:px-8 md:px-12 mx-auto max-w-7xl space-y-6">
+        <section className="w-full mt-20 sm:mt-28 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 space-y-6">
           <SectionHeader
             label="STUDIO DOSSIER"
             title="NETWORKS & PRODUCTION"
@@ -489,7 +488,7 @@ export const SeriesDetailPage: React.FC = () => {
           9. RELATED TV SHOWS
          ================================================== */}
       {relatedSeries.length > 0 && (
-        <section className="mt-20 sm:mt-28 px-4 sm:px-8 md:px-12 mx-auto max-w-7xl space-y-8">
+        <section className="w-full mt-20 sm:mt-28 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 space-y-8">
           <SectionHeader
             label="RECOMMENDATIONS"
             title="MORE LIKE THIS"

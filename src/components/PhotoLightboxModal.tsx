@@ -97,7 +97,7 @@ export const PhotoLightboxModal: React.FC<PhotoLightboxModalProps> = ({
         )}
 
         {/* Center Image */}
-        <div className="relative max-w-6xl max-h-full flex items-center justify-center">
+        <div className="relative w-full max-h-full flex items-center justify-center px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16">
           <img
             key={currentImage}
             src={currentImage}

@@ -108,7 +108,7 @@ export const MovieDetailPage: React.FC = () => {
       {/* ==================================================
           1. HERO CONCEPT — IMMERSIVE MAGAZINE COVER
          ================================================== */}
-      <section className="relative min-h-[85vh] lg:min-h-[90vh] flex flex-col justify-between pt-24 pb-12 px-4 sm:px-8 md:px-12 mx-auto overflow-hidden">
+      <section className="relative min-h-[85vh] lg:min-h-[90vh] flex flex-col justify-between pt-24 pb-12 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 w-full overflow-hidden">
         
         {/* Dominant Backdrop Visual Field */}
         <div className="absolute inset-0 z-0">
@@ -118,8 +118,7 @@ export const MovieDetailPage: React.FC = () => {
             className="w-full h-full object-cover filter brightness-60 contrast-110 scale-105 transition-transform duration-1000 ease-out"
           />
           {/* Gradient Vignette & Tint */}
-          <div className="absolute inset-0 bg-gradient-to-t from-[#0B0B0D] via-[#0B0B0D]/75 to-black/60" />
-          <div className="absolute inset-0 bg-gradient-to-r from-[#0B0B0D] via-[#0B0B0D]/60 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-r from-[#0B0B0D] via-[#0B0B0D]/50 to-transparent" />
           <div className="absolute inset-0 film-grain pointer-events-none opacity-40" />
         </div>
 
@@ -253,7 +252,7 @@ export const MovieDetailPage: React.FC = () => {
       {/* ==================================================
           2. MOVIE INFORMATION — EDITORIAL OVERVIEW
          ================================================== */}
-      <section id="overview-section" className="mt-12 sm:mt-16 px-4 sm:px-8 md:px-12 mx-auto max-w-7xl scroll-mt-28">
+      <section id="overview-section" className="w-full mt-12 sm:mt-16 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 scroll-mt-28">
         
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start border-t border-white/10 pt-10">
           
@@ -372,7 +371,7 @@ export const MovieDetailPage: React.FC = () => {
           3. CAST — HORIZONTAL CONTENT CAROUSEL
          ================================================== */}
       {movie.cast && movie.cast.length > 0 && (
-        <section id="cast-section" className="mt-20 sm:mt-28 px-4 sm:px-8 md:px-12 mx-auto max-w-7xl scroll-mt-28">
+        <section id="cast-section" className="w-full mt-20 sm:mt-28 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 scroll-mt-28">
           <CastCarousel cast={movie.cast} title="CAST" />
         </section>
       )}
@@ -381,7 +380,7 @@ export const MovieDetailPage: React.FC = () => {
           4. VIDEOS — REAL TMDB MEDIA GRID + TYPE FILTER
          ================================================== */}
       {playableVideos.length > 0 && (
-        <div className="mt-20 sm:mt-28 px-4 sm:px-8 md:px-12 mx-auto max-w-7xl">
+        <div className="w-full mt-20 sm:mt-28 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16">
           <MediaVideosSection id="videos-section" videos={playableVideos} parentTitle={movie.title} />
         </div>
       )}
@@ -390,7 +389,7 @@ export const MovieDetailPage: React.FC = () => {
           5. PHOTOS — BACKDROPS & POSTERS GALLERIES
          ================================================== */}
       {totalPhotosCount > 0 && (
-        <div className="mt-20 sm:mt-28 px-4 sm:px-8 md:px-12 mx-auto max-w-7xl">
+        <div className="w-full mt-20 sm:mt-28 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16">
           <MediaPhotosSection
             id="photos-section"
             backdrops={backdropImages}
@@ -404,7 +403,7 @@ export const MovieDetailPage: React.FC = () => {
           6. MOVIE COLLECTION / FRANCHISE
          ================================================== */}
       {movie.collection && (
-        <section className="mt-20 sm:mt-28 px-4 sm:px-8 md:px-12 mx-auto max-w-7xl space-y-6">
+        <section className="w-full mt-20 sm:mt-28 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 space-y-6">
           
           <SectionHeader
             label="FRANCHISE ARCHIVE"
@@ -446,7 +445,7 @@ export const MovieDetailPage: React.FC = () => {
           7. RELATED MOVIES
          ================================================== */}
       {relatedMovies.length > 0 && (
-        <section className="mt-20 sm:mt-28 px-4 sm:px-8 md:px-12 mx-auto max-w-7xl space-y-8">
+        <section className="w-full mt-20 sm:mt-28 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 space-y-8">
           
           <SectionHeader
             label="RECOMMENDATIONS"

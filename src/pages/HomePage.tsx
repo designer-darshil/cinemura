@@ -172,7 +172,7 @@ export const HomePage: React.FC = () => {
       {/* ==================================================
           SECTION 01 — DYNAMIC CINEMATIC HERO (REFRESH-DRIVEN)
          ================================================== */}
-      <section className="relative min-h-[70vh] lg:min-h-[75vh] flex flex-col justify-end pt-20 pb-8 px-4 sm:px-8 mx-auto overflow-hidden border-b border-white/10">
+      <section className="relative min-h-[70vh] lg:min-h-[75vh] flex flex-col justify-end pt-20 pb-8 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 w-full overflow-hidden border-b border-white/10">
         
         {/* Real Backdrop Background Field */}
         <div className="absolute inset-0 z-0">
@@ -277,7 +277,7 @@ export const HomePage: React.FC = () => {
           SECTION 02 — TRENDING MOVIES (HORIZONTAL RAIL)
          ================================================== */}
       {trendingMovies.length > 0 && (
-        <section className="mx-auto px-4 sm:px-8">
+        <section className="w-full px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16">
           <SectionHeader
             label="TRENDING"
             title="TRENDING MOVIES"
@@ -292,7 +292,7 @@ export const HomePage: React.FC = () => {
           SECTION 03 — TRENDING TV SHOWS (HORIZONTAL RAIL)
          ================================================== */}
       {trendingSeries.length > 0 && (
-        <section className="mx-auto px-4 sm:px-8">
+        <section className="w-full px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16">
           <SectionHeader
             label="TRENDING"
             title="TRENDING TV SHOWS"
@@ -307,7 +307,7 @@ export const HomePage: React.FC = () => {
           SECTION 04 — EDITORIAL FEATURE CARD
          ================================================== */}
       {editorialFeatureItem && (
-        <section className="mx-auto px-4 sm:px-8">
+        <section className="w-full px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16">
           <MediaCard item={editorialFeatureItem} variant="editorial" />
         </section>
       )}
@@ -316,7 +316,7 @@ export const HomePage: React.FC = () => {
           SECTION 05 — POPULAR MOVIES (GRID)
          ================================================== */}
       {popularMovies.length > 0 && (
-        <section className="mx-auto px-4 sm:px-8 space-y-6">
+        <section className="w-full px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 space-y-6">
           <SectionHeader
             label="DISCOVERY"
             title="POPULAR MOVIES"
@@ -336,7 +336,7 @@ export const HomePage: React.FC = () => {
           SECTION 06 — POPULAR TV SHOWS (GRID)
          ================================================== */}
       {popularSeries.length > 0 && (
-        <section className="mx-auto px-4 sm:px-8 space-y-6">
+        <section className="w-full px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 space-y-6">
           <SectionHeader
             label="DISCOVERY"
             title="POPULAR TV SHOWS"
@@ -355,7 +355,7 @@ export const HomePage: React.FC = () => {
       {/* ==================================================
           SECTION 07 — GENRE DISCOVERY
          ================================================== */}
-      <section className="mx-auto px-4 sm:px-8">
+      <section className="w-full px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16">
         <GenreDiscovery />
       </section>
 

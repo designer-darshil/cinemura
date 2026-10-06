@@ -261,6 +261,18 @@
   background-color: rgba(255, 255, 255, 0.05);
 }
 
+/* GLOBAL FLUID FULL-SCREEN LAYOUT & RESPONSIVE PADDING */
+.fluid-container {
+  width: 100%;
+  padding-left: clamp(16px, 4vw, 64px);
+  padding-right: clamp(16px, 4vw, 64px);
+}
+
+.fluid-px {
+  padding-left: clamp(16px, 4vw, 64px);
+  padding-right: clamp(16px, 4vw, 64px);
+}
+
 /* ACCESSIBILITY: RESPECT PREFERS-REDUCED-MOTION */
 @media (prefers-reduced-motion: reduce) {
   .animate-pulse,
@@ -274,4 +286,6 @@
     transform: none !important;
   }
 }
+
+
 

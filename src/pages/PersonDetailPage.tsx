@@ -75,7 +75,7 @@ export const PersonDetailPage: React.FC = () => {
     <div className="min-h-screen bg-[#0B0B0D] text-[#F2F0EC] pb-24 selection:bg-[#E43D3D] selection:text-white">
       
       {/* Top Navigation Bar */}
-      <div className="pt-24 px-4 sm:px-8 md:px-12 mx-auto">
+      <div className="pt-24 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 w-full">
         <div className="flex items-center justify-between border-b border-white/10 pb-4">
           <Link
             to="/people"
@@ -94,7 +94,7 @@ export const PersonDetailPage: React.FC = () => {
       {/* ==================================================
           1. HERO CONCEPT — PORTRAIT-DRIVEN CALM PROFILE
          ================================================== */}
-      <section className="mt-8 px-4 sm:px-8 md:px-12 mx-auto">
+      <section className="mt-8 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 w-full">
         
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center bg-[#111114] border border-white/10 p-6 sm:p-10 md:p-12 relative overflow-hidden">
           
@@ -188,7 +188,7 @@ export const PersonDetailPage: React.FC = () => {
       {/* ==================================================
           2. PERSON BIOGRAPHY — ABOUT SECTION
          ================================================== */}
-      <section className="mt-16 sm:mt-24 px-4 sm:px-8 md:px-12 mx-auto space-y-6">
+      <section className="mt-16 sm:mt-24 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 w-full space-y-6">
         
         <div className="border-t border-white/10 pt-12">
           <SectionHeader
@@ -216,7 +216,7 @@ export const PersonDetailPage: React.FC = () => {
           3. KNOWN FOR — VISUALLY PROMINENT SECTION
          ================================================== */}
       {person.knownFor && person.knownFor.length > 0 && (
-        <section className="mt-16 sm:mt-24 px-4 sm:px-8 md:px-12 mx-auto space-y-6">
+        <section className="mt-16 sm:mt-24 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 w-full space-y-6">
           
           <SectionHeader
             label="ACCLAIMED WORKS"
@@ -264,7 +264,7 @@ export const PersonDetailPage: React.FC = () => {
           4. PERSON FILMOGRAPHY — COMPACT EDITORIAL STREAM
          ================================================== */}
       {person.filmography && person.filmography.length > 0 && (
-        <section className="mt-20 sm:mt-28 px-4 sm:px-8 md:px-12 mx-auto space-y-8">
+        <section className="mt-20 sm:mt-28 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 w-full space-y-8">
           
           <SectionHeader
             label="FULL CREDIT RECORD"

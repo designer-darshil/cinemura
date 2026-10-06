@@ -118,10 +118,10 @@ export const SearchModal: React.FC = () => {
       role="dialog"
       aria-modal="true"
       aria-label="Search Catalog"
-      className="fixed inset-0 z-50 bg-[#0B0B0D] overflow-y-auto text-[#F2F0EC] p-4 sm:p-8 md:p-12 animate-fadeIn selection:bg-[#E43D3D] selection:text-white"
+      className="fixed inset-0 z-50 bg-[#0B0B0D] overflow-y-auto text-[#F2F0EC] px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 py-6 sm:py-10 animate-fadeIn selection:bg-[#E43D3D] selection:text-white"
     >
       
-      <div className="max-w-7xl mx-auto space-y-8 sm:space-y-12">
+      <div className="w-full space-y-8 sm:space-y-12">
         
         {/* Top Minimal Controls Header */}
         <div className="flex items-center justify-between border-b border-white/10 pb-4">

@@ -338,7 +338,7 @@ export const EpisodesSectionSkeleton: React.FC<{ count?: number }> = ({ count = 
 /* 10. HOMEPAGE HERO SKELETON */
 export const HomepageHeroSkeleton: React.FC = () => {
   return (
-    <section className="relative min-h-[70vh] lg:min-h-[75vh] flex flex-col justify-end pt-20 pb-8 px-4 sm:px-8 mx-auto overflow-hidden border-b border-white/10 bg-[#0B0B0D]">
+    <section className="relative min-h-[70vh] lg:min-h-[75vh] flex flex-col justify-end pt-20 pb-8 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 w-full overflow-hidden border-b border-white/10 bg-[#0B0B0D]">
       <div className="w-full grid grid-cols-1 lg:grid-cols-12 gap-8 items-end pb-4">
         <div className="lg:col-span-8 space-y-5">
           {/* Badge line */}
@@ -374,7 +374,7 @@ export const HomepageHeroSkeleton: React.FC = () => {
 /* 11. DETAIL HERO SKELETON (Movie / TV) */
 export const DetailHeroSkeleton: React.FC = () => {
   return (
-    <section className="relative min-h-[85vh] lg:min-h-[90vh] flex flex-col justify-between pt-24 pb-12 px-4 sm:px-8 md:px-12 mx-auto overflow-hidden border-b border-white/10 bg-[#0B0B0D]">
+    <section className="relative min-h-[85vh] lg:min-h-[90vh] flex flex-col justify-between pt-24 pb-12 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 w-full overflow-hidden border-b border-white/10 bg-[#0B0B0D]">
       {/* Top breadcrumb */}
       <div className="flex items-center justify-between border-b border-white/10 pb-4">
         <div className="h-4 w-40 skeleton-pulse" />
@@ -411,7 +411,7 @@ export const DetailHeroSkeleton: React.FC = () => {
 /* 12. DETAIL OVERVIEW & FACTS SKELETON */
 export const DetailOverviewSkeleton: React.FC = () => {
   return (
-    <section className="mt-12 sm:mt-16 px-4 sm:px-8 md:px-12 mx-auto max-w-7xl">
+    <section className="w-full mt-12 sm:mt-16 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16">
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start border-t border-white/10 pt-10">
         {/* Left Narrative */}
         <div className="lg:col-span-7 space-y-6">
@@ -458,13 +458,13 @@ export const MovieDetailPageSkeleton: React.FC = () => {
     <div className="min-h-screen bg-[#0B0B0D] text-[#F2F0EC] pb-24 space-y-16 animate-fadeIn">
       <DetailHeroSkeleton />
       <DetailOverviewSkeleton />
-      <div className="px-4 sm:px-8 md:px-12 mx-auto max-w-7xl">
+      <div className="w-full px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16">
         <CastRailSkeleton title="CAST" count={7} />
       </div>
-      <div className="px-4 sm:px-8 md:px-12 mx-auto max-w-7xl">
+      <div className="w-full px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16">
         <VideosGridSkeleton count={4} />
       </div>
-      <div className="px-4 sm:px-8 md:px-12 mx-auto max-w-7xl">
+      <div className="w-full px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16">
         <PhotosGallerySkeleton />
       </div>
     </div>
@@ -477,16 +477,16 @@ export const SeriesDetailPageSkeleton: React.FC = () => {
     <div className="min-h-screen bg-[#0B0B0D] text-[#F2F0EC] pb-24 space-y-16 animate-fadeIn">
       <DetailHeroSkeleton />
       <DetailOverviewSkeleton />
-      <div className="px-4 sm:px-8 md:px-12 mx-auto max-w-7xl">
+      <div className="w-full px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16">
         <CastRailSkeleton title="CAST" count={7} />
       </div>
-      <div className="px-4 sm:px-8 md:px-12 mx-auto max-w-7xl">
+      <div className="w-full px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16">
         <EpisodesSectionSkeleton count={6} />
       </div>
-      <div className="px-4 sm:px-8 md:px-12 mx-auto max-w-7xl">
+      <div className="w-full px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16">
         <VideosGridSkeleton count={4} />
       </div>
-      <div className="px-4 sm:px-8 md:px-12 mx-auto max-w-7xl">
+      <div className="w-full px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16">
         <PhotosGallerySkeleton />
       </div>
     </div>
@@ -498,7 +498,7 @@ export const PersonDetailSkeleton: React.FC = () => {
   return (
     <div className="min-h-screen bg-[#0B0B0D] text-[#F2F0EC] pb-24 space-y-12 animate-fadeIn">
       {/* Top Breadcrumb */}
-      <div className="pt-24 px-4 sm:px-8 md:px-12 mx-auto">
+      <div className="pt-24 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 w-full">
         <div className="flex items-center justify-between border-b border-white/10 pb-4">
           <div className="h-4 w-44 skeleton-pulse" />
           <div className="h-4 w-28 skeleton-pulse" />
@@ -506,7 +506,7 @@ export const PersonDetailSkeleton: React.FC = () => {
       </div>
 
       {/* Editorial Profile Box */}
-      <section className="px-4 sm:px-8 md:px-12 mx-auto">
+      <section className="px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 w-full">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center bg-[#111114] border border-white/10 p-6 sm:p-10 md:p-12">
           {/* Portrait Anchor */}
           <div className="lg:col-span-4 max-w-sm mx-auto lg:max-w-none w-full">
@@ -531,7 +531,7 @@ export const PersonDetailSkeleton: React.FC = () => {
       </section>
 
       {/* Biography Skeleton */}
-      <section className="px-4 sm:px-8 md:px-12 mx-auto space-y-4">
+      <section className="px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 w-full space-y-4">
         <div className="border-t border-white/10 pt-10 space-y-2">
           <div className="h-3 w-24 skeleton-pulse" />
           <div className="h-7 w-36 skeleton-pulse" />
@@ -545,7 +545,7 @@ export const PersonDetailSkeleton: React.FC = () => {
       </section>
 
       {/* Known For Skeleton */}
-      <section className="px-4 sm:px-8 md:px-12 mx-auto space-y-4">
+      <section className="px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 w-full space-y-4">
         <div className="border-t border-white/10 pt-10 space-y-2">
           <div className="h-3 w-28 skeleton-pulse" />
           <div className="h-7 w-40 skeleton-pulse" />
@@ -558,7 +558,7 @@ export const PersonDetailSkeleton: React.FC = () => {
       </section>
 
       {/* Filmography Skeleton */}
-      <section className="px-4 sm:px-8 md:px-12 mx-auto space-y-4">
+      <section className="px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 w-full space-y-4">
         <div className="border-t border-white/10 pt-10 space-y-2">
           <div className="h-3 w-32 skeleton-pulse" />
           <div className="h-7 w-48 skeleton-pulse" />
@@ -589,7 +589,7 @@ export const HomePageSkeleton: React.FC = () => {
       <HomepageHeroSkeleton />
 
       {/* Trending Movies Rail Skeleton */}
-      <section className="mx-auto px-4 sm:px-8 space-y-4">
+      <section className="w-full px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 space-y-4">
         <div className="flex items-baseline justify-between border-b border-white/10 pb-3">
           <div className="space-y-1">
             <span className="text-[10px] font-mono tracking-[0.2em] text-[#E43D3D] uppercase font-bold block">
@@ -609,7 +609,7 @@ export const HomePageSkeleton: React.FC = () => {
       </section>
 
       {/* Trending TV Rail Skeleton */}
-      <section className="mx-auto px-4 sm:px-8 space-y-4">
+      <section className="w-full px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 space-y-4">
         <div className="flex items-baseline justify-between border-b border-white/10 pb-3">
           <div className="space-y-1">
             <span className="text-[10px] font-mono tracking-[0.2em] text-[#E43D3D] uppercase font-bold block">
@@ -629,7 +629,7 @@ export const HomePageSkeleton: React.FC = () => {
       </section>
 
       {/* Popular Movies Grid Skeleton */}
-      <section className="mx-auto px-4 sm:px-8 space-y-6">
+      <section className="w-full px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 space-y-6">
         <div className="flex items-baseline justify-between border-b border-white/10 pb-3">
           <div className="space-y-1">
             <span className="text-[10px] font-mono tracking-[0.2em] text-[#E43D3D] uppercase font-bold block">

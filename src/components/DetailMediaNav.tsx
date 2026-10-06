@@ -51,9 +51,9 @@ export const DetailMediaNav: React.FC<DetailMediaNavProps> = ({ sections }) => {
   return (
     <nav
       aria-label="Detail page media sections"
-      className="sticky top-16 z-30 bg-[#0B0B0D]/95 backdrop-blur-md border-y border-white/10 px-4 sm:px-8 md:px-12 py-2"
+      className="sticky top-14 z-30 bg-[#0B0B0D]/95 backdrop-blur-md border-y border-white/10 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 py-2"
     >
-      <div className="max-w-7xl mx-auto flex items-center gap-1 sm:gap-2 overflow-x-auto no-scrollbar">
+      <div className="w-full flex items-center gap-1 sm:gap-2 overflow-x-auto no-scrollbar">
         {sections.map((sec) => {
           const isActive = activeId === sec.id;
           return (

@@ -37,7 +37,7 @@ export const Header: React.FC = () => {
           : 'bg-gradient-to-b from-[#0B0B0D]/90 via-[#0B0B0D]/40 to-transparent h-16'
       }`}
     >
-      <div className="mx-auto px-4 sm:px-8 h-full flex items-center justify-between">
+      <div className="w-full px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 h-full flex items-center justify-between">
         
         {/* Brand Logo */}
         <Link to="/" className="flex items-center gap-2 group">

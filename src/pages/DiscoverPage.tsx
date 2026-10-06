@@ -143,7 +143,7 @@ export const DiscoverPage: React.FC = () => {
   });
 
   return (
-    <div className="min-h-screen bg-[#0B0B0D] text-[#F2F0EC] pt-28 pb-20 px-4 sm:px-8 md:px-12 mx-auto max-w-7xl space-y-8">
+    <div className="min-h-screen bg-[#0B0B0D] text-[#F2F0EC] pt-28 pb-20 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 w-full space-y-8">
       
       <SectionHeader
         label={queryParam ? 'SEARCH RESULTS' : 'DISCOVERY'}

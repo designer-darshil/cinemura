@@ -66,7 +66,26 @@ export interface MovieCollection {
   name: string;
   poster?: string;
   backdrop?: string;
+  overview?: string;
   parts?: Movie[];
+}
+
+export interface WatchProviderItem {
+  providerId: number;
+  providerName: string;
+  logo: string;
+  displayPriority: number;
+}
+
+export interface RegionWatchProviders {
+  link?: string;
+  flatrate?: WatchProviderItem[];
+  rent?: WatchProviderItem[];
+  buy?: WatchProviderItem[];
+}
+
+export interface WatchProvidersData {
+  results: Record<string, RegionWatchProviders>;
 }
 
 export interface Movie {
@@ -108,6 +127,7 @@ export interface Movie {
   posters?: string[];
   recommendations?: Movie[];
   similar?: Movie[];
+  watchProviders?: RegionWatchProviders;
   trailerUrl?: string;
   primaryVideo?: VideoItem;
   featured?: boolean;
@@ -156,6 +176,7 @@ export interface Series {
   posters?: string[];
   recommendations?: Series[];
   similar?: Series[];
+  watchProviders?: RegionWatchProviders;
   seasons: Season[];
   trailerUrl?: string;
   primaryVideo?: VideoItem;

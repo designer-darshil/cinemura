@@ -14,6 +14,7 @@ import { SeriesEpisodesSection } from '../components/SeriesEpisodesSection';
 import { MediaVideosSection } from '../components/MediaVideosSection';
 import { MediaPhotosSection } from '../components/MediaPhotosSection';
 import { AwardsSection } from '../components/AwardsSection';
+import { WatchProvidersSection } from '../components/WatchProvidersSection';
 import { getTvAwards } from '../services/awardsService';
 import { EntityAwardsData } from '../types';
 
@@ -501,6 +502,15 @@ export const SeriesDetailPage: React.FC = () => {
             ))}
           </div>
         </section>
+      )}
+
+      {/* ==================================================
+          WHERE TO WATCH — REAL TMDB / JUSTWATCH PROVIDERS
+         ================================================== */}
+      {series.watchProviders && (
+        <div className="w-full px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16">
+          <WatchProvidersSection watchProviders={series.watchProviders} />
+        </div>
       )}
 
       {/* ==================================================

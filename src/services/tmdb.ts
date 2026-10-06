@@ -1,4 +1,4 @@
-import { Movie, Series, Person, MediaItem, Season, ProductionCompany, VideoItem } from '../types';
+import { Movie, Series, Person, MediaItem, Season, ProductionCompany, VideoItem, MovieCollection, RegionWatchProviders, WatchProviderItem } from '../types';
 import { getImageWithFallback } from '../utils/image';
 import { selectPrimaryVideo, getVideoEmbedUrl } from '../utils/trailer';
 
@@ -58,6 +58,36 @@ async function fetchFromTmdb<T>(endpoint: string, params: Record<string, string>
 export function formatCurrency(amount?: number): string | undefined {
   if (!amount || amount <= 0) return undefined;
   return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(amount);
+}
+
+// Transform TMDB raw watch providers into RegionWatchProviders contract
+export function transformWatchProviders(wpResults: any): RegionWatchProviders | undefined {
+  if (!wpResults) return undefined;
+  // Prioritize US, or fallback to first available region entry
+  const regionData = wpResults.US || Object.values(wpResults)[0] as any;
+  if (!regionData) return undefined;
+
+  const mapItem = (p: any): WatchProviderItem => ({
+    providerId: p.provider_id,
+    providerName: p.provider_name,
+    logo: getImageWithFallback(p.logo_path, 'logo', 'w185'),
+    displayPriority: p.display_priority || 0
+  });
+
+  const flatrate = regionData.flatrate?.map(mapItem) || [];
+  const rent = regionData.rent?.map(mapItem) || [];
+  const buy = regionData.buy?.map(mapItem) || [];
+
+  if (flatrate.length === 0 && rent.length === 0 && buy.length === 0) {
+    return undefined;
+  }
+
+  return {
+    link: regionData.link,
+    flatrate: flatrate.length > 0 ? flatrate : undefined,
+    rent: rent.length > 0 ? rent : undefined,
+    buy: buy.length > 0 ? buy : undefined
+  };
 }
 
 // Transform TMDB raw movie item into Movie contract
@@ -156,6 +186,7 @@ export function transformTmdbMovie(item: any): Movie {
     posters: posterImages,
     recommendations,
     similar,
+    watchProviders: transformWatchProviders(item['watch/providers']?.results || item.watch_providers?.results),
     primaryVideo: selectPrimaryVideo(videos, item.original_language || 'en') || undefined,
     trailerUrl: selectPrimaryVideo(videos, item.original_language || 'en')
       ? getVideoEmbedUrl(selectPrimaryVideo(videos, item.original_language || 'en')!)
@@ -276,6 +307,7 @@ export function transformTmdbTv(item: any): Series {
       overview: s.overview || '',
       episodes: []
     })) : [],
+    watchProviders: transformWatchProviders(item['watch/providers']?.results || item.watch_providers?.results),
     primaryVideo: selectPrimaryVideo(videos, item.original_language || 'en') || undefined,
     trailerUrl: selectPrimaryVideo(videos, item.original_language || 'en')
       ? getVideoEmbedUrl(selectPrimaryVideo(videos, item.original_language || 'en')!)
@@ -309,7 +341,14 @@ export interface MovieFilterOptions {
   sortBy?: string;
   year?: string;
   minRating?: string;
+  voteCountGte?: string;
   language?: string;
+  region?: string;
+  certification?: string;
+  certificationCountry?: string;
+  withRuntimeGte?: string;
+  withRuntimeLte?: string;
+  includeAdult?: boolean;
   page?: number;
 }
 
@@ -318,7 +357,9 @@ export interface TvFilterOptions {
   sortBy?: string;
   year?: string;
   minRating?: string;
+  voteCountGte?: string;
   language?: string;
+  includeAdult?: boolean;
   page?: number;
 }
 
@@ -335,7 +376,7 @@ export async function getMoviesList(
         page
       };
 
-  const endpoint = options.genreId || options.year || options.minRating || options.language || (options.sortBy && options.sortBy !== 'popularity.desc')
+  const endpoint = options.genreId || options.year || options.minRating || options.voteCountGte || options.language || options.certification || options.withRuntimeGte || options.withRuntimeLte || (options.sortBy && options.sortBy !== 'popularity.desc')
     ? '/discover/movie'
     : '/movie/popular';
 
@@ -347,20 +388,59 @@ export async function getMoviesList(
   if (options.sortBy) params.sort_by = options.sortBy;
   if (options.year && options.year !== 'All') params.primary_release_year = options.year;
   if (options.minRating && options.minRating !== 'All') params['vote_average.gte'] = options.minRating;
+  if (options.voteCountGte && options.voteCountGte !== 'All') params['vote_count.gte'] = options.voteCountGte;
   if (options.language && options.language !== 'All') params.with_original_language = options.language;
+  if (options.region && options.region !== 'All') params.region = options.region;
+  if (options.certification && options.certification !== 'All') {
+    params.certification_country = options.certificationCountry || 'US';
+    params.certification = options.certification;
+  }
+  if (options.withRuntimeGte) params['with_runtime.gte'] = options.withRuntimeGte;
+  if (options.withRuntimeLte) params['with_runtime.lte'] = options.withRuntimeLte;
+  if (options.includeAdult !== undefined) params.include_adult = options.includeAdult.toString();
 
   const data = await fetchFromTmdb<any>(endpoint, params);
   if (!data || !data.results) return null;
   return data.results.map(transformTmdbMovie);
 }
 
+export async function getCollection(collectionId: number | string): Promise<MovieCollection | null> {
+  if (!collectionId) return null;
+  const data = await fetchFromTmdb<any>(`/collection/${collectionId}`);
+  if (!data) return null;
+
+  return {
+    id: data.id,
+    name: data.name,
+    overview: data.overview || '',
+    poster: getImageWithFallback(data.poster_path, 'poster', 'w500'),
+    backdrop: getImageWithFallback(data.backdrop_path, 'backdrop', 'w1280'),
+    parts: data.parts ? data.parts.map(transformTmdbMovie) : []
+  };
+}
+
 export async function getMovieDetail(id: string): Promise<Movie | null> {
   if (!id) return null;
   const data = await fetchFromTmdb<any>(`/movie/${id}`, {
-    append_to_response: 'credits,videos,release_dates,keywords,recommendations,similar,images,external_ids'
+    append_to_response: 'credits,videos,release_dates,keywords,recommendations,similar,images,external_ids,watch/providers'
   });
   if (!data) return null;
-  return transformTmdbMovie(data);
+
+  const movie = transformTmdbMovie(data);
+
+  // If movie belongs to an official collection, load full collection parts
+  if (data.belongs_to_collection?.id) {
+    try {
+      const col = await getCollection(data.belongs_to_collection.id);
+      if (col) {
+        movie.collection = col;
+      }
+    } catch {
+      // Continue with base collection info
+    }
+  }
+
+  return movie;
 }
 
 export async function getTvList(
@@ -376,7 +456,7 @@ export async function getTvList(
         page
       };
 
-  const endpoint = options.genreId || options.year || options.minRating || options.language || (options.sortBy && options.sortBy !== 'popularity.desc')
+  const endpoint = options.genreId || options.year || options.minRating || options.voteCountGte || options.language || (options.sortBy && options.sortBy !== 'popularity.desc')
     ? '/discover/tv'
     : '/tv/popular';
 
@@ -388,7 +468,9 @@ export async function getTvList(
   if (options.sortBy) params.sort_by = options.sortBy;
   if (options.year && options.year !== 'All') params.first_air_date_year = options.year;
   if (options.minRating && options.minRating !== 'All') params['vote_average.gte'] = options.minRating;
+  if (options.voteCountGte && options.voteCountGte !== 'All') params['vote_count.gte'] = options.voteCountGte;
   if (options.language && options.language !== 'All') params.with_original_language = options.language;
+  if (options.includeAdult !== undefined) params.include_adult = options.includeAdult.toString();
 
   const data = await fetchFromTmdb<any>(endpoint, params);
   if (!data || !data.results) return null;
@@ -398,7 +480,7 @@ export async function getTvList(
 export async function getTvDetail(id: string): Promise<Series | null> {
   if (!id) return null;
   const data = await fetchFromTmdb<any>(`/tv/${id}`, {
-    append_to_response: 'credits,videos,content_ratings,keywords,recommendations,similar,images,external_ids'
+    append_to_response: 'credits,videos,content_ratings,keywords,recommendations,similar,images,external_ids,watch/providers'
   });
   if (!data) return null;
   return transformTmdbTv(data);

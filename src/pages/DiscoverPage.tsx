@@ -13,6 +13,7 @@ import {
   EndOfContentState
 } from '../components/StateViews';
 import { useInfiniteScroll } from '../hooks/useInfiniteScroll';
+import { DiscoveryFilters, FilterState } from '../components/DiscoveryFilters';
 
 export const DiscoverPage: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -24,6 +25,15 @@ export const DiscoverPage: React.FC = () => {
   const [genres, setGenres] = useState<GenreItem[]>([]);
   const [searchResults, setSearchResults] = useState<{ movies: Movie[]; series: Series[]; people: Person[] } | null>(null);
 
+  const [filterState, setFilterState] = useState<FilterState>({
+    sortBy: 'popularity.desc',
+    year: 'All',
+    minRating: 'All',
+    voteCountGte: 'All',
+    language: 'All',
+    certification: 'All'
+  });
+
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
@@ -33,7 +43,7 @@ export const DiscoverPage: React.FC = () => {
 
   const requestIdRef = React.useRef<number>(0);
 
-  // Perform search query when q searchParam is present
+  // Perform search query when q searchParam is present, or discover filtering
   useEffect(() => {
     const currentReqId = ++requestIdRef.current;
     if (queryParam.trim()) {
@@ -59,7 +69,7 @@ export const DiscoverPage: React.FC = () => {
       setPage(1);
       fetchDiscoveryData(1, false, currentReqId);
     }
-  }, [queryParam, genreParam]);
+  }, [queryParam, genreParam, filterState]);
 
   const fetchDiscoveryData = async (targetPage: number = 1, append: boolean = false, existingReqId?: number) => {
     if (queryParam.trim()) return;
@@ -75,9 +85,30 @@ export const DiscoverPage: React.FC = () => {
     }
 
     try {
+      const movieOptions = {
+        genreId: genreParam !== 'All' ? genreParam : undefined,
+        sortBy: filterState.sortBy,
+        year: filterState.year !== 'All' ? filterState.year : undefined,
+        minRating: filterState.minRating !== 'All' ? filterState.minRating : undefined,
+        voteCountGte: filterState.voteCountGte !== 'All' ? filterState.voteCountGte : undefined,
+        language: filterState.language !== 'All' ? filterState.language : undefined,
+        certification: filterState.certification !== 'All' ? filterState.certification : undefined,
+        page: targetPage
+      };
+
+      const tvOptions = {
+        genreId: genreParam !== 'All' ? genreParam : undefined,
+        sortBy: filterState.sortBy,
+        year: filterState.year !== 'All' ? filterState.year : undefined,
+        minRating: filterState.minRating !== 'All' ? filterState.minRating : undefined,
+        voteCountGte: filterState.voteCountGte !== 'All' ? filterState.voteCountGte : undefined,
+        language: filterState.language !== 'All' ? filterState.language : undefined,
+        page: targetPage
+      };
+
       const [movies, tvShows, genreList] = await Promise.all([
-        getMoviesList(genreParam !== 'All' ? genreParam : undefined, 'popularity.desc', targetPage),
-        getTvList(genreParam !== 'All' ? genreParam : undefined, 'popularity.desc', targetPage),
+        getMoviesList(movieOptions),
+        getTvList(tvOptions),
         genres.length === 0 ? getMovieGenres() : Promise.resolve(genres)
       ]);
 
@@ -198,6 +229,22 @@ export const DiscoverPage: React.FC = () => {
               ))}
             </div>
           )}
+
+          {/* Real TMDb Discovery Filters */}
+          <DiscoveryFilters
+            filters={filterState}
+            onChange={(updated) => setFilterState(prev => ({ ...prev, ...updated }))}
+            onReset={() =>
+              setFilterState({
+                sortBy: 'popularity.desc',
+                year: 'All',
+                minRating: 'All',
+                voteCountGte: 'All',
+                language: 'All',
+                certification: 'All'
+              })
+            }
+          />
         </div>
       )}
 

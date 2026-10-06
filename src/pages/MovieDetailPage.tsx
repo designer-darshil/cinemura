@@ -13,6 +13,7 @@ import { DetailMediaNav } from '../components/DetailMediaNav';
 import { MediaVideosSection } from '../components/MediaVideosSection';
 import { MediaPhotosSection } from '../components/MediaPhotosSection';
 import { AwardsSection } from '../components/AwardsSection';
+import { WatchProvidersSection } from '../components/WatchProvidersSection';
 import { getMovieAwards } from '../services/awardsService';
 import { EntityAwardsData } from '../types';
 
@@ -426,7 +427,7 @@ export const MovieDetailPage: React.FC = () => {
           
           <SectionHeader
             label="FRANCHISE ARCHIVE"
-            title="PART OF THE COLLECTION"
+            title="COLLECTION"
           />
 
           <div className="relative bg-[#111114] border border-white/10 p-6 sm:p-8 flex flex-col md:flex-row items-center gap-6 overflow-hidden">
@@ -445,19 +446,44 @@ export const MovieDetailPage: React.FC = () => {
               />
             </div>
             <div className="relative z-10 space-y-2 text-center md:text-left">
-              <span className="text-[10px] font-mono tracking-[0.2em] text-[#E43D3D] uppercase block">
+              <span className="text-[10px] font-mono tracking-[0.2em] text-[#E43D3D] uppercase block font-bold">
                 OFFICIAL TMDb COLLECTION
               </span>
               <h3 className="text-xl sm:text-2xl font-serif font-bold text-[#F2F0EC]">
                 {movie.collection.name}
               </h3>
-              <p className="text-xs font-mono text-[#8E8E93]">
-                Explore related titles within this cinematic universe.
-              </p>
+              {movie.collection.overview && (
+                <p className="text-xs font-mono text-[#8E8E93] max-w-2xl line-clamp-3">
+                  {movie.collection.overview}
+                </p>
+              )}
             </div>
           </div>
 
+          {/* All Collection Titles using shared Movie card component */}
+          {movie.collection.parts && movie.collection.parts.length > 0 && (
+            <div className="space-y-3 pt-4">
+              <span className="text-[10px] font-mono tracking-widest text-[#8E8E93] uppercase font-bold block">
+                TITLES IN THIS COLLECTION ({movie.collection.parts.length})
+              </span>
+              <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4">
+                {movie.collection.parts.map(part => (
+                  <MediaCard key={part.id} item={part} variant="poster" />
+                ))}
+              </div>
+            </div>
+          )}
+
         </section>
+      )}
+
+      {/* ==================================================
+          WHERE TO WATCH — REAL TMDB / JUSTWATCH PROVIDERS
+         ================================================== */}
+      {movie.watchProviders && (
+        <div className="w-full px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16">
+          <WatchProvidersSection watchProviders={movie.watchProviders} />
+        </div>
       )}
 
       {/* ==================================================

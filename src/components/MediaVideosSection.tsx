@@ -2,23 +2,27 @@ import React, { useState, useMemo } from 'react';
 import { Play } from 'lucide-react';
 import { VideoItem } from '../types';
 import { useApp } from '../context/AppContext';
+import { VideosGridSkeleton } from './StateViews';
 
 interface MediaVideosSectionProps {
   videos: VideoItem[];
   parentTitle: string;
   id?: string;
+  loading?: boolean;
 }
 
 export const MediaVideosSection: React.FC<MediaVideosSectionProps> = ({
   videos,
   parentTitle,
-  id = 'videos-section'
+  id = 'videos-section',
+  loading = false
 }) => {
   const { openVideoPlayer } = useApp();
   const [selectedType, setSelectedType] = useState<string>('ALL');
 
   // Dynamically derive available video types strictly from real API data
   const availableTypes = useMemo(() => {
+    if (!videos) return [];
     const types = new Set<string>();
     videos.forEach((v) => {
       if (v.type && v.type.trim()) {
@@ -30,11 +34,20 @@ export const MediaVideosSection: React.FC<MediaVideosSectionProps> = ({
 
   // Filter videos based on selection
   const filteredVideos = useMemo(() => {
+    if (!videos) return [];
     if (selectedType === 'ALL') return videos;
     return videos.filter(
       (v) => (v.type || '').trim().toLowerCase() === selectedType.toLowerCase()
     );
   }, [videos, selectedType]);
+
+  if (loading) {
+    return (
+      <section id={id} className="scroll-mt-28">
+        <VideosGridSkeleton count={4} />
+      </section>
+    );
+  }
 
   if (!videos || videos.length === 0) return null;
 

@@ -38,7 +38,10 @@ export const MoviesPage: React.FC = () => {
     }
   }, [genreIdParam]);
 
+  const requestIdRef = React.useRef<number>(0);
+
   const fetchMovies = async (targetPage: number = 1, append: boolean = false) => {
+    const currentReqId = ++requestIdRef.current;
     if (append) {
       setLoadingMore(true);
       setErrorMore(false);
@@ -52,6 +55,8 @@ export const MoviesPage: React.FC = () => {
         getMoviesList(selectedGenre !== 'All' ? selectedGenre : undefined, sortBy, targetPage),
         genres.length === 0 ? getMovieGenres() : Promise.resolve(genres)
       ]);
+
+      if (currentReqId !== requestIdRef.current) return; // Discard stale response
 
       if (!movieData || movieData.length === 0) {
         if (!append) setError(true);
@@ -72,6 +77,7 @@ export const MoviesPage: React.FC = () => {
         }
       }
     } catch (err) {
+      if (currentReqId !== requestIdRef.current) return;
       console.error('Failed to load movies', err);
       if (append) {
         setErrorMore(true);
@@ -79,8 +85,10 @@ export const MoviesPage: React.FC = () => {
         setError(true);
       }
     } finally {
-      setLoading(false);
-      setLoadingMore(false);
+      if (currentReqId === requestIdRef.current) {
+        setLoading(false);
+        setLoadingMore(false);
+      }
     }
   };
 

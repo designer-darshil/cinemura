@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Play, Star, ArrowUpRight } from 'lucide-react';
 import { MediaItem } from '../types';
 import { useApp } from '../context/AppContext';
+import { getImageWithFallback } from '../utils/image';
 
 interface MediaCardProps {
   item: MediaItem;
@@ -19,6 +20,11 @@ export const MediaCard: React.FC<MediaCardProps> = ({
   const detailPath = item.type === 'movie' ? `/movie/${item.id}` : `/tv/${item.id}`;
   const effectiveRatio = aspectRatio || (variant === 'horizontal' ? 'backdrop' : 'poster');
 
+  const [imageLoaded, setImageLoaded] = useState(false);
+  const [imgSrc, setImgSrc] = useState(
+    effectiveRatio === 'poster' ? (item.poster || item.backdrop) : (item.backdrop || item.poster)
+  );
+
   const handleTrailerClick = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
@@ -27,16 +33,27 @@ export const MediaCard: React.FC<MediaCardProps> = ({
     }
   };
 
+  const handleImageError = () => {
+    const fallback = getImageWithFallback(null, effectiveRatio === 'poster' ? 'poster' : 'backdrop');
+    setImgSrc(fallback);
+    setImageLoaded(true);
+  };
+
   // Variant 3: Large Editorial Feature Card
   if (variant === 'editorial') {
     return (
       <div className="hidden group relative bg-[#111114] border border-white/10 hover:border-[#E43D3D] transition-all duration-300 transform hover:-translate-y-1 grid grid-cols-1 lg:grid-cols-12 overflow-hidden">
-        <div className="lg:col-span-7 relative min-h-[300px] bg-black overflow-hidden">
+        <div className="lg:col-span-7 relative min-h-[300px] bg-[#141418] overflow-hidden">
+          {!imageLoaded && <div className="absolute inset-0 skeleton-pulse" />}
           <img
-            src={item.backdrop || item.poster}
+            src={imgSrc}
             alt={item.title}
             loading="lazy"
-            className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
+            onLoad={() => setImageLoaded(true)}
+            onError={handleImageError}
+            className={`w-full h-full object-cover transition-all duration-500 ease-out group-hover:scale-105 ${
+              imageLoaded ? 'opacity-100' : 'opacity-0'
+            }`}
           />
           <div className="absolute inset-0 bg-gradient-to-t from-[#111114] via-transparent to-black/40 opacity-80" />
           
@@ -102,14 +119,18 @@ export const MediaCard: React.FC<MediaCardProps> = ({
       tabIndex={0}
       className="group relative bg-[#111114] border border-white/10 hover:border-[#E43D3D] focus:outline-none focus:ring-1 focus:ring-[#E43D3D] transition-all duration-300 transform hover:-translate-y-1 flex flex-col justify-between overflow-hidden"
     >
-      
-      {/* 2:3 Aspect Image Container */}
-      <div className={`relative w-full overflow-hidden bg-black ${effectiveRatio === 'poster' ? 'aspect-[2/3]' : 'aspect-[16/9]'}`}>
+      {/* Aspect Image Container */}
+      <div className={`relative w-full overflow-hidden bg-[#141418] ${effectiveRatio === 'poster' ? 'aspect-[2/3]' : 'aspect-[16/9]'}`}>
+        {!imageLoaded && <div className="absolute inset-0 skeleton-pulse" />}
         <img
-          src={effectiveRatio === 'poster' ? item.poster : item.backdrop}
+          src={imgSrc}
           alt={item.title}
           loading="lazy"
-          className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
+          onLoad={() => setImageLoaded(true)}
+          onError={handleImageError}
+          className={`w-full h-full object-cover transition-all duration-500 ease-out group-hover:scale-105 ${
+            imageLoaded ? 'opacity-100' : 'opacity-0'
+          }`}
         />
 
         <div className="absolute inset-0 bg-gradient-to-t from-[#111114] via-transparent to-black/20 opacity-60 group-hover:opacity-80 transition-opacity" />
@@ -150,7 +171,6 @@ export const MediaCard: React.FC<MediaCardProps> = ({
           </div>
         </div>
       </div>
-
     </Link>
   );
 };
@@ -165,18 +185,31 @@ export interface CastCardProps {
 }
 
 export const CastCard: React.FC<CastCardProps> = ({ name, character, image, slug }) => {
+  const [loaded, setLoaded] = useState(false);
+  const [src, setSrc] = useState(image);
+
+  const handleError = () => {
+    setSrc(getImageWithFallback(null, 'profile'));
+    setLoaded(true);
+  };
+
   return (
     <Link
       to={`/person/${slug}`}
       tabIndex={0}
       className="group relative bg-[#111114] border border-white/10 hover:border-[#E43D3D] focus:outline-none focus:ring-1 focus:ring-[#E43D3D] transition-all duration-300 transform hover:-translate-y-1 flex flex-col justify-between overflow-hidden"
     >
-      <div className="relative w-full aspect-[2/3] overflow-hidden bg-black">
+      <div className="relative w-full aspect-[2/3] overflow-hidden bg-[#141418]">
+        {!loaded && <div className="absolute inset-0 skeleton-pulse" />}
         <img
-          src={image}
+          src={src}
           alt={name}
           loading="lazy"
-          className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
+          onLoad={() => setLoaded(true)}
+          onError={handleError}
+          className={`w-full h-full object-cover transition-all duration-500 ease-out group-hover:scale-105 ${
+            loaded ? 'opacity-100' : 'opacity-0'
+          }`}
         />
         <div className="absolute inset-0 bg-gradient-to-t from-[#111114] via-transparent to-black/20 opacity-60 group-hover:opacity-80 transition-opacity" />
       </div>
@@ -207,18 +240,31 @@ export interface PersonCardProps {
 }
 
 export const PersonCard: React.FC<PersonCardProps> = ({ name, role, knownFor, portrait, slug }) => {
+  const [loaded, setLoaded] = useState(false);
+  const [src, setSrc] = useState(portrait);
+
+  const handleError = () => {
+    setSrc(getImageWithFallback(null, 'profile'));
+    setLoaded(true);
+  };
+
   return (
     <Link
       to={`/person/${slug}`}
       tabIndex={0}
       className="group relative bg-[#111114] border border-white/10 hover:border-[#E43D3D] focus:outline-none focus:ring-1 focus:ring-[#E43D3D] transition-all duration-300 transform hover:-translate-y-1 flex flex-col justify-between overflow-hidden"
     >
-      <div className="relative w-full aspect-[2/3] overflow-hidden bg-black">
+      <div className="relative w-full aspect-[2/3] overflow-hidden bg-[#141418]">
+        {!loaded && <div className="absolute inset-0 skeleton-pulse" />}
         <img
-          src={portrait}
+          src={src}
           alt={name}
           loading="lazy"
-          className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
+          onLoad={() => setLoaded(true)}
+          onError={handleError}
+          className={`w-full h-full object-cover transition-all duration-500 ease-out group-hover:scale-105 ${
+            loaded ? 'opacity-100' : 'opacity-0'
+          }`}
         />
         <div className="absolute inset-0 bg-gradient-to-t from-[#111114] via-transparent to-black/20 opacity-60 group-hover:opacity-80 transition-opacity" />
         {role && (

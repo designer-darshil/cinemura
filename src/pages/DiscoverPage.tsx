@@ -31,30 +31,40 @@ export const DiscoverPage: React.FC = () => {
   const [errorMore, setErrorMore] = useState(false);
   const [hasMore, setHasMore] = useState(true);
 
+  const requestIdRef = React.useRef<number>(0);
+
   // Perform search query when q searchParam is present
   useEffect(() => {
+    const currentReqId = ++requestIdRef.current;
     if (queryParam.trim()) {
       setLoading(true);
       setError(false);
       searchTmdb(queryParam.trim())
         .then(res => {
+          if (currentReqId !== requestIdRef.current) return;
           setSearchResults(res);
-          setLoading(false);
         })
         .catch(err => {
+          if (currentReqId !== requestIdRef.current) return;
           console.error('Dedicated search failed', err);
           setError(true);
-          setLoading(false);
+        })
+        .finally(() => {
+          if (currentReqId === requestIdRef.current) {
+            setLoading(false);
+          }
         });
     } else {
       setSearchResults(null);
       setPage(1);
-      fetchDiscoveryData(1, false);
+      fetchDiscoveryData(1, false, currentReqId);
     }
   }, [queryParam, genreParam]);
 
-  const fetchDiscoveryData = async (targetPage: number = 1, append: boolean = false) => {
+  const fetchDiscoveryData = async (targetPage: number = 1, append: boolean = false, existingReqId?: number) => {
     if (queryParam.trim()) return;
+
+    const currentReqId = existingReqId || ++requestIdRef.current;
 
     if (append) {
       setLoadingMore(true);
@@ -70,6 +80,8 @@ export const DiscoverPage: React.FC = () => {
         getTvList(genreParam !== 'All' ? genreParam : undefined, 'popularity.desc', targetPage),
         genres.length === 0 ? getMovieGenres() : Promise.resolve(genres)
       ]);
+
+      if (currentReqId !== requestIdRef.current) return; // Discard stale response
 
       if (!movies && !tvShows) {
         if (!append) setError(true);
@@ -96,6 +108,7 @@ export const DiscoverPage: React.FC = () => {
         }
       }
     } catch (err) {
+      if (currentReqId !== requestIdRef.current) return;
       console.error('Failed to load discovery page data', err);
       if (append) {
         setErrorMore(true);
@@ -103,8 +116,10 @@ export const DiscoverPage: React.FC = () => {
         setError(true);
       }
     } finally {
-      setLoading(false);
-      setLoadingMore(false);
+      if (currentReqId === requestIdRef.current) {
+        setLoading(false);
+        setLoadingMore(false);
+      }
     }
   };
 

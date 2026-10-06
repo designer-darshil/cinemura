@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Star, Clock, Calendar, Film } from 'lucide-react';
 import { Season, Episode } from '../types';
 import { getTvSeasonDetail } from '../services/tmdb';
+import { EpisodeCardSkeleton } from './StateViews';
 
 interface SeriesEpisodesSectionProps {
   seriesId: string;
@@ -24,11 +25,13 @@ export const SeriesEpisodesSection: React.FC<SeriesEpisodesSectionProps> = ({
   const [selectedSeasonNumber, setSelectedSeasonNumber] = useState<number>(initialSeasonNum);
   const [episodes, setEpisodes] = useState<Episode[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
+  const activeSeasonRef = useRef<number>(initialSeasonNum);
 
-  // Fetch season episodes with client-side caching
+  // Fetch season episodes with client-side caching & race-condition safety
   useEffect(() => {
     if (!seriesId) return;
 
+    activeSeasonRef.current = selectedSeasonNumber;
     const cacheKey = `${seriesId}_season_${selectedSeasonNumber}`;
 
     if (episodeCache.current.has(cacheKey)) {
@@ -37,12 +40,13 @@ export const SeriesEpisodesSection: React.FC<SeriesEpisodesSectionProps> = ({
       return;
     }
 
-    let isMounted = true;
+    const targetSeason = selectedSeasonNumber;
     setLoading(true);
 
-    getTvSeasonDetail(seriesId, selectedSeasonNumber)
+    getTvSeasonDetail(seriesId, targetSeason)
       .then((data) => {
-        if (!isMounted) return;
+        // Discard stale responses if user clicked another season
+        if (activeSeasonRef.current !== targetSeason) return;
         const eps = data?.episodes || [];
         episodeCache.current.set(cacheKey, eps);
         setEpisodes(eps);
@@ -51,17 +55,16 @@ export const SeriesEpisodesSection: React.FC<SeriesEpisodesSectionProps> = ({
         console.error('Failed to load season episodes', err);
       })
       .finally(() => {
-        if (isMounted) setLoading(false);
+        if (activeSeasonRef.current === targetSeason) {
+          setLoading(false);
+        }
       });
-
-    return () => {
-      isMounted = false;
-    };
   }, [seriesId, selectedSeasonNumber]);
 
   if (!seasons || seasons.length === 0) return null;
 
   return (
+    <>
     <section id={id} className="space-y-6 scroll-mt-28">
       {/* Header Bar */}
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-white/10 pb-4">
@@ -110,14 +113,7 @@ export const SeriesEpisodesSection: React.FC<SeriesEpisodesSectionProps> = ({
       {loading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {Array.from({ length: 6 }).map((_, i) => (
-            <div key={i} className="bg-[#111114] border border-white/10 animate-pulse flex flex-col">
-              <div className="aspect-video bg-white/5 w-full" />
-              <div className="p-3 space-y-2">
-                <div className="h-4 bg-white/10 w-2/3" />
-                <div className="h-3 bg-white/5 w-1/2" />
-                <div className="h-10 bg-white/5 w-full" />
-              </div>
-            </div>
+            <EpisodeCardSkeleton key={`ep-skel-${i}`} />
           ))}
         </div>
       ) : episodes.length === 0 ? (
@@ -128,7 +124,7 @@ export const SeriesEpisodesSection: React.FC<SeriesEpisodesSectionProps> = ({
         </div>
       ) : (
         /* Dense Multi-Column Responsive Episode Grid for Fast Scanning */
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 animate-fadeIn">
           {episodes.map((ep) => {
             const hasStill = ep.stillImage && !ep.stillImage.includes('placeholder');
             const epNumFormatted = `E${String(ep.episodeNumber).padStart(2, '0')}`;
@@ -139,7 +135,7 @@ export const SeriesEpisodesSection: React.FC<SeriesEpisodesSectionProps> = ({
                 className="group relative bg-[#111114] border border-white/10 hover:border-[#E43D3D] transition-all duration-300 flex flex-col justify-between overflow-hidden shadow-md"
               >
                 {/* 16:9 Episode Still */}
-                <div className="relative aspect-video w-full bg-black overflow-hidden flex items-center justify-center">
+                <div className="relative aspect-video w-full bg-[#141418] overflow-hidden flex items-center justify-center">
                   {hasStill ? (
                     <img
                       src={ep.stillImage}
@@ -218,5 +214,6 @@ export const SeriesEpisodesSection: React.FC<SeriesEpisodesSectionProps> = ({
         </div>
       )}
     </section>
+    </>
   );
 };

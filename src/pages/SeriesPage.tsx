@@ -42,8 +42,11 @@ export const SeriesPage: React.FC = () => {
     }
   }, [genreIdParam]);
 
+  const requestIdRef = React.useRef<number>(0);
+
   // Load initial catalog data & trending TV rail
   const fetchSeries = async (targetPage: number = 1, append: boolean = false) => {
+    const currentReqId = ++requestIdRef.current;
     if (append) {
       setLoadingMore(true);
       setErrorMore(false);
@@ -58,6 +61,8 @@ export const SeriesPage: React.FC = () => {
         genres.length === 0 ? getTvGenres() : Promise.resolve(genres),
         targetPage === 1 && trendingSeries.length === 0 ? getTrendingMedia() : Promise.resolve(null)
       ]);
+
+      if (currentReqId !== requestIdRef.current) return; // Discard stale response
 
       if (!tvData || tvData.length === 0) {
         if (!append) setError(true);
@@ -84,6 +89,7 @@ export const SeriesPage: React.FC = () => {
         }
       }
     } catch (err) {
+      if (currentReqId !== requestIdRef.current) return;
       console.error('Failed to load TV series', err);
       if (append) {
         setErrorMore(true);
@@ -91,8 +97,10 @@ export const SeriesPage: React.FC = () => {
         setError(true);
       }
     } finally {
-      setLoading(false);
-      setLoadingMore(false);
+      if (currentReqId === requestIdRef.current) {
+        setLoading(false);
+        setLoadingMore(false);
+      }
     }
   };
 

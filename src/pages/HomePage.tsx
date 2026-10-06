@@ -15,7 +15,7 @@ import { HorizontalRail } from '../components/HorizontalRail';
 import { SectionHeader } from '../components/SectionHeader';
 import { GenreDiscovery } from '../components/GenreDiscovery';
 import { useApp } from '../context/AppContext';
-import { DetailHeroSkeleton, ErrorState } from '../components/StateViews';
+import { HomePageSkeleton, ErrorState } from '../components/StateViews';
 import { selectPrimaryVideo, sortVideosWithPrimaryFirst, getVideoButtonLabel } from '../utils/trailer';
 
 const LAST_HERO_SESSION_KEY = 'cinemura_last_hero_id';
@@ -35,6 +35,7 @@ export const HomePage: React.FC = () => {
   const loadLiveData = async () => {
     setLoading(true);
     setError(false);
+    let isMounted = true;
     try {
       // 1 & 2. Fetch real TMDb Trending Movies and Trending TV results in parallel
       const [tMovies, tSeries, popMovies, popSeries] = await Promise.all([
@@ -51,8 +52,10 @@ export const HomePage: React.FC = () => {
       const combinedCandidates: MediaItem[] = [...validMovies, ...validSeries];
 
       if (combinedCandidates.length === 0 && !popMovies && !popSeries) {
-        setError(true);
-        setLoading(false);
+        if (isMounted) {
+          setError(true);
+          setLoading(false);
+        }
         return;
       }
 
@@ -97,11 +100,23 @@ export const HomePage: React.FC = () => {
           fullHeroDetail = selectedCandidate;
         }
 
+        // Verify required image is preloaded before transition
+        if (fullHeroDetail?.backdrop) {
+          await new Promise<void>((resolve) => {
+            const preloader = new Image();
+            preloader.src = fullHeroDetail!.backdrop;
+            preloader.onload = () => resolve();
+            preloader.onerror = () => resolve(); // proceed gracefully
+          });
+        }
+
         // Remember selected hero ID for the session to prevent immediate repeats
         if (fullHeroDetail?.id) {
           sessionStorage.setItem(LAST_HERO_SESSION_KEY, fullHeroDetail.id);
         }
       }
+
+      if (!isMounted) return;
 
       // 7. Store states; render happens once with full detail
       setHeroItem(fullHeroDetail);
@@ -111,9 +126,9 @@ export const HomePage: React.FC = () => {
       setPopularSeries(popSeries || []);
     } catch (err) {
       console.error('Failed to load homepage live data', err);
-      setError(true);
+      if (isMounted) setError(true);
     } finally {
-      setLoading(false);
+      if (isMounted) setLoading(false);
     }
   };
 
@@ -122,11 +137,7 @@ export const HomePage: React.FC = () => {
   }, []);
 
   if (loading) {
-    return (
-      <div className="min-h-screen bg-[#0B0B0D] text-[#F2F0EC] pt-24 pb-16 px-4 sm:px-8 mx-auto">
-        <DetailHeroSkeleton />
-      </div>
-    );
+    return <HomePageSkeleton />;
   }
 
   if (error || !heroItem) {

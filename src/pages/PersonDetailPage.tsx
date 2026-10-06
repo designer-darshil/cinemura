@@ -4,7 +4,7 @@ import { Calendar, MapPin, ArrowLeft, ArrowUpRight, Award, ExternalLink } from '
 import { getPersonDetail } from '../services/tmdb';
 import { Person } from '../types';
 import { SectionHeader } from '../components/SectionHeader';
-import { DetailHeroSkeleton, ErrorState } from '../components/StateViews';
+import { PersonDetailSkeleton, ErrorState } from '../components/StateViews';
 
 export const PersonDetailPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -13,37 +13,48 @@ export const PersonDetailPage: React.FC = () => {
   const [filmoFilter, setFilmoFilter] = useState<'all' | 'movie' | 'tv'>('all');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
+  const activeSlugRef = React.useRef<string | undefined>(slug);
 
   const fetchPersonDetail = async () => {
     if (!slug) return;
+    activeSlugRef.current = slug;
     setLoading(true);
     setError(false);
     try {
       const data = await getPersonDetail(slug);
+      if (activeSlugRef.current !== slug) return; // Stale request guard
+
       if (!data) {
         setError(true);
       } else {
+        // Pre-verify portrait image is loaded before transitioning
+        if (data.portrait) {
+          await new Promise<void>((resolve) => {
+            const preloader = new Image();
+            preloader.src = data.portrait;
+            preloader.onload = () => resolve();
+            preloader.onerror = () => resolve();
+          });
+        }
+        if (activeSlugRef.current !== slug) return;
         setPerson(data);
       }
     } catch (err) {
       console.error('Failed to load person detail', err);
-      setError(true);
+      if (activeSlugRef.current === slug) setError(true);
     } finally {
-      setLoading(false);
+      if (activeSlugRef.current === slug) setLoading(false);
     }
   };
 
   useEffect(() => {
+    activeSlugRef.current = slug;
     fetchPersonDetail();
     window.scrollTo(0, 0);
   }, [slug]);
 
   if (loading) {
-    return (
-      <div className="min-h-screen bg-[#0B0B0D] text-[#F2F0EC] pt-28 pb-20 px-4 sm:px-8 mx-auto">
-        <DetailHeroSkeleton />
-      </div>
-    );
+    return <PersonDetailSkeleton />;
   }
 
   if (error || !person) {

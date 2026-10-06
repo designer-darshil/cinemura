@@ -2,15 +2,18 @@ import React, { useRef, useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { ChevronLeft, ChevronRight, ArrowUpRight } from 'lucide-react';
 import { CastMember } from '../types';
+import { CastRailSkeleton } from './StateViews';
 
 interface CastCarouselProps {
   cast: CastMember[];
   title?: string;
+  loading?: boolean;
 }
 
 export const CastCarousel: React.FC<CastCarouselProps> = ({
   cast,
-  title = 'CAST'
+  title = 'CAST',
+  loading = false
 }) => {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
@@ -25,6 +28,7 @@ export const CastCarousel: React.FC<CastCarouselProps> = ({
   };
 
   useEffect(() => {
+    if (loading) return;
     checkScroll();
     const el = scrollContainerRef.current;
     if (!el) return;
@@ -36,7 +40,7 @@ export const CastCarousel: React.FC<CastCarouselProps> = ({
       el.removeEventListener('scroll', checkScroll);
       window.removeEventListener('resize', checkScroll);
     };
-  }, [cast]);
+  }, [cast, loading]);
 
   const handleScrollLeft = () => {
     if (scrollContainerRef.current) {
@@ -49,6 +53,10 @@ export const CastCarousel: React.FC<CastCarouselProps> = ({
       scrollContainerRef.current.scrollBy({ left: 420, behavior: 'smooth' });
     }
   };
+
+  if (loading) {
+    return <CastRailSkeleton title={title} count={7} />;
+  }
 
   if (!cast || cast.length === 0) return null;
 

@@ -1,18 +1,21 @@
 import React, { useState } from 'react';
 import { PhotoLightboxModal } from './PhotoLightboxModal';
+import { PhotosGallerySkeleton } from './StateViews';
 
 interface MediaPhotosSectionProps {
   backdrops?: string[];
   posters?: string[];
   parentTitle: string;
   id?: string;
+  loading?: boolean;
 }
 
 export const MediaPhotosSection: React.FC<MediaPhotosSectionProps> = ({
   backdrops = [],
   posters = [],
   parentTitle,
-  id = 'photos-section'
+  id = 'photos-section',
+  loading = false
 }) => {
   const [lightboxImages, setLightboxImages] = useState<string[]>([]);
   const [lightboxIndex, setLightboxIndex] = useState<number>(0);
@@ -21,6 +24,14 @@ export const MediaPhotosSection: React.FC<MediaPhotosSectionProps> = ({
 
   const hasBackdrops = backdrops.length > 0;
   const hasPosters = posters.length > 0;
+
+  if (loading) {
+    return (
+      <section id={id} className="scroll-mt-28">
+        <PhotosGallerySkeleton />
+      </section>
+    );
+  }
 
   if (!hasBackdrops && !hasPosters) return null;
 

@@ -7,7 +7,7 @@ import { useApp } from '../context/AppContext';
 import { selectPrimaryVideo, sortVideosWithPrimaryFirst, getVideoButtonLabel } from '../utils/trailer';
 import { MediaCard, PersonCard } from '../components/MediaCard';
 import { SectionHeader } from '../components/SectionHeader';
-import { DetailHeroSkeleton, ErrorState } from '../components/StateViews';
+import { SeriesDetailPageSkeleton, ErrorState } from '../components/StateViews';
 import { CastCarousel } from '../components/CastCarousel';
 import { DetailMediaNav } from '../components/DetailMediaNav';
 import { SeriesEpisodesSection } from '../components/SeriesEpisodesSection';
@@ -21,37 +21,48 @@ export const SeriesDetailPage: React.FC = () => {
   const [series, setSeries] = useState<Series | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
+  const activeSlugRef = React.useRef<string | undefined>(slug);
 
   const fetchSeriesDetail = async () => {
     if (!slug) return;
+    activeSlugRef.current = slug;
     setLoading(true);
     setError(false);
     try {
       const data = await getTvDetail(slug);
+      if (activeSlugRef.current !== slug) return; // Stale request guard
+
       if (!data) {
         setError(true);
       } else {
+        // Pre-verify hero backdrop is loaded before transitioning
+        if (data.backdrop) {
+          await new Promise<void>((resolve) => {
+            const preloader = new Image();
+            preloader.src = data.backdrop;
+            preloader.onload = () => resolve();
+            preloader.onerror = () => resolve();
+          });
+        }
+        if (activeSlugRef.current !== slug) return;
         setSeries(data);
       }
     } catch (err) {
       console.error('Failed to load series detail', err);
-      setError(true);
+      if (activeSlugRef.current === slug) setError(true);
     } finally {
-      setLoading(false);
+      if (activeSlugRef.current === slug) setLoading(false);
     }
   };
 
   useEffect(() => {
+    activeSlugRef.current = slug;
     fetchSeriesDetail();
     window.scrollTo(0, 0);
   }, [slug]);
 
   if (loading) {
-    return (
-      <div className="min-h-screen bg-[#0B0B0D] text-[#F2F0EC] pt-28 pb-20 px-4 sm:px-8 mx-auto">
-        <DetailHeroSkeleton />
-      </div>
-    );
+    return <SeriesDetailPageSkeleton />;
   }
 
   if (error || !series) {

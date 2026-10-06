@@ -22,7 +22,10 @@ export const PeoplePage: React.FC = () => {
   const [errorMore, setErrorMore] = useState(false);
   const [hasMore, setHasMore] = useState(true);
 
+  const requestIdRef = React.useRef<number>(0);
+
   const fetchPeopleList = async (targetPage: number = 1, append: boolean = false) => {
+    const currentReqId = ++requestIdRef.current;
     if (append) {
       setLoadingMore(true);
       setErrorMore(false);
@@ -33,6 +36,8 @@ export const PeoplePage: React.FC = () => {
 
     try {
       const data = await getPopularPeople(targetPage);
+      if (currentReqId !== requestIdRef.current) return; // Discard stale response
+
       if (!data || data.length === 0) {
         if (!append) setError(true);
         setHasMore(false);
@@ -49,6 +54,7 @@ export const PeoplePage: React.FC = () => {
         setHasMore(data.length >= 10);
       }
     } catch (err) {
+      if (currentReqId !== requestIdRef.current) return;
       console.error('Failed to load popular people', err);
       if (append) {
         setErrorMore(true);
@@ -56,8 +62,10 @@ export const PeoplePage: React.FC = () => {
         setError(true);
       }
     } finally {
-      setLoading(false);
-      setLoadingMore(false);
+      if (currentReqId === requestIdRef.current) {
+        setLoading(false);
+        setLoadingMore(false);
+      }
     }
   };
 

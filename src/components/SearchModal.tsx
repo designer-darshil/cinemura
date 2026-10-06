@@ -79,6 +79,7 @@ export const SearchModal: React.FC = () => {
     }
 
     setSearching(true);
+    setResults({ movies: [], series: [], people: [] });
     const currentRequestId = ++requestIdRef.current;
 
     const timer = setTimeout(async () => {

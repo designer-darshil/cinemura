@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { Calendar, MapPin, ArrowLeft, ArrowUpRight, Award, ExternalLink } from 'lucide-react';
+import { Calendar, MapPin, ArrowLeft, ArrowUpRight, TrendingUp, ExternalLink } from 'lucide-react';
 import { getPersonDetail } from '../services/tmdb';
 import { Person } from '../types';
 import { SectionHeader } from '../components/SectionHeader';
@@ -149,7 +149,7 @@ export const PersonDetailPage: React.FC = () => {
 
               {person.popularity && (
                 <div className="flex items-center gap-2">
-                  <Award className="w-4 h-4 text-[#E43D3D]" />
+                  <TrendingUp className="w-4 h-4 text-[#E43D3D]" />
                   <span className="text-[#8E8E93]">POPULARITY INDEX:</span>
                   <span className="text-[#F2F0EC] font-bold">{person.popularity}</span>
                 </div>

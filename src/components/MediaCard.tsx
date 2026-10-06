@@ -41,7 +41,7 @@ export const MediaCard: React.FC<MediaCardProps> = ({
           <div className="absolute inset-0 bg-gradient-to-t from-[#111114] via-transparent to-black/40 opacity-80" />
           
           <div className="absolute top-3 left-3">
-            <span className="text-[9px] font-extrabold tracking-[0.18em] px-2.5 py-1 uppercase bg-[#E43D3D] text-white">
+            <span className="text-[9px] font-sans font-extrabold tracking-[0.18em] px-2.5 py-1 uppercase bg-[#E43D3D] text-white">
               FEATURED EDITORIAL
             </span>
           </div>
@@ -59,7 +59,7 @@ export const MediaCard: React.FC<MediaCardProps> = ({
 
         <div className="lg:col-span-5 p-6 flex flex-col justify-between space-y-4">
           <div className="space-y-2">
-            <div className="flex items-center justify-between text-xs text-[#929298] font-mono">
+            <div className="flex items-center justify-between text-xs text-[#8E8E93] font-sans">
               <span className="uppercase">{item.type === 'movie' ? 'FEATURE FILM' : 'SERIES'} • {item.year}</span>
               <div className="flex items-center gap-1 text-[#E43D3D] font-bold">
                 <Star className="w-3.5 h-3.5 fill-[#E43D3D]" />
@@ -68,19 +68,19 @@ export const MediaCard: React.FC<MediaCardProps> = ({
             </div>
 
             <Link to={detailPath}>
-              <h3 className="type-h3 text-[#F2F0EC] group-hover:text-[#E43D3D] transition-colors leading-tight flex items-center justify-between">
+              <h3 className="font-display font-bold text-xl sm:text-2xl text-[#F2F0EC] group-hover:text-[#E43D3D] transition-colors leading-tight flex items-center justify-between">
                 <span>{item.title}</span>
                 <ArrowUpRight className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity text-[#E43D3D]" />
               </h3>
             </Link>
 
             {item.genres.length > 0 && (
-              <p className="type-label text-[#626269]">
+              <p className="type-label text-[#8E8E93]">
                 {item.genres.join(' • ')}
               </p>
             )}
 
-            <p className="type-small line-clamp-3 font-light text-[#929298]">
+            <p className="type-small line-clamp-3 font-light text-[#8E8E93]">
               {item.synopsis}
             </p>
           </div>
@@ -116,7 +116,7 @@ export const MediaCard: React.FC<MediaCardProps> = ({
 
         {/* Type Badge */}
         <div className="absolute top-2 left-2 z-10">
-          <span className={`text-[8px] font-extrabold tracking-[0.15em] px-1.5 py-0.5 uppercase ${
+          <span className={`text-[9px] font-sans font-extrabold tracking-wider px-1.5 py-0.5 uppercase ${
             item.type === 'movie' ? 'bg-[#E43D3D] text-white' : 'bg-white text-black'
           }`}>
             {item.type === 'movie' ? 'MOVIE' : 'TV'}
@@ -137,12 +137,12 @@ export const MediaCard: React.FC<MediaCardProps> = ({
 
       {/* Content Area (TITLE -> METADATA) */}
       <div className="p-3 flex flex-col justify-between flex-grow space-y-1">
-        <h3 className="type-h3 text-xs sm:text-sm text-[#F2F0EC] group-hover:text-[#E43D3D] transition-colors leading-snug line-clamp-1 flex items-center justify-between gap-1">
+        <h3 className="font-display font-semibold text-[15px] sm:text-[16px] text-[#F2F0EC] group-hover:text-[#E43D3D] transition-colors leading-snug line-clamp-1 flex items-center justify-between gap-1">
           <span className="truncate">{item.title}</span>
-          <ArrowUpRight className="w-3 h-3 flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity text-[#E43D3D]" />
+          <ArrowUpRight className="w-3.5 h-3.5 flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity text-[#E43D3D]" />
         </h3>
 
-        <div className="flex items-center justify-between text-[11px] text-[#929298] font-mono pt-1">
+        <div className="flex items-center justify-between text-xs sm:text-[13px] text-[#8E8E93] font-sans pt-1">
           <span>{item.year || 'N/A'}</span>
           <div className="flex items-center gap-1 text-[#E43D3D] font-bold">
             <Star className="w-3 h-3 fill-[#E43D3D]" />
@@ -182,12 +182,12 @@ export const CastCard: React.FC<CastCardProps> = ({ name, character, image, slug
       </div>
 
       <div className="p-3 flex flex-col justify-between flex-grow space-y-1">
-        <h3 className="type-h3 text-xs sm:text-sm text-[#F2F0EC] group-hover:text-[#E43D3D] transition-colors leading-snug line-clamp-1 flex items-center justify-between gap-1">
+        <h3 className="font-display font-semibold text-[15px] sm:text-[16px] text-[#F2F0EC] group-hover:text-[#E43D3D] transition-colors leading-snug line-clamp-1 flex items-center justify-between gap-1">
           <span className="truncate">{name}</span>
-          <ArrowUpRight className="w-3 h-3 flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity text-[#E43D3D]" />
+          <ArrowUpRight className="w-3.5 h-3.5 flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity text-[#E43D3D]" />
         </h3>
         {character && (
-          <p className="text-[11px] text-[#929298] font-mono line-clamp-1">
+          <p className="text-xs sm:text-[13px] text-[#8E8E93] font-sans line-clamp-1">
             as {character}
           </p>
         )}
@@ -223,7 +223,7 @@ export const PersonCard: React.FC<PersonCardProps> = ({ name, role, knownFor, po
         <div className="absolute inset-0 bg-gradient-to-t from-[#111114] via-transparent to-black/20 opacity-60 group-hover:opacity-80 transition-opacity" />
         {role && (
           <div className="absolute top-2 left-2 z-10">
-            <span className="text-[8px] font-extrabold tracking-[0.15em] px-1.5 py-0.5 uppercase bg-[#E43D3D] text-white">
+            <span className="text-[9px] font-sans font-extrabold tracking-wider px-1.5 py-0.5 uppercase bg-[#E43D3D] text-white">
               {role}
             </span>
           </div>
@@ -231,12 +231,12 @@ export const PersonCard: React.FC<PersonCardProps> = ({ name, role, knownFor, po
       </div>
 
       <div className="p-3 flex flex-col justify-between flex-grow space-y-1">
-        <h3 className="type-h3 text-xs sm:text-sm text-[#F2F0EC] group-hover:text-[#E43D3D] transition-colors leading-snug line-clamp-1 flex items-center justify-between gap-1">
+        <h3 className="font-display font-semibold text-[15px] sm:text-[16px] text-[#F2F0EC] group-hover:text-[#E43D3D] transition-colors leading-snug line-clamp-1 flex items-center justify-between gap-1">
           <span className="truncate">{name}</span>
-          <ArrowUpRight className="w-3 h-3 flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity text-[#E43D3D]" />
+          <ArrowUpRight className="w-3.5 h-3.5 flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity text-[#E43D3D]" />
         </h3>
         {knownFor && knownFor.length > 0 && (
-          <p className="text-[11px] text-[#929298] font-mono line-clamp-1">
+          <p className="text-xs sm:text-[13px] text-[#8E8E93] font-sans line-clamp-1">
             {knownFor.join(' • ')}
           </p>
         )}

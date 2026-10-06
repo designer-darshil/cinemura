@@ -7,22 +7,23 @@ import { SectionHeader } from '../components/SectionHeader';
 import { PersonDetailSkeleton, ErrorState } from '../components/StateViews';
 
 export const PersonDetailPage: React.FC = () => {
-  const { slug } = useParams<{ slug: string }>();
+  const { id, slug } = useParams<{ id?: string; slug?: string }>();
+  const personId = id || slug;
 
   const [person, setPerson] = useState<Person | null>(null);
   const [filmoFilter, setFilmoFilter] = useState<'all' | 'movie' | 'tv'>('all');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
-  const activeSlugRef = React.useRef<string | undefined>(slug);
+  const activeIdRef = React.useRef<string | undefined>(personId);
 
   const fetchPersonDetail = async () => {
-    if (!slug) return;
-    activeSlugRef.current = slug;
+    if (!personId) return;
+    activeIdRef.current = personId;
     setLoading(true);
     setError(false);
     try {
-      const data = await getPersonDetail(slug);
-      if (activeSlugRef.current !== slug) return; // Stale request guard
+      const data = await getPersonDetail(personId);
+      if (activeIdRef.current !== personId) return; // Stale request guard
 
       if (!data) {
         setError(true);
@@ -36,22 +37,22 @@ export const PersonDetailPage: React.FC = () => {
             preloader.onerror = () => resolve();
           });
         }
-        if (activeSlugRef.current !== slug) return;
+        if (activeIdRef.current !== personId) return;
         setPerson(data);
       }
     } catch (err) {
       console.error('Failed to load person detail', err);
-      if (activeSlugRef.current === slug) setError(true);
+      if (activeIdRef.current === personId) setError(true);
     } finally {
-      if (activeSlugRef.current === slug) setLoading(false);
+      if (activeIdRef.current === personId) setLoading(false);
     }
   };
 
   useEffect(() => {
-    activeSlugRef.current = slug;
+    activeIdRef.current = personId;
     fetchPersonDetail();
     window.scrollTo(0, 0);
-  }, [slug]);
+  }, [personId]);
 
   if (loading) {
     return <PersonDetailSkeleton />;

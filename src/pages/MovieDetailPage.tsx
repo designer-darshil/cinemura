@@ -14,22 +14,23 @@ import { MediaVideosSection } from '../components/MediaVideosSection';
 import { MediaPhotosSection } from '../components/MediaPhotosSection';
 
 export const MovieDetailPage: React.FC = () => {
-  const { slug } = useParams<{ slug: string }>();
+  const { id, slug } = useParams<{ id?: string; slug?: string }>();
+  const movieId = id || slug;
   const { openVideoPlayer } = useApp();
 
   const [movie, setMovie] = useState<Movie | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
-  const activeSlugRef = React.useRef<string | undefined>(slug);
+  const activeIdRef = React.useRef<string | undefined>(movieId);
 
   const fetchDetail = async () => {
-    if (!slug) return;
-    activeSlugRef.current = slug;
+    if (!movieId) return;
+    activeIdRef.current = movieId;
     setLoading(true);
     setError(false);
     try {
-      const data = await getMovieDetail(slug);
-      if (activeSlugRef.current !== slug) return; // Stale request guard
+      const data = await getMovieDetail(movieId);
+      if (activeIdRef.current !== movieId) return; // Stale request guard
 
       if (!data) {
         setError(true);
@@ -43,22 +44,22 @@ export const MovieDetailPage: React.FC = () => {
             preloader.onerror = () => resolve();
           });
         }
-        if (activeSlugRef.current !== slug) return;
+        if (activeIdRef.current !== movieId) return;
         setMovie(data);
       }
     } catch (err) {
       console.error('Failed to load movie detail', err);
-      if (activeSlugRef.current === slug) setError(true);
+      if (activeIdRef.current === movieId) setError(true);
     } finally {
-      if (activeSlugRef.current === slug) setLoading(false);
+      if (activeIdRef.current === movieId) setLoading(false);
     }
   };
 
   useEffect(() => {
-    activeSlugRef.current = slug;
+    activeIdRef.current = movieId;
     fetchDetail();
     window.scrollTo(0, 0);
-  }, [slug]);
+  }, [movieId]);
 
   if (loading) {
     return <MovieDetailPageSkeleton />;

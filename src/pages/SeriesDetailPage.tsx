@@ -15,22 +15,23 @@ import { MediaVideosSection } from '../components/MediaVideosSection';
 import { MediaPhotosSection } from '../components/MediaPhotosSection';
 
 export const SeriesDetailPage: React.FC = () => {
-  const { slug } = useParams<{ slug: string }>();
+  const { id, slug } = useParams<{ id?: string; slug?: string }>();
+  const seriesId = id || slug;
   const { openVideoPlayer } = useApp();
 
   const [series, setSeries] = useState<Series | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
-  const activeSlugRef = React.useRef<string | undefined>(slug);
+  const activeIdRef = React.useRef<string | undefined>(seriesId);
 
   const fetchSeriesDetail = async () => {
-    if (!slug) return;
-    activeSlugRef.current = slug;
+    if (!seriesId) return;
+    activeIdRef.current = seriesId;
     setLoading(true);
     setError(false);
     try {
-      const data = await getTvDetail(slug);
-      if (activeSlugRef.current !== slug) return; // Stale request guard
+      const data = await getTvDetail(seriesId);
+      if (activeIdRef.current !== seriesId) return; // Stale request guard
 
       if (!data) {
         setError(true);
@@ -44,22 +45,22 @@ export const SeriesDetailPage: React.FC = () => {
             preloader.onerror = () => resolve();
           });
         }
-        if (activeSlugRef.current !== slug) return;
+        if (activeIdRef.current !== seriesId) return;
         setSeries(data);
       }
     } catch (err) {
       console.error('Failed to load series detail', err);
-      if (activeSlugRef.current === slug) setError(true);
+      if (activeIdRef.current === seriesId) setError(true);
     } finally {
-      if (activeSlugRef.current === slug) setLoading(false);
+      if (activeIdRef.current === seriesId) setLoading(false);
     }
   };
 
   useEffect(() => {
-    activeSlugRef.current = slug;
+    activeIdRef.current = seriesId;
     fetchSeriesDetail();
     window.scrollTo(0, 0);
-  }, [slug]);
+  }, [seriesId]);
 
   if (loading) {
     return <SeriesDetailPageSkeleton />;

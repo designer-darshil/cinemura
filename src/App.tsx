@@ -56,18 +56,18 @@ export function App() {
               <Route path="/" element={<HomePage />} />
               <Route path="/movie" element={<MoviesPage />} />
               <Route path="/movies" element={<MoviesPage />} />
-              <Route path="/movie/:slug" element={<MovieDetailPage />} />
+              <Route path="/movie/:id" element={<MovieDetailPage />} />
               <Route path="/movie/category/:name" element={<MoviesPage />} />
               <Route path="/movies/category/:name" element={<MoviesPage />} />
               
               <Route path="/tv" element={<SeriesPage />} />
               <Route path="/series" element={<SeriesPage />} />
-              <Route path="/tv/:slug" element={<SeriesDetailPage />} />
-              <Route path="/series/:slug" element={<SeriesDetailPage />} />
+              <Route path="/tv/:id" element={<SeriesDetailPage />} />
+              <Route path="/series/:id" element={<SeriesDetailPage />} />
               <Route path="/tv/category/:name" element={<SeriesPage />} />
               <Route path="/series/category/:name" element={<SeriesPage />} />
               
-              <Route path="/person/:slug" element={<PersonDetailPage />} />
+              <Route path="/person/:id" element={<PersonDetailPage />} />
               <Route path="/people" element={<PeoplePage />} />
               <Route path="/person" element={<PeoplePage />} />
 

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { Play, Star, ArrowLeft, Calendar, Building2, Tv, ExternalLink, Layers } from 'lucide-react';
+import { Play, Star, ArrowLeft, Tv, Building2, Layers, Globe } from 'lucide-react';
 import { getTvDetail, getTvSeasonDetail } from '../services/tmdb';
 import { Series, Episode } from '../types';
 import { useApp } from '../context/AppContext';
@@ -61,6 +61,7 @@ export const SeriesDetailPage: React.FC = () => {
 
   useEffect(() => {
     fetchSeriesDetail();
+    window.scrollTo(0, 0);
   }, [slug]);
 
   const handleSeasonChange = (seasonNum: number) => {
@@ -89,8 +90,8 @@ export const SeriesDetailPage: React.FC = () => {
     return (
       <div className="min-h-screen bg-[#0B0B0D] text-[#F2F0EC] pt-28 pb-20 px-4 sm:px-8 mx-auto">
         <ErrorState
-          title="TV SHOW NOT FOUND"
-          message="Unable to retrieve the requested TV series record from the live database."
+          title="SERIES RECORD UNRESOLVED"
+          message="Could not load the requested television series profile from the database."
           onRetry={fetchSeriesDetail}
         />
       </div>
@@ -101,120 +102,109 @@ export const SeriesDetailPage: React.FC = () => {
   const activeSeasonObj = series.seasons?.find(s => s.seasonNumber === selectedSeasonNumber);
 
   return (
-    <div className="min-h-screen bg-[#0B0B0D] text-[#F2F0EC] pb-24 space-y-16 lg:space-y-20">
+    <div className="min-h-screen bg-[#0B0B0D] text-[#F2F0EC] pb-24 selection:bg-[#E43D3D] selection:text-white">
       
       {/* ==================================================
-          SECTION 01 — SERIES IDENTITY HERO
+          1. TV SERIES HERO — INFORMATION-DENSE IMMERSIVE COVER
          ================================================== */}
-      <section className="relative min-h-[75vh] flex flex-col justify-end pt-28 pb-12 px-4 sm:px-8 mx-auto overflow-hidden border-b border-white/10">
+      <section className="relative min-h-[85vh] flex flex-col justify-between pt-24 pb-12 px-4 sm:px-8 md:px-12 mx-auto overflow-hidden">
         
-        {/* Background Backdrop */}
+        {/* Backdrop Background Field */}
         <div className="absolute inset-0 z-0">
           <img
             src={series.backdrop}
             alt={series.title}
-            className="w-full h-full object-cover opacity-45 filter brightness-75 contrast-110"
+            className="w-full h-full object-cover filter brightness-50 contrast-110 scale-105 transition-transform duration-1000"
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-[#0B0B0D] via-[#0B0B0D]/80 to-black/70" />
-          <div className="absolute inset-0 bg-gradient-to-t from-[#0B0B0D] via-transparent to-transparent" />
-          <div className="absolute inset-0 film-grain pointer-events-none" />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#0B0B0D] via-[#0B0B0D]/80 to-black/60" />
+          <div className="absolute inset-0 bg-gradient-to-r from-[#0B0B0D] via-[#0B0B0D]/70 to-transparent" />
+          <div className="absolute inset-0 film-grain pointer-events-none opacity-40" />
         </div>
 
-        {/* Back Link */}
-        <div className="relative z-10 w-full mb-6">
-          <Link to="/tv" className="btn-link inline-flex items-center gap-2 text-white text-md fw-bold uppercase text-[#929298] hover:text-[#E43D3D] text-xs">
-            <ArrowLeft className="w-4 h-4" />
-            <span>BACK TO TV SHOWS DIRECTORY</span>
+        {/* Top Editorial Nav Row */}
+        <div className="relative z-10 w-full flex items-center justify-between border-b border-white/10 pb-4">
+          <Link
+            to="/tv"
+            className="group flex items-center gap-2 text-xs font-mono tracking-wider text-[#8E8E93] hover:text-[#E43D3D] transition-colors"
+          >
+            <ArrowLeft className="w-3.5 h-3.5 transition-transform group-hover:-translate-x-1" />
+            <span>TV SERIES DIRECTORY</span>
           </Link>
+
+          <span className="text-[10px] font-mono tracking-[0.25em] text-[#8E8E93] uppercase">
+            SERIES GUIDE PROFILE
+          </span>
         </div>
 
-        {/* Balanced 2-Column Hero Structure */}
-        <div className="relative z-10 w-full grid grid-cols-1 lg:grid-cols-12 gap-8 items-end">
+        {/* Hero Content */}
+        <div className="relative z-10 w-full grid grid-cols-1 lg:grid-cols-12 gap-8 items-end pt-10">
           
-          {/* LEFT: Poster Image (2:3 Aspect Ratio) */}
-          <div className="lg:col-span-4 max-w-[280px] sm:max-w-[320px] lg:max-w-none">
-            <div className="aspect-[2/3] bg-black border border-white/15 overflow-hidden shadow-2xl relative group/poster">
-              <img
-                src={series.poster}
-                alt={series.title}
-                className="w-full h-full object-cover"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-60" />
-              {series.status && (
-                <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between text-[9px] font-mono font-extrabold uppercase">
-                  <span className="bg-[#E43D3D] text-white px-2 py-0.5 tracking-wider">
-                    {series.status}
-                  </span>
-                  <span className="bg-black/80 border border-white/20 text-white px-2 py-0.5">
-                    {series.seasonsCount} S / {series.totalEpisodes} EP
-                  </span>
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* RIGHT: Essential Series Metadata */}
-          <div className="lg:col-span-8 space-y-5">
+          <div className="lg:col-span-9 space-y-6">
             
-            <div className="flex flex-wrap items-center gap-2.5 text-xs">
-              <span className="type-label bg-[#E43D3D] text-white px-2.5 py-1">
+            {/* Editorial Type Label & Badges */}
+            <div className="flex flex-wrap items-center gap-3">
+              <span className="text-[10px] font-mono font-extrabold tracking-[0.2em] px-2.5 py-1 uppercase bg-[#E43D3D] text-white">
                 TV SERIES
               </span>
+              {series.status && (
+                <span className="text-[10px] font-mono font-semibold tracking-widest px-2.5 py-1 bg-white/10 text-white border border-white/20 uppercase">
+                  {series.status}
+                </span>
+              )}
               {series.certification && (
-                <span className="type-label border border-white/20 text-white px-2 py-0.5 font-mono">
+                <span className="text-[10px] font-mono font-semibold tracking-widest px-2 py-0.5 border border-white/20 text-[#F2F0EC]">
                   {series.certification}
                 </span>
               )}
-              {series.status && (
-                <span className="type-label bg-white/10 text-white px-2.5 py-0.5 font-mono border border-white/15">
-                  {series.status.toUpperCase()}
-                </span>
+              {series.rating > 0 && (
+                <div className="flex items-center gap-1.5 bg-black/60 backdrop-blur-md px-3 py-1 border border-white/10 text-xs font-mono text-[#F2F0EC]">
+                  <Star className="w-3.5 h-3.5 fill-[#E43D3D] text-[#E43D3D]" />
+                  <span className="font-bold text-white">{series.rating.toFixed(1)}</span>
+                  <span className="text-[#8E8E93] text-[10px]">/ 10</span>
+                  {series.voteCount > 0 && (
+                    <span className="text-[#8E8E93] text-[10px] border-l border-white/15 pl-1.5 ml-1">
+                      {series.voteCount.toLocaleString()} VOTES
+                    </span>
+                  )}
+                </div>
               )}
-              <div className="flex items-center gap-1 bg-white/10 px-2.5 py-0.5 text-xs text-[#E43D3D] font-bold border border-white/15">
-                <Star className="w-3.5 h-3.5 fill-[#E43D3D]" />
-                <span>{series.rating.toFixed(1)}</span>
-                {series.voteCount > 0 && (
-                  <span className="text-[10px] text-[#929298] font-mono">({series.voteCount.toLocaleString()})</span>
-                )}
-              </div>
             </div>
 
-            <div className="space-y-1">
-              <h1 className="type-display-l text-white leading-none">
+            {/* Title & Tagline */}
+            <div className="space-y-3 max-w-5xl">
+              <h1 className="text-4xl sm:text-6xl lg:text-7xl xl:text-8xl font-serif font-bold tracking-tight text-[#F2F0EC] leading-none uppercase">
                 {series.title}
               </h1>
-              {series.originalName && (
-                <p className="text-xs font-mono text-[#929298]">
-                  Original Name: {series.originalName}
+              {series.tagline && (
+                <p className="text-lg sm:text-xl md:text-2xl font-serif italic text-[#E43D3D]/90 max-w-3xl leading-snug">
+                  "{series.tagline}"
                 </p>
               )}
             </div>
 
-            {series.tagline && (
-              <p className="type-h3 text-[#E43D3D] font-serif italic text-lg sm:text-xl">
-                "{series.tagline}"
-              </p>
-            )}
-
-            {/* Prioritized Key Metadata Row */}
-            <div className="flex flex-wrap items-center gap-4 text-xs text-[#929298] font-mono border-y border-white/10 py-3">
-              <span className="flex items-center gap-1.5 text-white font-bold">
-                <Calendar className="w-4 h-4 text-[#E43D3D]" /> FIRST AIR: {series.firstAirDate || series.year}
-              </span>
+            {/* Multi-Parameter Series Metadata Line */}
+            <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-xs sm:text-sm font-mono text-[#8E8E93] pt-1 border-y border-white/10 py-3">
+              <span className="text-[#F2F0EC] font-bold">FIRST AIR: {series.firstAirDate || series.year}</span>
               <span>•</span>
-              <span className="text-white font-bold">{series.seasonsCount} SEASONS</span>
+              <span className="text-[#F2F0EC] font-bold">{series.seasonsCount} SEASONS</span>
               <span>•</span>
-              <span className="text-white font-bold">{series.totalEpisodes} EPISODES</span>
+              <span className="text-[#F2F0EC] font-bold">{series.totalEpisodes} EPISODES</span>
               {series.episodeRuntime && (
                 <>
                   <span>•</span>
-                  <span>{series.episodeRuntime}</span>
+                  <span className="text-[#8E8E93]">{series.episodeRuntime} / EP</span>
+                </>
+              )}
+              {series.genres.length > 0 && (
+                <>
+                  <span>•</span>
+                  <span className="text-[#F2F0EC] uppercase">{series.genres.join(' / ')}</span>
                 </>
               )}
             </div>
 
-            {/* Short Synopsis Overview */}
-            <p className="type-body text-sm text-[#F2F0EC]/85 max-w-3xl line-clamp-3 font-light leading-relaxed">
+            {/* Overview Excerpt */}
+            <p className="text-sm sm:text-base font-light text-[#F2F0EC]/85 max-w-3xl line-clamp-3 leading-relaxed">
               {series.synopsis}
             </p>
 
@@ -223,7 +213,7 @@ export const SeriesDetailPage: React.FC = () => {
               {series.trailerUrl && (
                 <button
                   onClick={() => openTrailer(series.trailerUrl!, series.title)}
-                  className="btn-primary"
+                  className="bg-[#E43D3D] hover:bg-[#c02e2e] text-white px-7 py-3.5 text-xs font-mono font-bold tracking-widest uppercase flex items-center gap-3 transition-all transform hover:-translate-y-0.5 shadow-lg"
                 >
                   <Play className="w-4 h-4 fill-white" />
                   <span>WATCH TRAILER</span>
@@ -232,25 +222,29 @@ export const SeriesDetailPage: React.FC = () => {
 
               <button
                 onClick={scrollToSeasons}
-                className="btn-secondary flex items-center gap-2"
+                className="bg-transparent hover:bg-white/5 border border-white/20 text-[#F2F0EC] px-6 py-3.5 text-xs font-mono font-bold tracking-widest uppercase flex items-center gap-2 transition-all"
               >
                 <Layers className="w-4 h-4 text-[#E43D3D]" />
                 <span>EXPLORE SEASONS</span>
               </button>
-
-              {series.imdbId && (
-                <a
-                  href={`https://www.imdb.com/title/${series.imdbId}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="btn-link inline-flex items-center gap-2 text-white text-md fw-bold uppercase text-xs text-[#929298] hover:text-white ml-2"
-                >
-                  <ExternalLink className="w-3.5 h-3.5 text-[#E43D3D]" />
-                  <span>IMDB PROFILE</span>
-                </a>
-              )}
             </div>
 
+          </div>
+
+          {/* Secondary Poster Anchor */}
+          <div className="lg:col-span-3 hidden lg:block">
+            <div className="relative group/anchor aspect-[2/3] max-w-[260px] ml-auto border border-white/20 bg-[#111114] shadow-2xl overflow-hidden transform -rotate-1 hover:rotate-0 transition-transform duration-500">
+              <img
+                src={series.poster}
+                alt={series.title}
+                className="w-full h-full object-cover group-hover/anchor:scale-105 transition-transform duration-500"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-60" />
+              <div className="absolute bottom-3 left-3 right-3 text-[10px] font-mono text-[#8E8E93] uppercase tracking-wider flex justify-between">
+                <span>SERIES ANCHOR</span>
+                <span className="text-[#E43D3D] font-bold">{series.language}</span>
+              </div>
+            </div>
           </div>
 
         </div>
@@ -258,103 +252,112 @@ export const SeriesDetailPage: React.FC = () => {
       </section>
 
       {/* ==================================================
-          SECTION 02 — OVERVIEW & SERIES DETAILS
+          2. TV SERIES OVERVIEW & SPECIFICATIONS
          ================================================== */}
-      <section className="mx-auto px-4 sm:px-8">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+      <section className="mt-16 sm:mt-24 px-4 sm:px-8 md:px-12 mx-auto">
+        
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start border-t border-white/10 pt-12">
           
-          {/* LEFT: Overview */}
-          <div className="lg:col-span-7 space-y-4">
-            <SectionHeader
-              label="SYNPOSIS"
-              title="OVERVIEW"
-            />
-            <p className="type-body-l text-[#F2F0EC]/90 leading-relaxed font-light">
+          {/* LEFT: THE SERIES OVERVIEW */}
+          <div className="lg:col-span-7 space-y-6">
+            <div className="space-y-1">
+              <span className="text-[10px] font-mono tracking-[0.2em] text-[#E43D3D] uppercase block">
+                SERIES STATEMENT
+              </span>
+              <h2 className="text-2xl sm:text-3xl font-serif font-bold text-[#F2F0EC] uppercase">
+                THE SERIES
+              </h2>
+            </div>
+
+            <p className="text-base sm:text-lg font-light text-[#F2F0EC]/90 leading-relaxed">
               {series.synopsis}
             </p>
 
             {series.spokenLanguages && series.spokenLanguages.length > 0 && (
-              <div className="pt-2 text-xs font-mono text-[#929298]">
-                Spoken Languages: <span className="text-white">{series.spokenLanguages.join(', ')}</span>
+              <div className="pt-4 border-t border-white/10 flex flex-wrap items-center gap-2 text-xs font-mono text-[#8E8E93]">
+                <Globe className="w-4 h-4 text-[#E43D3D]" />
+                <span>SPOKEN LANGUAGES:</span>
+                <span className="text-[#F2F0EC] font-semibold">{series.spokenLanguages.join(', ')}</span>
               </div>
             )}
           </div>
 
-          {/* RIGHT: Series Details Specification Sheet */}
-          <div className="lg:col-span-5 bg-[#111114] border border-white/10 p-6 space-y-4">
-            <SectionHeader
-              label="SPECIFICATIONS"
-              title="SERIES DETAILS"
-            />
+          {/* RIGHT: SERIES SPECIFICATIONS */}
+          <div className="lg:col-span-5 space-y-6">
+            <div className="space-y-1 border-b border-white/10 pb-3">
+              <span className="text-[10px] font-mono tracking-[0.2em] text-[#E43D3D] uppercase block">
+                PRODUCTION DATA
+              </span>
+              <h2 className="text-xl sm:text-2xl font-serif font-bold text-[#F2F0EC] uppercase">
+                SERIES DETAILS
+              </h2>
+            </div>
 
             <div className="divide-y divide-white/10 text-xs font-mono">
-              <div className="py-2.5 flex items-center justify-between">
-                <span className="text-[#929298]">FIRST AIR DATE</span>
-                <span className="text-white font-bold">{series.firstAirDate || 'N/A'}</span>
+              
+              <div className="py-3 flex items-center justify-between">
+                <span className="text-[#8E8E93]">FIRST AIR DATE</span>
+                <span className="text-[#F2F0EC] font-bold">{series.firstAirDate || 'N/A'}</span>
               </div>
 
               {series.lastAirDate && (
-                <div className="py-2.5 flex items-center justify-between">
-                  <span className="text-[#929298]">LAST AIR DATE</span>
-                  <span className="text-white font-bold">{series.lastAirDate}</span>
+                <div className="py-3 flex items-center justify-between">
+                  <span className="text-[#8E8E93]">LAST AIR DATE</span>
+                  <span className="text-[#F2F0EC] font-bold">{series.lastAirDate}</span>
                 </div>
               )}
 
-              <div className="py-2.5 flex items-center justify-between">
-                <span className="text-[#929298]">STATUS</span>
-                <span className="text-[#E43D3D] font-extrabold uppercase">{series.status || 'Ended'}</span>
+              <div className="py-3 flex items-center justify-between">
+                <span className="text-[#8E8E93]">STATUS</span>
+                <span className="text-[#E43D3D] font-bold uppercase">{series.status || 'Ended'}</span>
               </div>
 
-              <div className="py-2.5 flex items-center justify-between">
-                <span className="text-[#929298]">EPISODE RUNTIME</span>
-                <span className="text-white font-bold">{series.episodeRuntime || 'N/A'}</span>
+              <div className="py-3 flex items-center justify-between">
+                <span className="text-[#8E8E93]">EPISODE RUNTIME</span>
+                <span className="text-[#F2F0EC] font-bold">{series.episodeRuntime || 'N/A'}</span>
               </div>
 
-              <div className="py-2.5 flex items-center justify-between">
-                <span className="text-[#929298]">SEASONS COUNT</span>
-                <span className="text-white font-bold">{series.seasonsCount} Seasons</span>
+              <div className="py-3 flex items-center justify-between">
+                <span className="text-[#8E8E93]">SEASONS COUNT</span>
+                <span className="text-[#F2F0EC] font-bold">{series.seasonsCount} Seasons</span>
               </div>
 
-              <div className="py-2.5 flex items-center justify-between">
-                <span className="text-[#929298]">TOTAL EPISODES</span>
-                <span className="text-white font-bold">{series.totalEpisodes} Episodes</span>
+              <div className="py-3 flex items-center justify-between">
+                <span className="text-[#8E8E93]">TOTAL EPISODES</span>
+                <span className="text-[#F2F0EC] font-bold">{series.totalEpisodes} Episodes</span>
               </div>
 
-              <div className="py-2.5 flex items-center justify-between">
-                <span className="text-[#929298]">ORIGINAL LANGUAGE</span>
-                <span className="text-white uppercase font-bold">{series.language}</span>
+              <div className="py-3 flex items-center justify-between">
+                <span className="text-[#8E8E93]">ORIGINAL LANGUAGE</span>
+                <span className="text-[#F2F0EC] font-bold uppercase">{series.language}</span>
               </div>
 
               {series.certification && (
-                <div className="py-2.5 flex items-center justify-between">
-                  <span className="text-[#929298]">CONTENT RATING</span>
-                  <span className="text-white font-bold bg-white/10 px-2 py-0.5 border border-white/15">
+                <div className="py-3 flex items-center justify-between">
+                  <span className="text-[#8E8E93]">CONTENT RATING</span>
+                  <span className="text-[#F2F0EC] border border-white/20 px-2 py-0.5 text-[10px]">
                     {series.certification}
                   </span>
                 </div>
               )}
 
-              {series.genres.length > 0 && (
-                <div className="py-2.5 flex items-start justify-between gap-4">
-                  <span className="text-[#929298]">GENRES</span>
-                  <span className="text-white font-bold text-right">{series.genres.join(' • ')}</span>
-                </div>
-              )}
             </div>
           </div>
 
         </div>
+
       </section>
 
       {/* ==================================================
-          SECTION 03 — CREATORS (CREATED BY)
+          3. TV CREATORS & CAST
          ================================================== */}
       {((series.creatorDetails && series.creatorDetails.length > 0) || (series.creators && series.creators.length > 0)) && (
-        <section className="mx-auto px-4 sm:px-8 space-y-6">
+        <section className="mt-20 sm:mt-28 px-4 sm:px-8 md:px-12 mx-auto space-y-8">
+          
           <SectionHeader
             label="SHOWRUNNERS"
             title="CREATED BY"
-            description="Visionary creators and executive showrunners behind the series."
+            description="Visionary showrunners and series creators behind the show."
           />
 
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4">
@@ -372,22 +375,22 @@ export const SeriesDetailPage: React.FC = () => {
             ) : (
               series.creators.map((name, idx) => (
                 <div key={idx} className="bg-[#111114] border border-white/10 p-4 space-y-1">
-                  <span className="type-label text-[#E43D3D]">CREATOR</span>
-                  <h4 className="type-h3 text-sm text-white truncate">{name}</h4>
+                  <span className="text-[9px] font-mono tracking-widest text-[#E43D3D] uppercase block">CREATOR</span>
+                  <h4 className="font-serif font-bold text-sm text-[#F2F0EC] truncate">{name}</h4>
                 </div>
               ))
             )}
           </div>
+
         </section>
       )}
 
-      {/* ==================================================
-          SECTION 04 — CAST
-         ================================================== */}
+      {/* CAST SECTION */}
       {series.cast && series.cast.length > 0 && (
-        <section className="mx-auto px-4 sm:px-8 space-y-6">
+        <section className="mt-16 sm:mt-20 px-4 sm:px-8 md:px-12 mx-auto space-y-6">
+          
           <SectionHeader
-            label="ENSEMBLE"
+            label="ENSEMBLE CAST"
             title="CAST"
             description="Principal cast members and starring roles across series seasons."
           />
@@ -404,23 +407,24 @@ export const SeriesDetailPage: React.FC = () => {
               />
             ))}
           </div>
+
         </section>
       )}
 
       {/* ==================================================
-          SECTION 05 — SEASONS (PRIMARY TV EXPERIENCE)
+          4. TV SEASONS — CORE NAVIGATION EXPERIENCE
          ================================================== */}
       {series.seasons && series.seasons.length > 0 && (
-        <section id="seasons-section" className="mx-auto px-4 sm:px-8 space-y-8 scroll-mt-24">
+        <section id="seasons-section" className="mt-24 sm:mt-32 px-4 sm:px-8 md:px-12 mx-auto space-y-8 scroll-mt-24">
           
           <SectionHeader
             label="SEASON ARCHIVE"
-            title="SEASONS & EPISODES"
-            description="Browse episode breakdowns, air dates, and stills season by season."
+            title="SEASONS"
+            description="Select a season to inspect full episode listings, air dates, and stills."
           />
 
-          {/* Refined Horizontal Visual Season Selector */}
-          <div className="flex items-stretch gap-3 sm:gap-4 overflow-x-auto no-scrollbar pb-2 pt-1">
+          {/* Clean Horizontal Season Selector Bar */}
+          <div className="flex items-stretch gap-3 sm:gap-4 overflow-x-auto no-scrollbar pb-3 pt-1">
             {series.seasons.map((season) => {
               const isSelected = selectedSeasonNumber === season.seasonNumber;
               return (
@@ -442,7 +446,7 @@ export const SeriesDetailPage: React.FC = () => {
                     <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-black/20 opacity-70" />
                     
                     <div className="absolute top-2 left-2 z-10">
-                      <span className={`text-[8px] font-extrabold uppercase px-1.5 py-0.5 ${
+                      <span className={`text-[8px] font-mono font-extrabold uppercase px-1.5 py-0.5 ${
                         isSelected ? 'bg-[#E43D3D] text-white' : 'bg-black/80 text-white border border-white/20'
                       }`}>
                         S0{season.seasonNumber}
@@ -451,14 +455,14 @@ export const SeriesDetailPage: React.FC = () => {
                   </div>
 
                   <div className="p-3 space-y-1">
-                    <h4 className={`type-h3 text-xs sm:text-sm truncate transition-colors ${
-                      isSelected ? 'text-[#E43D3D]' : 'text-white group-hover/season:text-[#E43D3D]'
+                    <h4 className={`font-serif font-bold text-xs sm:text-sm truncate transition-colors ${
+                      isSelected ? 'text-[#E43D3D]' : 'text-[#F2F0EC] group-hover/season:text-[#E43D3D]'
                     }`}>
                       {season.title}
                     </h4>
-                    <div className="flex items-center justify-between text-[10px] font-mono text-[#929298]">
+                    <div className="flex items-center justify-between text-[10px] font-mono text-[#8E8E93]">
                       <span>{season.year || 'N/A'}</span>
-                      <span className="text-white font-bold">{season.episodeCount} EP</span>
+                      <span className="text-[#F2F0EC] font-bold">{season.episodeCount} EP</span>
                     </div>
                   </div>
                 </button>
@@ -466,38 +470,40 @@ export const SeriesDetailPage: React.FC = () => {
             })}
           </div>
 
-          {/* Active Season Info Header */}
+          {/* Active Season Overview Header */}
           {activeSeasonObj && (
-            <div className="bg-[#111114] border border-white/10 p-5 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-              <div>
-                <span className="type-label text-[#E43D3D] block mb-1">
-                  CURRENTLY INSPECTING
+            <div className="bg-[#111114] border border-white/10 p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+              <div className="space-y-1">
+                <span className="text-[10px] font-mono tracking-[0.2em] text-[#E43D3D] uppercase block">
+                  SELECTED SEASON
                 </span>
-                <h3 className="type-h2 text-white">
+                <h3 className="text-xl sm:text-2xl font-serif font-bold text-[#F2F0EC]">
                   {activeSeasonObj.title}
                 </h3>
                 {activeSeasonObj.overview && (
-                  <p className="type-small font-light text-[#929298] max-w-3xl mt-1">
+                  <p className="text-xs font-light text-[#8E8E93] max-w-3xl pt-1">
                     {activeSeasonObj.overview}
                   </p>
                 )}
               </div>
-              <div className="text-xs font-mono text-[#929298] flex items-center gap-3">
-                <span className="bg-white/5 border border-white/10 px-3 py-1 text-white font-bold">
+              <div className="text-xs font-mono text-[#8E8E93]">
+                <span className="bg-white/5 border border-white/10 px-3 py-1.5 text-[#F2F0EC] font-bold inline-block">
                   {episodes.length} EPISODES LOADED
                 </span>
               </div>
             </div>
           )}
 
-          {/* Season Episode Rows */}
+          {/* ==================================================
+              5. TV EPISODES — CORE EDITORIAL LIST
+             ================================================== */}
           {seasonLoading ? (
-            <div className="p-12 text-center text-[#929298] font-mono text-xs uppercase animate-pulse border border-white/10 bg-[#111114]">
-              LOADING EPISODES FOR SEASON {selectedSeasonNumber}...
+            <div className="p-12 text-center text-[#8E8E93] font-mono text-xs uppercase animate-pulse border border-white/10 bg-[#111114]">
+              FETCHING SEASON {selectedSeasonNumber} EPISODE ARCHIVE...
             </div>
           ) : episodes.length === 0 ? (
-            <div className="p-12 bg-[#111114] border border-white/10 text-center text-[#929298] font-mono text-xs uppercase">
-              NO EPISODE DATA AVAILABLE FOR THIS SEASON.
+            <div className="p-12 bg-[#111114] border border-white/10 text-center text-[#8E8E93] font-mono text-xs uppercase">
+              NO EPISODE DATA RECORDED FOR THIS SEASON.
             </div>
           ) : (
             <div className="space-y-3">
@@ -508,8 +514,8 @@ export const SeriesDetailPage: React.FC = () => {
                 >
                   <div className="flex flex-col sm:flex-row items-start gap-4 min-w-0 w-full md:w-auto">
                     
-                    {/* Desktop/Mobile Episode Still Image */}
-                    <div className="w-full sm:w-36 md:w-40 aspect-[16/9] bg-black flex-shrink-0 border border-white/10 overflow-hidden relative">
+                    {/* Episode Still Container */}
+                    <div className="w-full sm:w-40 md:w-44 aspect-[16/9] bg-black flex-shrink-0 border border-white/10 overflow-hidden relative">
                       <img
                         src={ep.stillImage}
                         alt={ep.title}
@@ -524,7 +530,7 @@ export const SeriesDetailPage: React.FC = () => {
 
                     {/* Episode Meta & Synopsis */}
                     <div className="space-y-1.5 min-w-0 flex-grow">
-                      <div className="flex flex-wrap items-center gap-2 text-[10px] font-mono text-[#929298]">
+                      <div className="flex flex-wrap items-center gap-2 text-[10px] font-mono text-[#8E8E93]">
                         <span className="text-[#E43D3D] font-bold">EPISODE {ep.episodeNumber}</span>
                         {ep.airDate && <span>• {ep.airDate}</span>}
                         {ep.rating > 0 && (
@@ -535,28 +541,28 @@ export const SeriesDetailPage: React.FC = () => {
                         )}
                       </div>
 
-                      <h4 className="type-h3 text-base text-white group-hover/ep:text-[#E43D3D] transition-colors truncate">
+                      <h4 className="font-serif font-bold text-base sm:text-lg text-[#F2F0EC] group-hover/ep:text-[#E43D3D] transition-colors truncate">
                         {ep.title}
                       </h4>
 
-                      <p className="type-small font-light text-[#929298] line-clamp-2 max-w-2xl leading-relaxed">
+                      <p className="text-xs font-light text-[#8E8E93] line-clamp-2 max-w-3xl leading-relaxed">
                         {ep.synopsis}
                       </p>
 
                       {ep.guestStars && ep.guestStars.length > 0 && (
-                        <div className="text-[10px] font-mono text-[#626269] pt-0.5">
-                          Guest Stars: <span className="text-[#929298]">{ep.guestStars.join(', ')}</span>
+                        <div className="text-[10px] font-mono text-[#8E8E93]/70 pt-0.5">
+                          Guest Stars: <span className="text-[#8E8E93]">{ep.guestStars.join(', ')}</span>
                         </div>
                       )}
                     </div>
+
                   </div>
 
                   {series.trailerUrl && (
                     <button
                       onClick={() => openTrailer(series.trailerUrl!, `${series.title} - S${ep.seasonNumber}E${ep.episodeNumber}: ${ep.title}`)}
-                      className="btn-secondary text-[10px] h-9 px-4 self-end md:self-center flex-shrink-0"
+                      className="bg-white/5 hover:bg-[#E43D3D] border border-white/10 text-[#F2F0EC] hover:text-white text-[10px] font-mono tracking-widest px-4 py-2 self-end md:self-center flex-shrink-0 transition-colors"
                     >
-                      <Play className="w-3.5 h-3.5 fill-current text-[#E43D3D]" />
                       <span>PREVIEW</span>
                     </button>
                   )}
@@ -569,48 +575,15 @@ export const SeriesDetailPage: React.FC = () => {
       )}
 
       {/* ==================================================
-          SECTION 06 — OFFICIAL TRAILER / VIDEO
-         ================================================== */}
-      {series.trailerUrl && (
-        <section className="mx-auto px-4 sm:px-8 space-y-4">
-          <SectionHeader
-            label="PREVIEW"
-            title="OFFICIAL TRAILER"
-            description="Watch official series trailers and promotional teasers."
-          />
-
-          <div
-            onClick={() => openTrailer(series.trailerUrl!, series.title)}
-            className="relative aspect-video w-full bg-[#111114] border border-white/10 overflow-hidden group/trailer cursor-pointer"
-          >
-            <img
-              src={series.backdrop}
-              alt={series.title}
-              className="w-full h-full object-cover filter brightness-75 group-hover/trailer:scale-105 transition-transform duration-500"
-            />
-            <div className="absolute inset-0 bg-black/40 group-hover/trailer:bg-black/20 transition-colors" />
-            
-            <div className="absolute inset-0 flex flex-col items-center justify-center space-y-4">
-              <div className="w-16 h-16 bg-[#E43D3D] text-white flex items-center justify-center shadow-lg group-hover/trailer:scale-110 transition-transform">
-                <Play className="w-6 h-6 fill-white pl-1" />
-              </div>
-              <span className="type-label text-white tracking-widest bg-black/60 px-3 py-1 border border-white/20">
-                PLAY OFFICIAL TRAILER IN ULTRA HD
-              </span>
-            </div>
-          </div>
-        </section>
-      )}
-
-      {/* ==================================================
-          SECTION 07 — NETWORKS & PRODUCTION
+          6. TV NETWORK / PRODUCTION SUPPORTING SECTION
          ================================================== */}
       {((series.networks && series.networks.length > 0) || (series.productionCompanies && series.productionCompanies.length > 0)) && (
-        <section className="mx-auto px-4 sm:px-8 space-y-4">
+        <section className="mt-20 sm:mt-28 px-4 sm:px-8 md:px-12 mx-auto space-y-6">
+          
           <SectionHeader
             label="NETWORKS & STUDIOS"
-            title="BROADCAST NETWORKS & PRODUCTION"
-            description="Broadcasters, streaming networks, and production companies behind the show."
+            title="BROADCASTERS & PRODUCTION"
+            description="Broadcast networks and production entities behind the show."
           />
 
           <div className="flex flex-wrap gap-4">
@@ -619,9 +592,9 @@ export const SeriesDetailPage: React.FC = () => {
                 key={network.id}
                 className="bg-[#111114] border border-white/10 p-4 flex items-center gap-3 text-xs font-mono text-[#F2F0EC]"
               >
-                <Tv className="w-5 h-5 text-[#E43D3D]" />
+                <Tv className="w-4 h-4 text-[#E43D3D]" />
                 <div>
-                  <span className="block font-bold text-white">{network.name}</span>
+                  <span className="block font-bold text-[#F2F0EC]">{network.name}</span>
                   <span className="text-[10px] text-[#E43D3D] uppercase">BROADCAST NETWORK</span>
                 </div>
               </div>
@@ -631,56 +604,77 @@ export const SeriesDetailPage: React.FC = () => {
                 key={company.id}
                 className="bg-[#111114] border border-white/10 p-4 flex items-center gap-3 text-xs font-mono text-[#F2F0EC]"
               >
-                <Building2 className="w-5 h-5 text-[#929298]" />
+                <Building2 className="w-4 h-4 text-[#8E8E93]" />
                 <div>
-                  <span className="block font-bold text-white">{company.name}</span>
-                  {company.country && <span className="text-[10px] text-[#929298]">{company.country}</span>}
+                  <span className="block font-bold text-[#F2F0EC]">{company.name}</span>
+                  {company.country && <span className="text-[10px] text-[#8E8E93]">{company.country}</span>}
                 </div>
               </div>
             ))}
           </div>
-        </section>
-      )}
 
-      {/* KEYWORDS */}
-      {series.keywords && series.keywords.length > 0 && (
-        <section className="mx-auto px-4 sm:px-8 space-y-3">
-          <SectionHeader
-            label="TAGS"
-            title="KEYWORDS & THEMES"
-          />
-          <div className="flex flex-wrap gap-2 pt-1">
-            {series.keywords.map(keyword => (
-              <span
-                key={keyword}
-                className="text-xs font-mono px-3 py-1 bg-[#111114] border border-white/10 text-[#929298] uppercase"
-              >
-                #{keyword}
-              </span>
-            ))}
-          </div>
         </section>
       )}
 
       {/* ==================================================
-          SECTION 08 — RELATED TV SHOWS
+          7. TV MEDIA / TRAILER & GALLERY
+         ================================================== */}
+      {series.trailerUrl && (
+        <section className="mt-20 sm:mt-28 px-4 sm:px-8 md:px-12 mx-auto space-y-6">
+          
+          <SectionHeader
+            label="PREVIEW"
+            title="OFFICIAL TRAILER"
+            description="Watch official series promo and trailers."
+          />
+
+          <div
+            onClick={() => openTrailer(series.trailerUrl!, series.title)}
+            className="relative aspect-video w-full bg-[#111114] border border-white/10 overflow-hidden group/trailer cursor-pointer shadow-2xl"
+          >
+            <img
+              src={series.backdrop}
+              alt={series.title}
+              className="w-full h-full object-cover filter brightness-75 group-hover/trailer:scale-105 transition-transform duration-700"
+            />
+            <div className="absolute inset-0 bg-black/40 group-hover/trailer:bg-black/20 transition-colors" />
+            
+            <div className="absolute inset-0 flex flex-col items-center justify-center space-y-4">
+              <div className="w-20 h-20 bg-[#E43D3D] text-white flex items-center justify-center shadow-xl group-hover/trailer:scale-110 transition-transform">
+                <Play className="w-8 h-8 fill-white pl-1" />
+              </div>
+              <span className="text-xs font-mono font-bold tracking-[0.2em] text-white bg-black/70 px-4 py-2 border border-white/20 uppercase">
+                LAUNCH SERIES TRAILER
+              </span>
+            </div>
+          </div>
+
+        </section>
+      )}
+
+      {/* ==================================================
+          8. TV RELATED SHOWS
          ================================================== */}
       {relatedSeries.length > 0 && (
-        <section className="mx-auto px-4 sm:px-8 space-y-6">
+        <section className="mt-20 sm:mt-28 px-4 sm:px-8 md:px-12 mx-auto space-y-8">
+          
           <SectionHeader
             label="RECOMMENDATIONS"
             title="RELATED SHOWS"
-            description="Recommended television series with similar thematic tone or genre."
+            description="Television series sharing similar genre or narrative scope."
           />
 
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 sm:gap-4">
-            {relatedSeries.slice(0, 12).map(item => (
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4">
+            {relatedSeries.slice(0, 6).map(item => (
               <MediaCard key={item.id} item={item} variant="poster" />
             ))}
           </div>
+
         </section>
       )}
 
     </div>
   );
 };
+
+export default SeriesDetailPage;

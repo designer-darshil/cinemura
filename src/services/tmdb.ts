@@ -78,7 +78,7 @@ export function transformTmdbMovie(item: any): Movie {
     site: v.site
   })) || [];
 
-  const images: string[] = item.images?.backdrops?.slice(0, 8).map((img: any) =>
+  const images: string[] = item.images?.backdrops?.map((img: any) =>
     getImageWithFallback(img.file_path, 'backdrop', 'w1280')
   ) || [];
 
@@ -112,7 +112,7 @@ export function transformTmdbMovie(item: any): Movie {
     voteCount: item.vote_count || 0,
     popularity: item.popularity ? parseFloat(item.popularity.toFixed(1)) : undefined,
     certification,
-    synopsis: item.overview || 'No synopsis available.',
+    synopsis: item.overview || '',
     language: item.original_language ? item.original_language.toUpperCase() : 'EN',
     spokenLanguages: item.spoken_languages?.map((l: any) => l.english_name || l.name) || [],
     status: item.status || 'Released',
@@ -122,7 +122,7 @@ export function transformTmdbMovie(item: any): Movie {
     imdbId: item.external_ids?.imdb_id || item.imdb_id || undefined,
     director: item.credits?.crew?.find((c: any) => c.job === 'Director')?.name || 'N/A',
     writers: item.credits?.crew?.filter((c: any) => c.job === 'Screenplay' || c.job === 'Writer').map((w: any) => w.name) || [],
-    cast: item.credits?.cast?.slice(0, 12).map((c: any) => ({
+    cast: item.credits?.cast?.map((c: any) => ({
       id: c.id.toString(),
       name: c.name,
       role: 'Actor',
@@ -130,7 +130,7 @@ export function transformTmdbMovie(item: any): Movie {
       image: getImageWithFallback(c.profile_path, 'profile', 'h632'),
       slug: c.id.toString()
     })) || [],
-    crew: item.credits?.crew?.slice(0, 10).map((c: any) => ({
+    crew: item.credits?.crew?.map((c: any) => ({
       id: c.id.toString(),
       name: c.name,
       job: c.job,
@@ -178,7 +178,7 @@ export function transformTmdbTv(item: any): Series {
     site: v.site
   })) || [];
 
-  const images: string[] = item.images?.backdrops?.slice(0, 8).map((img: any) =>
+  const images: string[] = item.images?.backdrops?.map((img: any) =>
     getImageWithFallback(img.file_path, 'backdrop', 'w1280')
   ) || [];
 
@@ -208,7 +208,7 @@ export function transformTmdbTv(item: any): Series {
     voteCount: item.vote_count || 0,
     popularity: item.popularity ? parseFloat(item.popularity.toFixed(1)) : undefined,
     certification,
-    synopsis: item.overview || 'No synopsis available.',
+    synopsis: item.overview || '',
     language: item.original_language ? item.original_language.toUpperCase() : 'EN',
     spokenLanguages: item.spoken_languages?.map((l: any) => l.english_name || l.name) || [],
     status: item.status || 'Ended',
@@ -223,7 +223,7 @@ export function transformTmdbTv(item: any): Series {
       portrait: getImageWithFallback(c.profile_path, 'profile', 'h632'),
       slug: c.id.toString()
     })) : [],
-    cast: item.credits?.cast?.slice(0, 12).map((c: any) => ({
+    cast: item.credits?.cast?.map((c: any) => ({
       id: c.id.toString(),
       name: c.name,
       role: 'Actor',
@@ -231,7 +231,7 @@ export function transformTmdbTv(item: any): Series {
       image: getImageWithFallback(c.profile_path, 'profile', 'h632'),
       slug: c.id.toString()
     })) || [],
-    crew: item.credits?.crew?.slice(0, 10).map((c: any) => ({
+    crew: item.credits?.crew?.map((c: any) => ({
       id: c.id.toString(),
       name: c.name,
       job: c.job,

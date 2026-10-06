@@ -7,7 +7,7 @@ export const AboutPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-[#0B0B0D] text-[#F2F0EC] pt-28 pb-20 space-y-20">
       
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
+      <section className="mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
         <span className="text-[10px] tracking-mega text-[#E43D3D] uppercase font-bold block">
           ABOUT CINEMURA PLATFORM
         </span>
@@ -29,7 +29,7 @@ export const AboutPage: React.FC = () => {
         </div>
       </section>
 
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-3 gap-8">
+      <section className="mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-3 gap-8">
         <div className="bg-[#121215] border border-white/12 p-8 space-y-4">
           <div className="w-10 h-10 bg-[#E43D3D]/10 text-[#E43D3D] flex items-center justify-center font-bold">
             <Eye className="w-5 h-5" />
@@ -62,7 +62,7 @@ export const AboutPage: React.FC = () => {
       </section>
 
       <section className="bg-[#121215] border-y border-white/12 py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-2 md:grid-cols-4 gap-8">
+        <div className="mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-2 md:grid-cols-4 gap-8">
           {MOCK_STATS.map((stat, idx) => (
             <div key={idx} className="space-y-1">
               <span className="font-editorial-heading text-5xl text-[#E43D3D] block">{stat.value}</span>

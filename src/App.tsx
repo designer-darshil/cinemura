@@ -15,6 +15,7 @@ import { MovieDetailPage } from './pages/MovieDetailPage';
 import { SeriesDetailPage } from './pages/SeriesDetailPage';
 import { DiscoverPage } from './pages/DiscoverPage';
 import { PeoplePage } from './pages/PeoplePage';
+import { PersonDetailPage } from './pages/PersonDetailPage';
 import { NotFoundPage } from './pages/NotFoundPage';
 
 // Scroll to top on route change
@@ -64,7 +65,7 @@ export function App() {
               <Route path="/series/:slug" element={<SeriesDetailPage />} />
               <Route path="/tv/category/:name" element={<SeriesPage />} />
               
-              <Route path="/person/:slug" element={<PeoplePage />} />
+              <Route path="/person/:slug" element={<PersonDetailPage />} />
               <Route path="/people" element={<PeoplePage />} />
 
               <Route path="/genre/:id/movie" element={<MoviesPage />} />

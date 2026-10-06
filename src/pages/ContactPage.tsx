@@ -18,7 +18,7 @@ export const ContactPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#0A0A0A] text-[#F5F3EE] pt-28 pb-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto space-y-12">
+    <div className="min-h-screen bg-[#0A0A0A] text-[#F5F3EE] pt-28 pb-20 px-4 sm:px-6 lg:px-8 mx-auto space-y-12">
       
       {/* Header */}
       <div className="border-b border-white/10 pb-8 space-y-3">

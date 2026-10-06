@@ -78,9 +78,13 @@ export function transformTmdbMovie(item: any): Movie {
     site: v.site
   })) || [];
 
-  const images: string[] = item.images?.backdrops?.map((img: any) =>
+  const backdropImages: string[] = item.images?.backdrops?.map((img: any) =>
     getImageWithFallback(img.file_path, 'backdrop', 'w1280')
   ) || [];
+  const posterImages: string[] = item.images?.posters?.map((img: any) =>
+    getImageWithFallback(img.file_path, 'poster', 'w780')
+  ) || [];
+  const images: string[] = [...backdropImages, ...posterImages];
 
   const keywords: string[] = item.keywords?.keywords?.map((k: any) => k.name) ||
     item.keywords?.results?.map((k: any) => k.name) || [];
@@ -178,9 +182,13 @@ export function transformTmdbTv(item: any): Series {
     site: v.site
   })) || [];
 
-  const images: string[] = item.images?.backdrops?.map((img: any) =>
+  const backdropImages: string[] = item.images?.backdrops?.map((img: any) =>
     getImageWithFallback(img.file_path, 'backdrop', 'w1280')
   ) || [];
+  const posterImages: string[] = item.images?.posters?.map((img: any) =>
+    getImageWithFallback(img.file_path, 'poster', 'w780')
+  ) || [];
+  const images: string[] = [...backdropImages, ...posterImages];
 
   const keywords: string[] = item.keywords?.results?.map((k: any) => k.name) || [];
 

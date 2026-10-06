@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { Play, Star, ArrowLeft, Tv, Building2, Layers, Globe } from 'lucide-react';
+import { Play, Star, ArrowLeft, Tv, Building2, Layers, Globe, Film, Image as ImageIcon } from 'lucide-react';
 import { getTvDetail, getTvSeasonDetail } from '../services/tmdb';
 import { Series, Episode } from '../types';
 import { useApp } from '../context/AppContext';
 import { MediaCard, CastCard, PersonCard } from '../components/MediaCard';
 import { SectionHeader } from '../components/SectionHeader';
 import { DetailHeroSkeleton, ErrorState } from '../components/StateViews';
+import { PhotoLightboxModal } from '../components/PhotoLightboxModal';
 
 export const SeriesDetailPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -19,6 +20,10 @@ export const SeriesDetailPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [seasonLoading, setSeasonLoading] = useState(false);
   const [error, setError] = useState(false);
+
+  // Photo Lightbox state
+  const [lightboxOpen, setLightboxOpen] = useState(false);
+  const [lightboxIndex, setLightboxIndex] = useState(0);
 
   const fetchSeriesDetail = async () => {
     if (!slug) return;
@@ -78,6 +83,11 @@ export const SeriesDetailPage: React.FC = () => {
     }
   };
 
+  const openLightboxAt = (index: number) => {
+    setLightboxIndex(index);
+    setLightboxOpen(true);
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-[#0B0B0D] text-[#F2F0EC] pt-28 pb-20 px-4 sm:px-8 mx-auto">
@@ -100,6 +110,10 @@ export const SeriesDetailPage: React.FC = () => {
 
   const relatedSeries = series.recommendations?.length ? series.recommendations : (series.similar || []);
   const activeSeasonObj = series.seasons?.find(s => s.seasonNumber === selectedSeasonNumber);
+
+  // Real TMDb media items
+  const validVideos = (series.videos || []).filter(v => v.key && v.site === 'YouTube');
+  const photos = series.images && series.images.length > 0 ? series.images : (series.backdrop ? [series.backdrop] : []);
 
   return (
     <div className="min-h-screen bg-[#0B0B0D] text-[#F2F0EC] pb-24 selection:bg-[#E43D3D] selection:text-white">
@@ -227,6 +241,16 @@ export const SeriesDetailPage: React.FC = () => {
                 <Layers className="w-4 h-4 text-[#E43D3D]" />
                 <span>EXPLORE SEASONS</span>
               </button>
+
+              {validVideos.length > 0 && (
+                <a
+                  href="#videos-section"
+                  className="bg-transparent hover:bg-white/5 border border-white/20 text-[#8E8E93] hover:text-white px-5 py-3.5 text-xs font-mono font-bold tracking-widest uppercase flex items-center gap-2 transition-all"
+                >
+                  <Film className="w-3.5 h-3.5 text-[#E43D3D]" />
+                  <span>VIDEOS ({validVideos.length})</span>
+                </a>
+              )}
             </div>
 
           </div>
@@ -254,7 +278,7 @@ export const SeriesDetailPage: React.FC = () => {
       {/* ==================================================
           2. TV SERIES OVERVIEW & SPECIFICATIONS
          ================================================== */}
-      <section className="mt-16 sm:mt-24 px-4 sm:px-8 md:px-12 mx-auto">
+      <section className="mt-16 sm:mt-24 px-4 sm:px-8 md:px-12 mx-auto max-w-7xl">
         
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start border-t border-white/10 pt-12">
           
@@ -349,10 +373,10 @@ export const SeriesDetailPage: React.FC = () => {
       </section>
 
       {/* ==================================================
-          3. TV CREATORS & CAST
+          3. TV CREATORS
          ================================================== */}
       {((series.creatorDetails && series.creatorDetails.length > 0) || (series.creators && series.creators.length > 0)) && (
-        <section className="mt-20 sm:mt-28 px-4 sm:px-8 md:px-12 mx-auto space-y-8">
+        <section className="mt-20 sm:mt-28 px-4 sm:px-8 md:px-12 mx-auto max-w-7xl space-y-8">
           
           <SectionHeader
             label="SHOWRUNNERS"
@@ -387,7 +411,7 @@ export const SeriesDetailPage: React.FC = () => {
 
       {/* CAST SECTION */}
       {series.cast && series.cast.length > 0 && (
-        <section className="mt-16 sm:mt-20 px-4 sm:px-8 md:px-12 mx-auto space-y-6">
+        <section className="mt-16 sm:mt-20 px-4 sm:px-8 md:px-12 mx-auto max-w-7xl space-y-6">
           
           <SectionHeader
             label="ENSEMBLE CAST"
@@ -415,7 +439,7 @@ export const SeriesDetailPage: React.FC = () => {
           4. TV SEASONS — CORE NAVIGATION EXPERIENCE
          ================================================== */}
       {series.seasons && series.seasons.length > 0 && (
-        <section id="seasons-section" className="mt-24 sm:mt-32 px-4 sm:px-8 md:px-12 mx-auto space-y-8 scroll-mt-24">
+        <section id="seasons-section" className="mt-24 sm:mt-32 px-4 sm:px-8 md:px-12 mx-auto max-w-7xl space-y-8 scroll-mt-24">
           
           <SectionHeader
             label="SEASON ARCHIVE"
@@ -520,6 +544,7 @@ export const SeriesDetailPage: React.FC = () => {
                         src={ep.stillImage}
                         alt={ep.title}
                         className="w-full h-full object-cover group-hover/ep:scale-105 transition-transform duration-300"
+                        loading="lazy"
                       />
                       {ep.runtime && ep.runtime !== 'N/A' && (
                         <span className="absolute bottom-1 right-1 bg-black/80 text-white font-mono text-[9px] px-1.5 py-0.5">
@@ -575,10 +600,169 @@ export const SeriesDetailPage: React.FC = () => {
       )}
 
       {/* ==================================================
-          6. TV NETWORK / PRODUCTION SUPPORTING SECTION
+          6. TV VIDEOS (REAL TMDB VIDEOS SECTION)
+         ================================================== */}
+      {validVideos.length > 0 && (
+        <section id="videos-section" className="mt-20 sm:mt-28 px-4 sm:px-8 md:px-12 mx-auto max-w-7xl space-y-6 scroll-mt-24">
+          <SectionHeader
+            label="OFFICIAL MEDIA"
+            title="VIDEOS"
+            description="Official series trailers, promos, teasers, and featurettes."
+          />
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+            {validVideos.map(video => {
+              const youtubeThumb = `https://img.youtube.com/vi/${video.key}/hqdefault.jpg`;
+              const embedUrl = `https://www.youtube.com/embed/${video.key}?autoplay=1`;
+
+              return (
+                <div
+                  key={video.id}
+                  onClick={() => openTrailer(embedUrl, `${series.title} — ${video.name}`)}
+                  className="group/video bg-[#111114] border border-white/10 hover:border-[#E43D3D] transition-all duration-300 cursor-pointer flex flex-col justify-between overflow-hidden"
+                >
+                  <div className="relative aspect-video w-full bg-black overflow-hidden">
+                    <img
+                      src={youtubeThumb}
+                      alt={video.name}
+                      className="w-full h-full object-cover group-hover/video:scale-105 transition-transform duration-500"
+                      loading="lazy"
+                    />
+                    <div className="absolute inset-0 bg-black/40 group-hover/video:bg-black/20 transition-colors" />
+
+                    {/* Play Badge */}
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <div className="w-12 h-12 bg-[#E43D3D] text-white flex items-center justify-center shadow-lg group-hover/video:scale-110 transition-transform">
+                        <Play className="w-5 h-5 fill-white pl-0.5" />
+                      </div>
+                    </div>
+
+                    {/* Video Type Badge */}
+                    <div className="absolute top-2 left-2">
+                      <span className="text-[9px] font-mono font-extrabold uppercase px-2 py-0.5 bg-black/80 text-white border border-white/20">
+                        {video.type}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="p-3 space-y-1">
+                    <h4 className="font-serif font-bold text-sm text-[#F2F0EC] group-hover/video:text-[#E43D3D] transition-colors line-clamp-1">
+                      {video.name}
+                    </h4>
+                    <div className="text-[11px] font-mono text-[#8E8E93]">
+                      <span>{video.site}</span> • <span className="uppercase text-[#E43D3D] font-bold">{video.type}</span>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </section>
+      )}
+
+      {/* ==================================================
+          7. TV PHOTOS (EDITORIAL GALLERY + LIGHTBOX)
+         ================================================== */}
+      {photos.length > 0 && (
+        <section id="photos-section" className="mt-20 sm:mt-28 px-4 sm:px-8 md:px-12 mx-auto max-w-7xl space-y-6">
+          <div className="flex items-end justify-between border-b border-white/10 pb-4">
+            <div>
+              <span className="text-[10px] font-mono tracking-[0.2em] text-[#E43D3D] uppercase block mb-1">
+                VISUAL ARCHIVE
+              </span>
+              <h2 className="text-2xl sm:text-3xl font-serif font-bold text-[#F2F0EC] uppercase">
+                PHOTOS ({photos.length})
+              </h2>
+            </div>
+            <button
+              onClick={() => openLightboxAt(0)}
+              className="text-xs font-mono tracking-wider text-[#8E8E93] hover:text-[#E43D3D] flex items-center gap-1.5 transition-colors"
+            >
+              <ImageIcon className="w-4 h-4 text-[#E43D3D]" />
+              <span>OPEN FULL GALLERY</span>
+            </button>
+          </div>
+
+          {/* Curated Editorial Layout: 1 Featured Large + Grid of Supporting */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
+            
+            {/* Large Featured Photo */}
+            <div
+              onClick={() => openLightboxAt(0)}
+              className="lg:col-span-8 aspect-video bg-[#111114] border border-white/10 overflow-hidden relative group/img cursor-pointer"
+            >
+              <img
+                src={photos[0]}
+                alt={`${series.title} photo 1`}
+                className="w-full h-full object-cover group-hover/img:scale-105 transition-transform duration-700"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-80" />
+              <div className="absolute bottom-3 left-3 flex items-center gap-2">
+                <span className="text-[10px] font-mono tracking-widest bg-black/80 text-[#F2F0EC] px-2.5 py-1 border border-white/10">
+                  FEATURED STILL 01
+                </span>
+                <span className="text-[10px] font-mono text-[#8E8E93] bg-black/80 px-2 py-1 border border-white/10">
+                  CLICK TO EXPAND
+                </span>
+              </div>
+            </div>
+
+            {/* Supporting Photos Column */}
+            <div className="lg:col-span-4 grid grid-cols-2 lg:grid-cols-1 gap-4">
+              {photos.slice(1, 3).map((img, idx) => (
+                <div
+                  key={idx}
+                  onClick={() => openLightboxAt(idx + 1)}
+                  className="aspect-video bg-[#111114] border border-white/10 overflow-hidden relative group/img cursor-pointer"
+                >
+                  <img
+                    src={img}
+                    alt={`${series.title} photo ${idx + 2}`}
+                    className="w-full h-full object-cover group-hover/img:scale-105 transition-transform duration-500"
+                    loading="lazy"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-70" />
+                  <span className="absolute bottom-2 left-2 text-[9px] font-mono tracking-widest bg-black/80 text-[#8E8E93] px-2 py-0.5 border border-white/10">
+                    PHOTO 0{idx + 2}
+                  </span>
+                </div>
+              ))}
+            </div>
+
+          </div>
+
+          {/* Additional Supporting Stills Horizontal Grid */}
+          {photos.length > 3 && (
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 pt-2">
+              {photos.slice(3, 9).map((img, idx) => (
+                <div
+                  key={idx}
+                  onClick={() => openLightboxAt(idx + 3)}
+                  className="aspect-video bg-[#111114] border border-white/10 overflow-hidden relative group/img cursor-pointer"
+                >
+                  <img
+                    src={img}
+                    alt={`${series.title} gallery ${idx + 4}`}
+                    className="w-full h-full object-cover group-hover/img:scale-105 transition-transform duration-300"
+                    loading="lazy"
+                  />
+                  <div className="absolute inset-0 bg-black/30 group-hover/img:bg-transparent transition-colors" />
+                  <span className="absolute bottom-1.5 left-1.5 text-[8px] font-mono bg-black/80 text-[#8E8E93] px-1.5 py-0.5">
+                    0{idx + 4}
+                  </span>
+                </div>
+              ))}
+            </div>
+          )}
+
+        </section>
+      )}
+
+      {/* ==================================================
+          8. TV NETWORK / PRODUCTION SUPPORTING SECTION
          ================================================== */}
       {((series.networks && series.networks.length > 0) || (series.productionCompanies && series.productionCompanies.length > 0)) && (
-        <section className="mt-20 sm:mt-28 px-4 sm:px-8 md:px-12 mx-auto space-y-6">
+        <section className="mt-20 sm:mt-28 px-4 sm:px-8 md:px-12 mx-auto max-w-7xl space-y-6">
           
           <SectionHeader
             label="NETWORKS & STUDIOS"
@@ -617,46 +801,10 @@ export const SeriesDetailPage: React.FC = () => {
       )}
 
       {/* ==================================================
-          7. TV MEDIA / TRAILER & GALLERY
-         ================================================== */}
-      {series.trailerUrl && (
-        <section className="mt-20 sm:mt-28 px-4 sm:px-8 md:px-12 mx-auto space-y-6">
-          
-          <SectionHeader
-            label="PREVIEW"
-            title="OFFICIAL TRAILER"
-            description="Watch official series promo and trailers."
-          />
-
-          <div
-            onClick={() => openTrailer(series.trailerUrl!, series.title)}
-            className="relative aspect-video w-full bg-[#111114] border border-white/10 overflow-hidden group/trailer cursor-pointer shadow-2xl"
-          >
-            <img
-              src={series.backdrop}
-              alt={series.title}
-              className="w-full h-full object-cover filter brightness-75 group-hover/trailer:scale-105 transition-transform duration-700"
-            />
-            <div className="absolute inset-0 bg-black/40 group-hover/trailer:bg-black/20 transition-colors" />
-            
-            <div className="absolute inset-0 flex flex-col items-center justify-center space-y-4">
-              <div className="w-20 h-20 bg-[#E43D3D] text-white flex items-center justify-center shadow-xl group-hover/trailer:scale-110 transition-transform">
-                <Play className="w-8 h-8 fill-white pl-1" />
-              </div>
-              <span className="text-xs font-mono font-bold tracking-[0.2em] text-white bg-black/70 px-4 py-2 border border-white/20 uppercase">
-                LAUNCH SERIES TRAILER
-              </span>
-            </div>
-          </div>
-
-        </section>
-      )}
-
-      {/* ==================================================
-          8. TV RELATED SHOWS
+          9. TV RELATED SHOWS
          ================================================== */}
       {relatedSeries.length > 0 && (
-        <section className="mt-20 sm:mt-28 px-4 sm:px-8 md:px-12 mx-auto space-y-8">
+        <section className="mt-20 sm:mt-28 px-4 sm:px-8 md:px-12 mx-auto max-w-7xl space-y-8">
           
           <SectionHeader
             label="RECOMMENDATIONS"
@@ -672,6 +820,15 @@ export const SeriesDetailPage: React.FC = () => {
 
         </section>
       )}
+
+      {/* Photo Lightbox Modal */}
+      <PhotoLightboxModal
+        images={photos}
+        initialIndex={lightboxIndex}
+        isOpen={lightboxOpen}
+        onClose={() => setLightboxOpen(false)}
+        title={series.title}
+      />
 
     </div>
   );

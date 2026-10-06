@@ -1,5 +1,6 @@
 import { Movie, Series, Person, MediaItem, Season, ProductionCompany, VideoItem } from '../types';
 import { getImageWithFallback } from '../utils/image';
+import { selectPrimaryVideo, getVideoEmbedUrl } from '../utils/trailer';
 
 const TMDB_BASE_URL = 'https://api.themoviedb.org/3';
 const API_KEY = import.meta.env.VITE_TMDB_API_KEY || '4e44d9029b1270a757cddc766a1bcb63';
@@ -75,7 +76,11 @@ export function transformTmdbMovie(item: any): Movie {
     key: v.key,
     name: v.name,
     type: v.type,
-    site: v.site
+    site: v.site,
+    official: Boolean(v.official),
+    publishedAt: v.published_at,
+    language: v.iso_639_1,
+    size: v.size
   })) || [];
 
   const backdropImages: string[] = item.images?.backdrops?.map((img: any) =>
@@ -149,8 +154,9 @@ export function transformTmdbMovie(item: any): Movie {
     images,
     recommendations,
     similar,
-    trailerUrl: videos.find(v => (v.type === 'Trailer' || v.type === 'Teaser') && v.site === 'YouTube')?.key
-      ? `https://www.youtube.com/embed/${videos.find(v => (v.type === 'Trailer' || v.type === 'Teaser') && v.site === 'YouTube')!.key}`
+    primaryVideo: selectPrimaryVideo(videos, item.original_language || 'en') || undefined,
+    trailerUrl: selectPrimaryVideo(videos, item.original_language || 'en')
+      ? getVideoEmbedUrl(selectPrimaryVideo(videos, item.original_language || 'en')!)
       : undefined,
     featured: true
   };
@@ -179,7 +185,11 @@ export function transformTmdbTv(item: any): Series {
     key: v.key,
     name: v.name,
     type: v.type,
-    site: v.site
+    site: v.site,
+    official: Boolean(v.official),
+    publishedAt: v.published_at,
+    language: v.iso_639_1,
+    size: v.size
   })) || [];
 
   const backdropImages: string[] = item.images?.backdrops?.map((img: any) =>
@@ -262,8 +272,9 @@ export function transformTmdbTv(item: any): Series {
       overview: s.overview || '',
       episodes: []
     })) : [],
-    trailerUrl: videos.find(v => (v.type === 'Trailer' || v.type === 'Teaser') && v.site === 'YouTube')?.key
-      ? `https://www.youtube.com/embed/${videos.find(v => (v.type === 'Trailer' || v.type === 'Teaser') && v.site === 'YouTube')!.key}`
+    primaryVideo: selectPrimaryVideo(videos, item.original_language || 'en') || undefined,
+    trailerUrl: selectPrimaryVideo(videos, item.original_language || 'en')
+      ? getVideoEmbedUrl(selectPrimaryVideo(videos, item.original_language || 'en')!)
       : undefined,
     featured: true
   };

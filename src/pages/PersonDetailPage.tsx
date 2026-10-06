@@ -214,8 +214,8 @@ export const PersonDetailPage: React.FC = () => {
           />
 
           {/* Render Known For titles using credit items matching the titles */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-4 gap-4">
-            {person.filmography.slice(0, 4).map(credit => (
+          <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-4">
+            {person.filmography.slice(0, 6).map(credit => (
               <Link
                 key={`known-${credit.id}`}
                 to={credit.type === 'movie' ? `/movie/${credit.id}` : `/tv/${credit.id}`}

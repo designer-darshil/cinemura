@@ -4,6 +4,7 @@ import { Play, Star, ArrowLeft, Globe, Film, Image as ImageIcon } from 'lucide-r
 import { getMovieDetail, formatCurrency } from '../services/tmdb';
 import { Movie } from '../types';
 import { useApp } from '../context/AppContext';
+import { selectPrimaryVideo, sortVideosWithPrimaryFirst, getVideoButtonLabel } from '../utils/trailer';
 import { MediaCard, CastCard } from '../components/MediaCard';
 import { SectionHeader } from '../components/SectionHeader';
 import { DetailHeroSkeleton, ErrorState } from '../components/StateViews';
@@ -11,7 +12,7 @@ import { PhotoLightboxModal } from '../components/PhotoLightboxModal';
 
 export const MovieDetailPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
-  const { openTrailer } = useApp();
+  const { openVideoPlayer } = useApp();
 
   const [movie, setMovie] = useState<Movie | null>(null);
   const [loading, setLoading] = useState(true);
@@ -81,8 +82,10 @@ export const MovieDetailPage: React.FC = () => {
   const formattedRevenue = formatCurrency(movie.revenue);
   const relatedMovies = movie.recommendations?.length ? movie.recommendations : (movie.similar || []);
   
-  // Real TMDb media items
-  const validVideos = (movie.videos || []).filter(v => v.key && v.site === 'YouTube');
+  // Real TMDb media items and prioritized video playlist
+  const playableVideos = sortVideosWithPrimaryFirst(movie.videos, movie.language);
+  const primaryVideo = selectPrimaryVideo(movie.videos, movie.language) || movie.primaryVideo || null;
+  const primaryVideoLabel = getVideoButtonLabel(primaryVideo);
   const photos = movie.images && movie.images.length > 0 ? movie.images : (movie.backdrop ? [movie.backdrop] : []);
 
   return (
@@ -185,30 +188,33 @@ export const MovieDetailPage: React.FC = () => {
 
             {/* Actions */}
             <div className="flex flex-wrap items-center gap-4 pt-3">
-              {movie.trailerUrl && (
+              {primaryVideo && (
                 <button
-                  onClick={() => openTrailer(movie.trailerUrl!, movie.title)}
+                  type="button"
+                  onClick={() => openVideoPlayer(playableVideos, 0, movie.title)}
                   className="bg-[#E43D3D] hover:bg-[#c02e2e] text-white px-7 py-3.5 text-xs font-mono font-bold tracking-widest uppercase flex items-center gap-3 transition-all transform hover:-translate-y-0.5 shadow-lg"
                 >
                   <Play className="w-4 h-4 fill-white" />
-                  <span>WATCH TRAILER</span>
+                  <span>{primaryVideoLabel}</span>
                 </button>
               )}
 
               <button
+                type="button"
                 onClick={() => scrollToSection('cast-section')}
                 className="bg-transparent hover:bg-white/5 border border-white/20 text-[#F2F0EC] px-6 py-3.5 text-xs font-mono font-bold tracking-widest uppercase flex items-center gap-2 transition-all"
               >
                 <span>VIEW CAST & CREW</span>
               </button>
 
-              {validVideos.length > 0 && (
+              {playableVideos.length > 0 && (
                 <button
+                  type="button"
                   onClick={() => scrollToSection('videos-section')}
                   className="bg-transparent hover:bg-white/5 border border-white/20 text-[#8E8E93] hover:text-white px-5 py-3.5 text-xs font-mono font-bold tracking-widest uppercase flex items-center gap-2 transition-all"
                 >
                   <Film className="w-3.5 h-3.5 text-[#E43D3D]" />
-                  <span>VIDEOS ({validVideos.length})</span>
+                  <span>VIDEOS ({playableVideos.length})</span>
                 </button>
               )}
             </div>
@@ -407,7 +413,7 @@ export const MovieDetailPage: React.FC = () => {
       {/* ==================================================
           4. VIDEOS (REAL TMDB VIDEOS SECTION)
          ================================================== */}
-      {validVideos.length > 0 && (
+      {playableVideos.length > 0 && (
         <section id="videos-section" className="mt-20 sm:mt-28 px-4 sm:px-8 md:px-12 mx-auto max-w-7xl space-y-6 scroll-mt-24">
           <SectionHeader
             label="OFFICIAL MEDIA"
@@ -416,14 +422,13 @@ export const MovieDetailPage: React.FC = () => {
           />
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-            {validVideos.map(video => {
+            {playableVideos.map((video, idx) => {
               const youtubeThumb = `https://img.youtube.com/vi/${video.key}/hqdefault.jpg`;
-              const embedUrl = `https://www.youtube.com/embed/${video.key}?autoplay=1`;
 
               return (
                 <div
-                  key={video.id}
-                  onClick={() => openTrailer(embedUrl, `${movie.title} — ${video.name}`)}
+                  key={video.id || idx}
+                  onClick={() => openVideoPlayer(playableVideos, idx, movie.title)}
                   className="group/video bg-[#111114] border border-white/10 hover:border-[#E43D3D] transition-all duration-300 cursor-pointer flex flex-col justify-between overflow-hidden"
                 >
                   <div className="relative aspect-video w-full bg-black overflow-hidden">
@@ -437,16 +442,21 @@ export const MovieDetailPage: React.FC = () => {
 
                     {/* Play Badge */}
                     <div className="absolute inset-0 flex items-center justify-center">
-                      <div className="w-12 h-12 bg-[#E43D3D] text-white flex items-center justify-center shadow-lg group-hover/video:scale-110 transition-transform">
-                        <Play className="w-5 h-5 fill-white pl-0.5" />
+                      <div className="w-10 h-10 bg-[#E43D3D] text-white flex items-center justify-center shadow-lg group-hover/video:scale-110 transition-transform">
+                        <Play className="w-4 h-4 fill-white pl-0.5" />
                       </div>
                     </div>
 
-                    {/* Video Type Badge */}
-                    <div className="absolute top-2 left-2">
+                    {/* Video Type Badge & Official Status */}
+                    <div className="absolute top-2 left-2 flex items-center gap-1.5">
                       <span className="text-[9px] font-mono font-extrabold uppercase px-2 py-0.5 bg-black/80 text-white border border-white/20">
                         {video.type}
                       </span>
+                      {video.official && (
+                        <span className="text-[8px] font-mono font-bold uppercase px-1.5 py-0.5 bg-[#E43D3D] text-white">
+                          OFFICIAL
+                        </span>
+                      )}
                     </div>
                   </div>
 

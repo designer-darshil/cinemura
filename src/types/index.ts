@@ -30,6 +30,10 @@ export interface VideoItem {
   name: string;
   type: string;
   site: string;
+  official?: boolean;
+  publishedAt?: string;
+  language?: string;
+  size?: number;
 }
 
 export interface Episode {
@@ -103,6 +107,7 @@ export interface Movie {
   recommendations?: Movie[];
   similar?: Movie[];
   trailerUrl?: string;
+  primaryVideo?: VideoItem;
   featured?: boolean;
   trendingRank?: number;
 }
@@ -149,6 +154,7 @@ export interface Series {
   similar?: Series[];
   seasons: Season[];
   trailerUrl?: string;
+  primaryVideo?: VideoItem;
   featured?: boolean;
   trendingRank?: number;
 }

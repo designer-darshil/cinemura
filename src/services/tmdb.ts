@@ -304,11 +304,50 @@ export async function getTrendingTv(timeWindow: 'day' | 'week' = 'day'): Promise
   return data.results.map(transformTmdbTv);
 }
 
-export async function getMoviesList(genreId?: string, sortBy: string = 'popularity.desc', page: number = 1): Promise<Movie[] | null> {
-  const endpoint = genreId ? `/discover/movie` : `/movie/popular`;
-  const params: Record<string, string> = { page: page.toString() };
-  if (genreId && genreId !== 'All') params.with_genres = genreId;
-  if (sortBy) params.sort_by = sortBy;
+export interface MovieFilterOptions {
+  genreId?: string;
+  sortBy?: string;
+  year?: string;
+  minRating?: string;
+  language?: string;
+  page?: number;
+}
+
+export interface TvFilterOptions {
+  genreId?: string;
+  sortBy?: string;
+  year?: string;
+  minRating?: string;
+  language?: string;
+  page?: number;
+}
+
+export async function getMoviesList(
+  genreOrOptions?: string | MovieFilterOptions,
+  sortBy: string = 'popularity.desc',
+  page: number = 1
+): Promise<Movie[] | null> {
+  const options: MovieFilterOptions = typeof genreOrOptions === 'object' && genreOrOptions !== null
+    ? genreOrOptions
+    : {
+        genreId: genreOrOptions,
+        sortBy,
+        page
+      };
+
+  const endpoint = options.genreId || options.year || options.minRating || options.language || (options.sortBy && options.sortBy !== 'popularity.desc')
+    ? '/discover/movie'
+    : '/movie/popular';
+
+  const params: Record<string, string> = {
+    page: (options.page || 1).toString()
+  };
+
+  if (options.genreId && options.genreId !== 'All') params.with_genres = options.genreId;
+  if (options.sortBy) params.sort_by = options.sortBy;
+  if (options.year && options.year !== 'All') params.primary_release_year = options.year;
+  if (options.minRating && options.minRating !== 'All') params['vote_average.gte'] = options.minRating;
+  if (options.language && options.language !== 'All') params.with_original_language = options.language;
 
   const data = await fetchFromTmdb<any>(endpoint, params);
   if (!data || !data.results) return null;
@@ -324,11 +363,32 @@ export async function getMovieDetail(id: string): Promise<Movie | null> {
   return transformTmdbMovie(data);
 }
 
-export async function getTvList(genreId?: string, sortBy: string = 'popularity.desc', page: number = 1): Promise<Series[] | null> {
-  const endpoint = genreId ? `/discover/tv` : `/tv/popular`;
-  const params: Record<string, string> = { page: page.toString() };
-  if (genreId && genreId !== 'All') params.with_genres = genreId;
-  if (sortBy) params.sort_by = sortBy;
+export async function getTvList(
+  genreOrOptions?: string | TvFilterOptions,
+  sortBy: string = 'popularity.desc',
+  page: number = 1
+): Promise<Series[] | null> {
+  const options: TvFilterOptions = typeof genreOrOptions === 'object' && genreOrOptions !== null
+    ? genreOrOptions
+    : {
+        genreId: genreOrOptions,
+        sortBy,
+        page
+      };
+
+  const endpoint = options.genreId || options.year || options.minRating || options.language || (options.sortBy && options.sortBy !== 'popularity.desc')
+    ? '/discover/tv'
+    : '/tv/popular';
+
+  const params: Record<string, string> = {
+    page: (options.page || 1).toString()
+  };
+
+  if (options.genreId && options.genreId !== 'All') params.with_genres = options.genreId;
+  if (options.sortBy) params.sort_by = options.sortBy;
+  if (options.year && options.year !== 'All') params.first_air_date_year = options.year;
+  if (options.minRating && options.minRating !== 'All') params['vote_average.gte'] = options.minRating;
+  if (options.language && options.language !== 'All') params.with_original_language = options.language;
 
   const data = await fetchFromTmdb<any>(endpoint, params);
   if (!data || !data.results) return null;
@@ -374,6 +434,22 @@ export async function getTvSeasonDetail(tvId: string, seasonNumber: number): Pro
 
 export async function getPopularPeople(page: number = 1): Promise<Person[] | null> {
   const data = await fetchFromTmdb<any>('/person/popular', { page: page.toString() });
+  if (!data || !data.results) return null;
+
+  return data.results.map((p: any) => ({
+    id: p.id.toString(),
+    name: p.name,
+    slug: p.id.toString(),
+    role: (p.known_for_department === 'Directing' ? 'Director' : 'Actor') as 'Actor' | 'Director',
+    portrait: getImageWithFallback(p.profile_path, 'profile', 'h632'),
+    biography: '',
+    knownFor: p.known_for?.map((k: any) => k.title || k.name) || [],
+    filmography: []
+  }));
+}
+
+export async function getTrendingPeople(timeWindow: 'day' | 'week' = 'day'): Promise<Person[] | null> {
+  const data = await fetchFromTmdb<any>(`/trending/person/${timeWindow}`);
   if (!data || !data.results) return null;
 
   return data.results.map((p: any) => ({

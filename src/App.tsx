@@ -67,6 +67,7 @@ export function App() {
               
               <Route path="/person/:slug" element={<PersonDetailPage />} />
               <Route path="/people" element={<PeoplePage />} />
+              <Route path="/person" element={<PeoplePage />} />
 
               <Route path="/genre/:id/movie" element={<MoviesPage />} />
               <Route path="/genre/:id/tv" element={<SeriesPage />} />

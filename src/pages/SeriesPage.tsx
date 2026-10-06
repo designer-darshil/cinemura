@@ -1,8 +1,14 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { useParams } from 'react-router-dom';
-import { Search, Grid, List as ListIcon, RotateCcw } from 'lucide-react';
-import { getTvList, getTvGenres, getTrendingMedia, GenreItem } from '../services/tmdb';
-import { Series, MediaItem } from '../types';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { useParams, useSearchParams } from 'react-router-dom';
+import { RotateCcw, SlidersHorizontal } from 'lucide-react';
+import {
+  getTvList,
+  getTvGenres,
+  getTrendingTv,
+  GenreItem,
+  TvFilterOptions
+} from '../services/tmdb';
+import { Series } from '../types';
 import { MediaCard } from '../components/MediaCard';
 import { HorizontalRail } from '../components/HorizontalRail';
 import { SectionHeader } from '../components/SectionHeader';
@@ -16,19 +22,64 @@ import {
 } from '../components/StateViews';
 import { useInfiniteScroll } from '../hooks/useInfiniteScroll';
 
+const YEAR_OPTIONS = [
+  { label: 'ALL YEARS', value: 'All' },
+  { label: '2025', value: '2025' },
+  { label: '2024', value: '2024' },
+  { label: '2023', value: '2023' },
+  { label: '2022', value: '2022' },
+  { label: '2021', value: '2021' },
+  { label: '2020', value: '2020' },
+  { label: '2010s', value: '2015' }
+];
+
+const RATING_OPTIONS = [
+  { label: 'ANY RATING', value: 'All' },
+  { label: '★ 8.0+', value: '8.0' },
+  { label: '★ 7.0+', value: '7.0' },
+  { label: '★ 6.0+', value: '6.0' }
+];
+
+const SORT_OPTIONS = [
+  { label: 'MOST POPULAR', value: 'popularity.desc' },
+  { label: 'HIGHEST RATED', value: 'vote_average.desc' },
+  { label: 'NEWEST PREMIERE', value: 'first_air_date.desc' },
+  { label: 'SERIES TITLE A–Z', value: 'name.asc' }
+];
+
+const LANGUAGE_OPTIONS = [
+  { label: 'ALL LANGUAGES', value: 'All' },
+  { label: 'ENGLISH', value: 'en' },
+  { label: 'JAPANESE (ANIME)', value: 'ja' },
+  { label: 'KOREAN (K-DRAMA)', value: 'ko' },
+  { label: 'SPANISH', value: 'es' },
+  { label: 'FRENCH', value: 'fr' },
+  { label: 'GERMAN', value: 'de' }
+];
+
 export const SeriesPage: React.FC = () => {
   const { id: genreIdParam, name: categoryNameParam } = useParams<{ id?: string; name?: string }>();
+  const [searchParams, setSearchParams] = useSearchParams();
 
-  const [seriesList, setSeriesList] = useState<Series[]>([]);
-  const [trendingSeries, setTrendingSeries] = useState<MediaItem[]>([]);
+  // URL State synchronization
+  const initialGenre = genreIdParam || searchParams.get('genre') || 'All';
+  const initialYear = searchParams.get('year') || 'All';
+  const initialRating = searchParams.get('rating') || 'All';
+  const initialSort = searchParams.get('sort') || 'popularity.desc';
+  const initialLanguage = searchParams.get('lang') || 'All';
+
   const [genres, setGenres] = useState<GenreItem[]>([]);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [selectedGenre, setSelectedGenre] = useState<string>(genreIdParam || 'All');
-  const [selectedYear, setSelectedYear] = useState<string>('All');
-  const [minRating, setMinRating] = useState<number>(0);
-  const [sortBy, setSortBy] = useState<string>('popularity.desc');
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  const [trendingSeries, setTrendingSeries] = useState<Series[]>([]);
+  const [seriesList, setSeriesList] = useState<Series[]>([]);
 
+  // Filter states
+  const [selectedGenre, setSelectedGenre] = useState<string>(initialGenre);
+  const [selectedYear, setSelectedYear] = useState<string>(initialYear);
+  const [selectedRating, setSelectedRating] = useState<string>(initialRating);
+  const [sortBy, setSortBy] = useState<string>(initialSort);
+  const [selectedLanguage, setSelectedLanguage] = useState<string>(initialLanguage);
+
+  // Pagination & Loading
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
@@ -36,348 +87,399 @@ export const SeriesPage: React.FC = () => {
   const [errorMore, setErrorMore] = useState(false);
   const [hasMore, setHasMore] = useState(true);
 
+  const requestIdRef = useRef<number>(0);
+
+  // Synchronize route param change
   useEffect(() => {
-    if (genreIdParam) {
+    if (genreIdParam && genreIdParam !== selectedGenre) {
       setSelectedGenre(genreIdParam);
     }
   }, [genreIdParam]);
 
-  const requestIdRef = React.useRef<number>(0);
+  // Load TV genres and Trending TV rail once on mount
+  useEffect(() => {
+    let mounted = true;
+    Promise.all([getTvGenres(), getTrendingTv('day')])
+      .then(([genreList, trendingList]) => {
+        if (!mounted) return;
+        if (genreList) setGenres(genreList);
+        if (trendingList) setTrendingSeries(trendingList);
+      })
+      .catch((err) => console.error('Error fetching initial TV meta:', err));
 
-  // Load initial catalog data & trending TV rail
-  const fetchSeries = async (targetPage: number = 1, append: boolean = false) => {
-    const currentReqId = ++requestIdRef.current;
-    if (append) {
-      setLoadingMore(true);
-      setErrorMore(false);
-    } else {
-      setLoading(true);
-      setError(false);
-    }
+    return () => {
+      mounted = false;
+    };
+  }, []);
 
-    try {
-      const [tvData, genreData, trendingData] = await Promise.all([
-        getTvList(selectedGenre !== 'All' ? selectedGenre : undefined, sortBy, targetPage),
-        genres.length === 0 ? getTvGenres() : Promise.resolve(genres),
-        targetPage === 1 && trendingSeries.length === 0 ? getTrendingMedia() : Promise.resolve(null)
-      ]);
-
-      if (currentReqId !== requestIdRef.current) return; // Discard stale response
-
-      if (!tvData || tvData.length === 0) {
-        if (!append) setError(true);
-        setHasMore(false);
-      } else {
-        if (append) {
-          setSeriesList(prev => {
-            const existingIds = new Set(prev.map(s => s.id));
-            const uniqueNew = tvData.filter(s => !existingIds.has(s.id));
-            return [...prev, ...uniqueNew];
-          });
-        } else {
-          setSeriesList(tvData);
-        }
-        setHasMore(tvData.length >= 10);
-        
-        if (genres.length === 0 && genreData) {
-          setGenres(genreData);
-        }
-
-        if (trendingData) {
-          const tvTrending = trendingData.filter(item => item.type === 'tv');
-          setTrendingSeries(tvTrending);
-        }
-      }
-    } catch (err) {
-      if (currentReqId !== requestIdRef.current) return;
-      console.error('Failed to load TV series', err);
-      if (append) {
-        setErrorMore(true);
-      } else {
-        setError(true);
-      }
-    } finally {
-      if (currentReqId === requestIdRef.current) {
-        setLoading(false);
-        setLoadingMore(false);
-      }
-    }
+  // Sync state to URL searchParams
+  const updateUrlParams = (
+    genre: string,
+    year: string,
+    rating: string,
+    sort: string,
+    lang: string
+  ) => {
+    const params = new URLSearchParams();
+    if (genre !== 'All') params.set('genre', genre);
+    if (year !== 'All') params.set('year', year);
+    if (rating !== 'All') params.set('rating', rating);
+    if (sort !== 'popularity.desc') params.set('sort', sort);
+    if (lang !== 'All') params.set('lang', lang);
+    setSearchParams(params, { replace: true });
   };
 
+  // Fetch TV series with active filters
+  const fetchTvData = useCallback(
+    async (
+      targetPage: number = 1,
+      append: boolean = false,
+      filterOverride?: Partial<TvFilterOptions>
+    ) => {
+      const currentReqId = ++requestIdRef.current;
+
+      if (append) {
+        setLoadingMore(true);
+        setErrorMore(false);
+      } else {
+        setLoading(true);
+        setError(false);
+      }
+
+      const activeFilters: TvFilterOptions = {
+        genreId: filterOverride?.genreId ?? selectedGenre,
+        year: filterOverride?.year ?? selectedYear,
+        minRating: filterOverride?.minRating ?? selectedRating,
+        sortBy: filterOverride?.sortBy ?? sortBy,
+        language: filterOverride?.language ?? selectedLanguage,
+        page: targetPage
+      };
+
+      try {
+        const results = await getTvList(activeFilters);
+
+        if (currentReqId !== requestIdRef.current) return;
+
+        if (!results || results.length === 0) {
+          if (!append) {
+            setSeriesList([]);
+          }
+          setHasMore(false);
+        } else {
+          if (append) {
+            setSeriesList((prev) => {
+              const existingIds = new Set(prev.map((s) => s.id));
+              const uniqueIncoming = results.filter((s) => !existingIds.has(s.id));
+              return [...prev, ...uniqueIncoming];
+            });
+          } else {
+            setSeriesList(results);
+          }
+          setHasMore(results.length >= 10 && targetPage < 500);
+        }
+      } catch (err) {
+        if (currentReqId !== requestIdRef.current) return;
+        if (append) {
+          setErrorMore(true);
+        } else {
+          setError(true);
+        }
+      } finally {
+        if (currentReqId === requestIdRef.current) {
+          setLoading(false);
+          setLoadingMore(false);
+        }
+      }
+    },
+    [selectedGenre, selectedYear, selectedRating, sortBy, selectedLanguage]
+  );
+
+  // Trigger fetch when any filter changes
   useEffect(() => {
     setPage(1);
-    fetchSeries(1, false);
-  }, [selectedGenre, sortBy]);
+    fetchTvData(1, false);
+    updateUrlParams(selectedGenre, selectedYear, selectedRating, sortBy, selectedLanguage);
+  }, [selectedGenre, selectedYear, selectedRating, sortBy, selectedLanguage]);
 
+  // Infinite scroll trigger
   const handleLoadMore = useCallback(() => {
-    if (loadingMore || !hasMore) return;
+    if (loading || loadingMore || !hasMore) return;
     const nextPage = page + 1;
     setPage(nextPage);
-    fetchSeries(nextPage, true);
-  }, [page, loadingMore, hasMore]);
+    fetchTvData(nextPage, true);
+  }, [page, loading, loadingMore, hasMore, fetchTvData]);
 
   const sentinelRef = useInfiniteScroll({
     loading: loading || loadingMore,
     hasMore,
-    onLoadMore: handleLoadMore
+    onLoadMore: handleLoadMore,
+    rootMargin: '600px 0px'
   });
 
-  // Client-side filtering for search, year, and rating thresholds
-  const filteredSeries = seriesList.filter(series => {
-    const matchesSearch = series.title.toLowerCase().includes(searchTerm.toLowerCase());
-    
-    let matchesYear = true;
-    if (selectedYear !== 'All') {
-      if (selectedYear === '2020s') matchesYear = series.year >= 2020;
-      else if (selectedYear === '2010s') matchesYear = series.year >= 2010 && series.year < 2020;
-      else if (selectedYear === '2000s') matchesYear = series.year >= 2000 && series.year < 2010;
-      else matchesYear = series.year === parseInt(selectedYear);
-    }
-
-    const matchesRating = series.rating >= minRating;
-
-    return matchesSearch && matchesYear && matchesRating;
-  });
-
-  const resetFilters = () => {
-    setSearchTerm('');
+  // Reset filters
+  const handleResetFilters = () => {
     setSelectedGenre('All');
     setSelectedYear('All');
-    setMinRating(0);
+    setSelectedRating('All');
     setSortBy('popularity.desc');
+    setSelectedLanguage('All');
   };
 
-  // Determine current active section title and subtitle context
-  const activeGenreName = genres.find(g => g.id.toString() === selectedGenre)?.name;
-  const pageTitle = categoryNameParam 
-    ? `TV SHOWS — ${categoryNameParam.toUpperCase()}`
-    : activeGenreName 
-    ? `TV SHOWS — ${activeGenreName.toUpperCase()}`
-    : 'TV SHOWS';
+  const hasActiveFilters =
+    selectedGenre !== 'All' ||
+    selectedYear !== 'All' ||
+    selectedRating !== 'All' ||
+    sortBy !== 'popularity.desc' ||
+    selectedLanguage !== 'All';
 
-  const pageSubtitle = categoryNameParam || activeGenreName
-    ? `Explore curated television series in the ${activeGenreName || categoryNameParam} catalog.`
-    : 'Explore series, seasons and stories worth getting into.';
+  const activeGenreName = genres.find((g) => g.id.toString() === selectedGenre)?.name;
 
   return (
-    <div className="min-h-screen bg-[#0B0B0D] text-[#F2F0EC] pt-24 pb-16 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 w-full space-y-12">
+    <div className="min-h-screen bg-[#0B0B0D] text-[#F2F0EC] pt-24 pb-20 w-full px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 space-y-12">
       
       {/* ==================================================
-          SECTION 01 — EDITORIAL INTRO HEADER
+          1. EDITORIAL HEADER
          ================================================== */}
-      <section className="space-y-6 border-b border-white/10 pb-8">
-        <div className="space-y-3">
+      <header className="border-b border-white/10 pb-6 space-y-3">
+        <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-2">
-            <span className="type-label bg-[#E43D3D] text-white px-2 py-0.5">
-              PRESTIGE TELEVISION
+            <span className="type-label bg-[#E43D3D] text-white px-2 py-0.5 font-bold">
+              TELEVISION ARCHIVE
             </span>
-            <span className="type-label text-[#929298] font-mono">
-              LIVE TMDB ARCHIVE
-            </span>
+            {activeGenreName && (
+              <span className="type-label text-[#8E8E93] border border-white/15 px-2 py-0.5">
+                {activeGenreName.toUpperCase()}
+              </span>
+            )}
+            {categoryNameParam && (
+              <span className="type-label text-[#8E8E93] border border-white/15 px-2 py-0.5">
+                {categoryNameParam.toUpperCase()}
+              </span>
+            )}
           </div>
 
-          <h1 className="type-display-l text-white">
-            {pageTitle}
-          </h1>
-
-          <p className="type-body-l max-w-2xl font-light text-[#929298]">
-            {pageSubtitle}
-          </p>
+          <span className="text-[11px] font-mono text-[#8E8E93] tracking-widest uppercase">
+            EPISODIC MEDIA DIRECTORY
+          </span>
         </div>
 
-        {/* Compact Discovery Control Bar */}
-        <div className="bg-[#111114] border border-white/10 p-4 space-y-4">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-            
-            {/* Search Input */}
-            <div className="relative w-full md:w-80">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#E43D3D]" />
-              <input
-                type="text"
-                placeholder="Search TV shows by title..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full bg-[#0B0B0D] border border-white/15 focus:border-[#E43D3D] text-xs text-white pl-9 pr-4 py-2 outline-none font-mono"
-              />
-            </div>
-
-            {/* Controls & View Mode */}
-            <div className="flex flex-wrap items-center gap-3 w-full md:w-auto justify-between md:justify-end">
-              
-              {/* Year Filter */}
-              <div className="flex items-center gap-1.5 text-xs">
-                <span className="type-label text-[#929298]">YEAR:</span>
-                <select
-                  value={selectedYear}
-                  onChange={(e) => setSelectedYear(e.target.value)}
-                  className="bg-[#0B0B0D] border border-white/15 text-white text-xs px-2.5 py-1.5 outline-none focus:border-[#E43D3D] font-mono"
-                >
-                  <option value="All">ALL YEARS</option>
-                  <option value="2024">2024</option>
-                  <option value="2023">2023</option>
-                  <option value="2022">2022</option>
-                  <option value="2020s">2020s</option>
-                  <option value="2010s">2010s</option>
-                  <option value="2000s">2000s</option>
-                </select>
-              </div>
-
-              {/* Rating Filter */}
-              <div className="flex items-center gap-1.5 text-xs">
-                <span className="type-label text-[#929298]">RATING:</span>
-                <select
-                  value={minRating}
-                  onChange={(e) => setMinRating(parseFloat(e.target.value))}
-                  className="bg-[#0B0B0D] border border-white/15 text-white text-xs px-2.5 py-1.5 outline-none focus:border-[#E43D3D] font-mono"
-                >
-                  <option value="0">ALL RATINGS</option>
-                  <option value="8">8.0+ RATED</option>
-                  <option value="7">7.0+ RATED</option>
-                  <option value="6">6.0+ RATED</option>
-                </select>
-              </div>
-
-              {/* Sort By */}
-              <div className="flex items-center gap-1.5 text-xs">
-                <span className="type-label text-[#929298]">SORT:</span>
-                <select
-                  value={sortBy}
-                  onChange={(e) => setSortBy(e.target.value)}
-                  className="bg-[#0B0B0D] border border-white/15 text-white text-xs px-3 py-1.5 outline-none focus:border-[#E43D3D] font-mono"
-                >
-                  <option value="popularity.desc">MOST POPULAR</option>
-                  <option value="vote_average.desc">HIGHEST RATED</option>
-                  <option value="first_air_date.desc">NEWEST AIR DATE</option>
-                  <option value="name.asc">TITLE A-Z</option>
-                </select>
-              </div>
-
-              {/* Grid / List View Toggles */}
-              <div className="flex items-center gap-1 border border-white/15 p-1 bg-[#0B0B0D]">
-                <button
-                  onClick={() => setViewMode('grid')}
-                  className={`p-1 transition-colors ${viewMode === 'grid' ? 'bg-[#E43D3D] text-white' : 'text-[#929298] hover:text-white'}`}
-                  aria-label="Grid view"
-                >
-                  <Grid className="w-3.5 h-3.5" />
-                </button>
-                <button
-                  onClick={() => setViewMode('list')}
-                  className={`p-1 transition-colors ${viewMode === 'list' ? 'bg-[#E43D3D] text-white' : 'text-[#929298] hover:text-white'}`}
-                  aria-label="List view"
-                >
-                  <ListIcon className="w-3.5 h-3.5" />
-                </button>
-              </div>
-
-            </div>
-
-          </div>
-
-          {/* Genre Strip */}
-          {genres.length > 0 && (
-            <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-white/10">
-              <div className="flex flex-wrap items-center gap-1.5">
-                <span className="type-label text-[#929298] mr-2">GENRE:</span>
-                <button
-                  onClick={() => setSelectedGenre('All')}
-                  className={`text-xs px-2.5 py-0.5 font-bold uppercase transition-all ${
-                    selectedGenre === 'All'
-                      ? 'bg-[#E43D3D] text-white'
-                      : 'bg-[#0B0B0D] text-[#929298] hover:text-white border border-white/10'
-                  }`}
-                >
-                  ALL
-                </button>
-                {genres.map(genre => (
-                  <button
-                    key={genre.id}
-                    onClick={() => setSelectedGenre(genre.id.toString())}
-                    className={`text-xs px-2.5 py-0.5 font-bold uppercase transition-all ${
-                      selectedGenre === genre.id.toString()
-                        ? 'bg-[#E43D3D] text-white'
-                        : 'bg-[#0B0B0D] text-[#929298] hover:text-white border border-white/10'
-                    }`}
-                  >
-                    {genre.name}
-                  </button>
-                ))}
-              </div>
-
-              <button
-                onClick={resetFilters}
-                className="btn-link inline-flex items-center gap-2 text-white text-md fw-bold uppercase text-[#929298] hover:text-[#E43D3D] text-[11px]"
-              >
-                <RotateCcw className="w-3 h-3" />
-                <span>RESET FILTERS</span>
-              </button>
-            </div>
-          )}
-        </div>
-      </section>
+        <h1 className="type-display-l text-white tracking-tight uppercase leading-none">
+          TV SHOWS
+        </h1>
+      </header>
 
       {/* ==================================================
-          SECTION 02 — TRENDING TV (CURATED EDITORIAL RAIL)
+          2. TRENDING TV (DISTINCTIVE RHYTHM BEFORE CONTROLS)
          ================================================== */}
-      {trendingSeries.length > 0 && !selectedGenre && !searchTerm && (
+      {trendingSeries.length > 0 && (
         <section className="space-y-4">
           <SectionHeader
-            label="CURATED"
-            title="TRENDING TV"
-            description="Broadcast series and streaming hits trending across global audiences."
+            label="TRENDING"
+            title="TRENDING TV SHOWS"
           />
           <HorizontalRail items={trendingSeries} variant="poster" />
         </section>
       )}
 
       {/* ==================================================
-          SECTION 03 — DENSE 6-COLUMN DESKTOP CATALOG GRID
+          3. DISCOVERY CONTROLS BAR
          ================================================== */}
-      {loading ? (
-        <CardGridSkeleton count={12} />
-      ) : error ? (
-        <ErrorState
-          title="UNABLE TO LOAD TV SHOWS"
-          message="Could not connect to live television catalog database."
-          onRetry={() => fetchSeries(1, false)}
-        />
-      ) : filteredSeries.length === 0 ? (
-        <EmptyState
-          variant={searchTerm ? 'search' : 'genre'}
-          onAction={resetFilters}
-        />
-      ) : (
-        <section className="space-y-6 pt-4">
-          <SectionHeader
-            label="DISCOVERY"
-            title={selectedGenre !== 'All' ? `CATALOG — ${activeGenreName || 'GENRE'}` : "ALL TV SHOWS"}
-            description={`Displaying ${filteredSeries.length} live television titles from the archive.`}
-          />
-
-          <div className={viewMode === 'grid'
-            ? 'grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 sm:gap-4'
-            : 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4'
-          }>
-            {filteredSeries.map(series => (
-              <MediaCard key={series.id} item={series} variant={viewMode === 'grid' ? 'poster' : 'horizontal'} />
-            ))}
+      <section className="bg-[#111114] border border-white/10 p-3 sm:p-4 space-y-3 shadow-xl">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div className="flex items-center gap-2 text-xs font-mono text-[#8E8E93]">
+            <SlidersHorizontal className="w-3.5 h-3.5 text-[#E43D3D]" />
+            <span className="uppercase font-bold tracking-wider text-white">SERIES DISCOVERY FILTERS</span>
           </div>
 
-          {/* Sentinel Element for Infinite Preloading (~2nd last row) */}
-          <div ref={sentinelRef} className="h-1 w-full" />
-
-          {loadingMore && <InfiniteLoadingSkeleton count={6} />}
-
-          {errorMore && (
-            <InfiniteErrorState onRetry={() => fetchSeries(page, true)} />
+          {hasActiveFilters && (
+            <button
+              onClick={handleResetFilters}
+              className="inline-flex items-center gap-1.5 text-xs font-mono text-[#8E8E93] hover:text-[#E43D3D] transition-colors"
+            >
+              <RotateCcw className="w-3 h-3" />
+              <span>RESET FILTERS</span>
+            </button>
           )}
+        </div>
 
-          {!hasMore && seriesList.length > 0 && (
-            <EndOfContentState />
+        {/* Compact Filter Row */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2.5 pt-1">
+          {/* Genre Control */}
+          <div className="space-y-1">
+            <label className="text-[10px] font-mono uppercase text-[#8E8E93] block">GENRE</label>
+            <select
+              value={selectedGenre}
+              onChange={(e) => setSelectedGenre(e.target.value)}
+              className={`w-full bg-[#0B0B0D] border text-xs px-2.5 py-1.5 outline-none font-mono transition-colors ${
+                selectedGenre !== 'All'
+                  ? 'border-[#E43D3D] text-[#E43D3D] font-bold'
+                  : 'border-white/15 text-white focus:border-white/40'
+              }`}
+            >
+              <option value="All">ALL GENRES</option>
+              {genres.map((g) => (
+                <option key={g.id} value={g.id.toString()}>
+                  {g.name.toUpperCase()}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Premiere Year */}
+          <div className="space-y-1">
+            <label className="text-[10px] font-mono uppercase text-[#8E8E93] block">PREMIERE YEAR</label>
+            <select
+              value={selectedYear}
+              onChange={(e) => setSelectedYear(e.target.value)}
+              className={`w-full bg-[#0B0B0D] border text-xs px-2.5 py-1.5 outline-none font-mono transition-colors ${
+                selectedYear !== 'All'
+                  ? 'border-[#E43D3D] text-[#E43D3D] font-bold'
+                  : 'border-white/15 text-white focus:border-white/40'
+              }`}
+            >
+              {YEAR_OPTIONS.map((y) => (
+                <option key={y.value} value={y.value}>
+                  {y.label}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Min Rating */}
+          <div className="space-y-1">
+            <label className="text-[10px] font-mono uppercase text-[#8E8E93] block">MIN RATING</label>
+            <select
+              value={selectedRating}
+              onChange={(e) => setSelectedRating(e.target.value)}
+              className={`w-full bg-[#0B0B0D] border text-xs px-2.5 py-1.5 outline-none font-mono transition-colors ${
+                selectedRating !== 'All'
+                  ? 'border-[#E43D3D] text-[#E43D3D] font-bold'
+                  : 'border-white/15 text-white focus:border-white/40'
+              }`}
+            >
+              {RATING_OPTIONS.map((r) => (
+                <option key={r.value} value={r.value}>
+                  {r.label}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Sort Order */}
+          <div className="space-y-1">
+            <label className="text-[10px] font-mono uppercase text-[#8E8E93] block">SORT ORDER</label>
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value)}
+              className={`w-full bg-[#0B0B0D] border text-xs px-2.5 py-1.5 outline-none font-mono transition-colors ${
+                sortBy !== 'popularity.desc'
+                  ? 'border-[#E43D3D] text-[#E43D3D] font-bold'
+                  : 'border-white/15 text-white focus:border-white/40'
+              }`}
+            >
+              {SORT_OPTIONS.map((s) => (
+                <option key={s.value} value={s.value}>
+                  {s.label}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Original Language */}
+          <div className="space-y-1">
+            <label className="text-[10px] font-mono uppercase text-[#8E8E93] block">ORIGINAL LANGUAGE</label>
+            <select
+              value={selectedLanguage}
+              onChange={(e) => setSelectedLanguage(e.target.value)}
+              className={`w-full bg-[#0B0B0D] border text-xs px-2.5 py-1.5 outline-none font-mono transition-colors ${
+                selectedLanguage !== 'All'
+                  ? 'border-[#E43D3D] text-[#E43D3D] font-bold'
+                  : 'border-white/15 text-white focus:border-white/40'
+              }`}
+            >
+              {LANGUAGE_OPTIONS.map((l) => (
+                <option key={l.value} value={l.value}>
+                  {l.label}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+      </section>
+
+      {/* ==================================================
+          4. ALL TV SHOWS (EXACTLY 6 CARDS PER ROW ON DESKTOP)
+         ================================================== */}
+      <section className="space-y-6 pt-4 border-t border-white/10">
+        <div className="flex items-baseline justify-between">
+          <SectionHeader
+            label="EXPLORE"
+            title={activeGenreName ? `${activeGenreName.toUpperCase()} SERIES` : 'ALL TV SHOWS'}
+          />
+
+          {!loading && seriesList.length > 0 && (
+            <span className="text-[10px] font-mono text-[#8E8E93] tracking-widest uppercase">
+              PAGE {page} • {seriesList.length} SHOWS
+            </span>
           )}
-        </section>
-      )}
+        </div>
+
+        {/* Initial Loading Skeleton */}
+        {loading && (
+          <CardGridSkeleton count={18} variant="poster" />
+        )}
+
+        {/* Initial Error State */}
+        {!loading && error && (
+          <ErrorState
+            title="FAILED TO LOAD TV SHOWS"
+            message="Could not connect to the live TV catalog database. Please verify your connection and retry."
+            onRetry={() => fetchTvData(1, false)}
+          />
+        )}
+
+        {/* Empty State */}
+        {!loading && !error && seriesList.length === 0 && (
+          <EmptyState
+            title="NO TV SHOWS FOUND"
+            message="No television series match the selected filter combination."
+            actionText="RESET FILTERS"
+            onAction={handleResetFilters}
+          />
+        )}
+
+        {/* Dense Responsive Grid (2 Mobile, 4 Tablet, 6 Desktop) */}
+        {!loading && !error && seriesList.length > 0 && (
+          <>
+            <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4">
+              {seriesList.map((series) => (
+                <MediaCard key={series.id} item={series} variant="poster" />
+              ))}
+            </div>
+
+            {/* Next Page Skeleton Loading */}
+            {loadingMore && (
+              <InfiniteLoadingSkeleton count={6} />
+            )}
+
+            {/* Next Page Error State with Retry Button */}
+            {errorMore && (
+              <InfiniteErrorState onRetry={() => fetchTvData(page + 1, true)} />
+            )}
+
+            {/* End of content indicator */}
+            {!hasMore && seriesList.length > 0 && (
+              <EndOfContentState />
+            )}
+
+            {/* Intersection Observer Sentinel for continuous prefetching */}
+            <div ref={sentinelRef} className="h-10 w-full pointer-events-none" />
+          </>
+        )}
+      </section>
 
     </div>
   );
 };
+
+export default SeriesPage;

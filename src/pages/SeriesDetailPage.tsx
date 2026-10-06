@@ -1,30 +1,26 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { Play, Star, ArrowLeft, Tv, Building2, Layers, Globe, Film, Image as ImageIcon } from 'lucide-react';
-import { getTvDetail, getTvSeasonDetail } from '../services/tmdb';
-import { Series, Episode } from '../types';
+import { Play, Star, ArrowLeft, Building2, Globe } from 'lucide-react';
+import { getTvDetail } from '../services/tmdb';
+import { Series } from '../types';
 import { useApp } from '../context/AppContext';
 import { selectPrimaryVideo, sortVideosWithPrimaryFirst, getVideoButtonLabel } from '../utils/trailer';
-import { MediaCard, CastCard, PersonCard } from '../components/MediaCard';
+import { MediaCard, PersonCard } from '../components/MediaCard';
 import { SectionHeader } from '../components/SectionHeader';
 import { DetailHeroSkeleton, ErrorState } from '../components/StateViews';
-import { PhotoLightboxModal } from '../components/PhotoLightboxModal';
+import { CastCarousel } from '../components/CastCarousel';
+import { DetailMediaNav } from '../components/DetailMediaNav';
+import { SeriesEpisodesSection } from '../components/SeriesEpisodesSection';
+import { MediaVideosSection } from '../components/MediaVideosSection';
+import { MediaPhotosSection } from '../components/MediaPhotosSection';
 
 export const SeriesDetailPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
   const { openVideoPlayer } = useApp();
 
   const [series, setSeries] = useState<Series | null>(null);
-  const [selectedSeasonNumber, setSelectedSeasonNumber] = useState<number>(1);
-  const [episodes, setEpisodes] = useState<Episode[]>([]);
-  
   const [loading, setLoading] = useState(true);
-  const [seasonLoading, setSeasonLoading] = useState(false);
   const [error, setError] = useState(false);
-
-  // Photo Lightbox state
-  const [lightboxOpen, setLightboxOpen] = useState(false);
-  const [lightboxIndex, setLightboxIndex] = useState(0);
 
   const fetchSeriesDetail = async () => {
     if (!slug) return;
@@ -36,9 +32,6 @@ export const SeriesDetailPage: React.FC = () => {
         setError(true);
       } else {
         setSeries(data);
-        const firstSeason = data.seasons && data.seasons.length > 0 ? data.seasons[0].seasonNumber : 1;
-        setSelectedSeasonNumber(firstSeason);
-        loadSeasonEpisodes(data.id, firstSeason);
       }
     } catch (err) {
       console.error('Failed to load series detail', err);
@@ -48,46 +41,10 @@ export const SeriesDetailPage: React.FC = () => {
     }
   };
 
-  const loadSeasonEpisodes = async (tvId: string, seasonNum: number) => {
-    setSeasonLoading(true);
-    try {
-      const seasonData = await getTvSeasonDetail(tvId, seasonNum);
-      if (seasonData && seasonData.episodes) {
-        setEpisodes(seasonData.episodes);
-      } else {
-        setEpisodes([]);
-      }
-    } catch (err) {
-      console.error('Failed to load season episodes', err);
-      setEpisodes([]);
-    } finally {
-      setSeasonLoading(false);
-    }
-  };
-
   useEffect(() => {
     fetchSeriesDetail();
     window.scrollTo(0, 0);
   }, [slug]);
-
-  const handleSeasonChange = (seasonNum: number) => {
-    setSelectedSeasonNumber(seasonNum);
-    if (series) {
-      loadSeasonEpisodes(series.id, seasonNum);
-    }
-  };
-
-  const scrollToSeasons = () => {
-    const el = document.getElementById('seasons-section');
-    if (el) {
-      el.scrollIntoView({ behavior: 'smooth' });
-    }
-  };
-
-  const openLightboxAt = (index: number) => {
-    setLightboxIndex(index);
-    setLightboxOpen(true);
-  };
 
   if (loading) {
     return (
@@ -110,13 +67,32 @@ export const SeriesDetailPage: React.FC = () => {
   }
 
   const relatedSeries = series.recommendations?.length ? series.recommendations : (series.similar || []);
-  const activeSeasonObj = series.seasons?.find(s => s.seasonNumber === selectedSeasonNumber);
 
   // Real TMDb media items and prioritized video playlist
   const playableVideos = sortVideosWithPrimaryFirst(series.videos, series.language);
   const primaryVideo = selectPrimaryVideo(series.videos, series.language) || series.primaryVideo || null;
   const primaryVideoLabel = getVideoButtonLabel(primaryVideo);
-  const photos = series.images && series.images.length > 0 ? series.images : (series.backdrop ? [series.backdrop] : []);
+
+  // Photos split from real TMDb data
+  const backdropImages = series.backdrops && series.backdrops.length > 0
+    ? series.backdrops
+    : (series.backdrop ? [series.backdrop] : []);
+  const posterImages = series.posters && series.posters.length > 0
+    ? series.posters
+    : (series.poster ? [series.poster] : []);
+  const totalPhotosCount = backdropImages.length + posterImages.length;
+
+  // Total real episode count across all seasons
+  const totalEpisodesCount = series.totalEpisodes || (series.seasons || []).reduce((acc, s) => acc + (s.episodeCount || 0), 0);
+
+  // Compact sub-navigation anchor items for TV
+  const navSections = [
+    { id: 'overview-section', label: 'OVERVIEW' },
+    ...(series.cast && series.cast.length > 0 ? [{ id: 'cast-section', label: 'CAST', count: series.cast.length }] : []),
+    ...(series.seasons && series.seasons.length > 0 ? [{ id: 'episodes-section', label: 'EPISODES', count: totalEpisodesCount }] : []),
+    ...(playableVideos.length > 0 ? [{ id: 'videos-section', label: 'VIDEOS', count: playableVideos.length }] : []),
+    ...(totalPhotosCount > 0 ? [{ id: 'photos-section', label: 'PHOTOS', count: totalPhotosCount }] : [])
+  ];
 
   return (
     <div className="min-h-screen bg-[#0B0B0D] text-[#F2F0EC] pb-24 selection:bg-[#E43D3D] selection:text-white">
@@ -178,38 +154,35 @@ export const SeriesDetailPage: React.FC = () => {
                   <Star className="w-3.5 h-3.5 fill-[#E43D3D] text-[#E43D3D]" />
                   <span className="font-bold text-white">{series.rating.toFixed(1)}</span>
                   <span className="text-[#8E8E93] text-[10px]">/ 10</span>
-                  {series.voteCount > 0 && (
-                    <span className="text-[#8E8E93] text-[10px] border-l border-white/15 pl-1.5 ml-1">
-                      {series.voteCount.toLocaleString()} VOTES
-                    </span>
-                  )}
                 </div>
               )}
             </div>
 
-            {/* Title & Tagline */}
-            <div className="space-y-3 max-w-5xl">
-              <h1 className="text-4xl sm:text-6xl lg:text-7xl xl:text-8xl font-serif font-bold tracking-tight text-[#F2F0EC] leading-none uppercase">
-                {series.title}
-              </h1>
-              {series.tagline && (
-                <p className="text-lg sm:text-xl md:text-2xl font-serif italic text-[#E43D3D]/90 max-w-3xl leading-snug">
-                  "{series.tagline}"
-                </p>
-              )}
-            </div>
+            {/* Tagline if available */}
+            {series.tagline && (
+              <p className="text-xs sm:text-sm font-mono tracking-[0.2em] text-[#E43D3D] uppercase font-bold">
+                "{series.tagline}"
+              </p>
+            )}
 
-            {/* Multi-Parameter Series Metadata Line */}
-            <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-xs sm:text-sm font-mono text-[#8E8E93] pt-1 border-y border-white/10 py-3">
-              <span className="text-[#F2F0EC] font-bold">FIRST AIR: {series.firstAirDate || series.year}</span>
-              <span>•</span>
-              <span className="text-[#F2F0EC] font-bold">{series.seasonsCount} SEASONS</span>
-              <span>•</span>
-              <span className="text-[#F2F0EC] font-bold">{series.totalEpisodes} EPISODES</span>
-              {series.episodeRuntime && (
+            {/* Title */}
+            <h1 className="text-4xl sm:text-6xl lg:text-7xl font-serif font-bold text-[#F2F0EC] tracking-tight uppercase leading-none">
+              {series.title}
+            </h1>
+
+            {/* Metadata Bar */}
+            <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-xs sm:text-sm font-mono text-[#8E8E93]">
+              <span className="text-[#F2F0EC] font-semibold">{series.year}</span>
+              {series.seasonsCount > 0 && (
                 <>
                   <span>•</span>
-                  <span className="text-[#8E8E93]">{series.episodeRuntime} / EP</span>
+                  <span className="text-[#F2F0EC] font-semibold">{series.seasonsCount} {series.seasonsCount === 1 ? 'Season' : 'Seasons'}</span>
+                </>
+              )}
+              {series.totalEpisodes > 0 && (
+                <>
+                  <span>•</span>
+                  <span className="text-[#F2F0EC]">{series.totalEpisodes} Episodes</span>
                 </>
               )}
               {series.genres.length > 0 && (
@@ -238,39 +211,40 @@ export const SeriesDetailPage: React.FC = () => {
                 </button>
               )}
 
-              <button
-                type="button"
-                onClick={scrollToSeasons}
-                className="bg-transparent hover:bg-white/5 border border-white/20 text-[#F2F0EC] px-6 py-3.5 text-xs font-mono font-bold tracking-widest uppercase flex items-center gap-2 transition-all"
-              >
-                <Layers className="w-4 h-4 text-[#E43D3D]" />
-                <span>EXPLORE SEASONS</span>
-              </button>
+              {series.seasons && series.seasons.length > 0 && (
+                <button
+                  type="button"
+                  onClick={() => document.getElementById('episodes-section')?.scrollIntoView({ behavior: 'smooth' })}
+                  className="bg-transparent hover:bg-white/5 border border-white/20 text-[#F2F0EC] px-6 py-3.5 text-xs font-mono font-bold tracking-widest uppercase flex items-center gap-2 transition-all"
+                >
+                  <span>VIEW EPISODES</span>
+                </button>
+              )}
 
-              {playableVideos.length > 0 && (
-                <a
-                  href="#videos-section"
+              {series.cast && series.cast.length > 0 && (
+                <button
+                  type="button"
+                  onClick={() => document.getElementById('cast-section')?.scrollIntoView({ behavior: 'smooth' })}
                   className="bg-transparent hover:bg-white/5 border border-white/20 text-[#8E8E93] hover:text-white px-5 py-3.5 text-xs font-mono font-bold tracking-widest uppercase flex items-center gap-2 transition-all"
                 >
-                  <Film className="w-3.5 h-3.5 text-[#E43D3D]" />
-                  <span>VIDEOS ({playableVideos.length})</span>
-                </a>
+                  <span>CAST ({series.cast.length})</span>
+                </button>
               )}
             </div>
 
           </div>
 
-          {/* Secondary Poster Anchor */}
+          {/* Right Poster Anchor */}
           <div className="lg:col-span-3 hidden lg:block">
-            <div className="relative group/anchor aspect-[2/3] max-w-[260px] ml-auto border border-white/20 bg-[#111114] shadow-2xl overflow-hidden transform -rotate-1 hover:rotate-0 transition-transform duration-500">
+            <div className="relative aspect-[2/3] max-w-[260px] ml-auto border border-white/20 bg-[#111114] shadow-2xl overflow-hidden group/poster">
               <img
                 src={series.poster}
                 alt={series.title}
-                className="w-full h-full object-cover group-hover/anchor:scale-105 transition-transform duration-500"
+                className="w-full h-full object-cover group-hover/poster:scale-105 transition-transform duration-500"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-60" />
-              <div className="absolute bottom-3 left-3 right-3 text-[10px] font-mono text-[#8E8E93] uppercase tracking-wider flex justify-between">
-                <span>SERIES ANCHOR</span>
+              <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-60" />
+              <div className="absolute bottom-3 left-3 right-3 text-[10px] font-mono text-[#8E8E93] uppercase flex justify-between">
+                <span>POSTER ART</span>
                 <span className="text-[#E43D3D] font-bold">{series.language}</span>
               </div>
             </div>
@@ -281,20 +255,25 @@ export const SeriesDetailPage: React.FC = () => {
       </section>
 
       {/* ==================================================
-          2. TV SERIES OVERVIEW & SPECIFICATIONS
+          COMPACT DETAIL MEDIA SUB-NAV
          ================================================== */}
-      <section className="mt-16 sm:mt-24 px-4 sm:px-8 md:px-12 mx-auto max-w-7xl">
+      <DetailMediaNav sections={navSections} />
+
+      {/* ==================================================
+          2. NARRATIVE SYNOPSIS & SPECIFICATIONS
+         ================================================== */}
+      <section id="overview-section" className="mt-12 sm:mt-16 px-4 sm:px-8 md:px-12 mx-auto max-w-7xl scroll-mt-28">
         
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start border-t border-white/10 pt-12">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start border-t border-white/10 pt-10">
           
-          {/* LEFT: THE SERIES OVERVIEW */}
+          {/* LEFT: SYNOPSIS */}
           <div className="lg:col-span-7 space-y-6">
             <div className="space-y-1">
               <span className="text-[10px] font-mono tracking-[0.2em] text-[#E43D3D] uppercase block">
-                SERIES STATEMENT
+                NARRATIVE ARC
               </span>
               <h2 className="text-2xl sm:text-3xl font-serif font-bold text-[#F2F0EC] uppercase">
-                THE SERIES
+                SERIES OVERVIEW
               </h2>
             </div>
 
@@ -323,7 +302,6 @@ export const SeriesDetailPage: React.FC = () => {
             </div>
 
             <div className="divide-y divide-white/10 text-xs font-mono">
-              
               <div className="py-3 flex items-center justify-between">
                 <span className="text-[#8E8E93]">FIRST AIR DATE</span>
                 <span className="text-[#F2F0EC] font-bold">{series.firstAirDate || 'N/A'}</span>
@@ -369,7 +347,6 @@ export const SeriesDetailPage: React.FC = () => {
                   </span>
                 </div>
               )}
-
             </div>
           </div>
 
@@ -378,11 +355,10 @@ export const SeriesDetailPage: React.FC = () => {
       </section>
 
       {/* ==================================================
-          3. TV CREATORS
+          3. TV CREATORS (SHOWRUNNERS)
          ================================================== */}
       {((series.creatorDetails && series.creatorDetails.length > 0) || (series.creators && series.creators.length > 0)) && (
-        <section className="mt-20 sm:mt-28 px-4 sm:px-8 md:px-12 mx-auto max-w-7xl space-y-8">
-          
+        <section className="mt-20 sm:mt-28 px-4 sm:px-8 md:px-12 mx-auto max-w-7xl space-y-6">
           <SectionHeader
             label="SHOWRUNNERS"
             title="CREATED BY"
@@ -410,434 +386,112 @@ export const SeriesDetailPage: React.FC = () => {
               ))
             )}
           </div>
-
-        </section>
-      )}
-
-      {/* CAST SECTION */}
-      {series.cast && series.cast.length > 0 && (
-        <section className="mt-16 sm:mt-20 px-4 sm:px-8 md:px-12 mx-auto max-w-7xl space-y-6">
-          
-          <SectionHeader
-            label="ENSEMBLE CAST"
-            title="CAST"
-            description="Principal cast members and starring roles across series seasons."
-          />
-
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4">
-            {series.cast.map(person => (
-              <CastCard
-                key={person.id}
-                id={person.id}
-                name={person.name}
-                character={person.character}
-                image={person.image}
-                slug={person.slug}
-              />
-            ))}
-          </div>
-
         </section>
       )}
 
       {/* ==================================================
-          4. TV SEASONS — CORE NAVIGATION EXPERIENCE
+          4. CAST — HORIZONTAL CONTENT CAROUSEL
+         ================================================== */}
+      {series.cast && series.cast.length > 0 && (
+        <section id="cast-section" className="mt-20 sm:mt-28 px-4 sm:px-8 md:px-12 mx-auto max-w-7xl scroll-mt-28">
+          <CastCarousel cast={series.cast} title="CAST" />
+        </section>
+      )}
+
+      {/* ==================================================
+          5. TV EPISODES — SEASON SELECTOR & DENSE GRID
          ================================================== */}
       {series.seasons && series.seasons.length > 0 && (
-        <section id="seasons-section" className="mt-24 sm:mt-32 px-4 sm:px-8 md:px-12 mx-auto max-w-7xl space-y-8 scroll-mt-24">
-          
-          <SectionHeader
-            label="SEASON ARCHIVE"
-            title="SEASONS"
-            description="Select a season to inspect full episode listings, air dates, and stills."
+        <div className="mt-20 sm:mt-28 px-4 sm:px-8 md:px-12 mx-auto max-w-7xl">
+          <SeriesEpisodesSection
+            id="episodes-section"
+            seriesId={series.id}
+            seriesTitle={series.title}
+            seasons={series.seasons}
           />
-
-          {/* Clean Horizontal Season Selector Bar */}
-          <div className="flex items-stretch gap-3 sm:gap-4 overflow-x-auto no-scrollbar pb-3 pt-1">
-            {series.seasons.map((season) => {
-              const isSelected = selectedSeasonNumber === season.seasonNumber;
-              return (
-                <button
-                  key={season.seasonNumber}
-                  onClick={() => handleSeasonChange(season.seasonNumber)}
-                  className={`flex-shrink-0 w-[140px] sm:w-[170px] text-left border transition-all duration-300 group/season overflow-hidden ${
-                    isSelected
-                      ? 'bg-[#17171B] border-[#E43D3D] shadow-lg scale-[1.02]'
-                      : 'bg-[#111114] border-white/10 hover:border-white/30'
-                  }`}
-                >
-                  <div className="relative w-full aspect-[2/3] bg-black overflow-hidden">
-                    <img
-                      src={season.poster || series.poster}
-                      alt={season.title}
-                      className="w-full h-full object-cover transition-transform duration-500 group-hover/season:scale-105"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-black/20 opacity-70" />
-                    
-                    <div className="absolute top-2 left-2 z-10">
-                      <span className={`text-[8px] font-mono font-extrabold uppercase px-1.5 py-0.5 ${
-                        isSelected ? 'bg-[#E43D3D] text-white' : 'bg-black/80 text-white border border-white/20'
-                      }`}>
-                        S0{season.seasonNumber}
-                      </span>
-                    </div>
-                  </div>
-
-                  <div className="p-3 space-y-1">
-                    <h4 className={`font-serif font-bold text-xs sm:text-sm truncate transition-colors ${
-                      isSelected ? 'text-[#E43D3D]' : 'text-[#F2F0EC] group-hover/season:text-[#E43D3D]'
-                    }`}>
-                      {season.title}
-                    </h4>
-                    <div className="flex items-center justify-between text-[10px] font-mono text-[#8E8E93]">
-                      <span>{season.year || 'N/A'}</span>
-                      <span className="text-[#F2F0EC] font-bold">{season.episodeCount} EP</span>
-                    </div>
-                  </div>
-                </button>
-              );
-            })}
-          </div>
-
-          {/* Active Season Overview Header */}
-          {activeSeasonObj && (
-            <div className="bg-[#111114] border border-white/10 p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-              <div className="space-y-1">
-                <span className="text-[10px] font-mono tracking-[0.2em] text-[#E43D3D] uppercase block">
-                  SELECTED SEASON
-                </span>
-                <h3 className="text-xl sm:text-2xl font-serif font-bold text-[#F2F0EC]">
-                  {activeSeasonObj.title}
-                </h3>
-                {activeSeasonObj.overview && (
-                  <p className="text-xs font-light text-[#8E8E93] max-w-3xl pt-1">
-                    {activeSeasonObj.overview}
-                  </p>
-                )}
-              </div>
-              <div className="text-xs font-mono text-[#8E8E93]">
-                <span className="bg-white/5 border border-white/10 px-3 py-1.5 text-[#F2F0EC] font-bold inline-block">
-                  {episodes.length} EPISODES LOADED
-                </span>
-              </div>
-            </div>
-          )}
-
-          {/* ==================================================
-              5. TV EPISODES — CORE EDITORIAL LIST
-             ================================================== */}
-          {seasonLoading ? (
-            <div className="p-12 text-center text-[#8E8E93] font-mono text-xs uppercase animate-pulse border border-white/10 bg-[#111114]">
-              FETCHING SEASON {selectedSeasonNumber} EPISODE ARCHIVE...
-            </div>
-          ) : episodes.length === 0 ? (
-            <div className="p-12 bg-[#111114] border border-white/10 text-center text-[#8E8E93] font-mono text-xs uppercase">
-              NO EPISODE DATA RECORDED FOR THIS SEASON.
-            </div>
-          ) : (
-            <div className="space-y-3">
-              {episodes.map(ep => (
-                <div
-                  key={ep.id}
-                  className="bg-[#111114] border border-white/10 hover:border-[#E43D3D] p-4 sm:p-5 flex flex-col md:flex-row items-start md:items-center justify-between gap-5 transition-all group/ep"
-                >
-                  <div className="flex flex-col sm:flex-row items-start gap-4 min-w-0 w-full md:w-auto">
-                    
-                    {/* Episode Still Container */}
-                    <div className="w-full sm:w-40 md:w-44 aspect-[16/9] bg-black flex-shrink-0 border border-white/10 overflow-hidden relative">
-                      <img
-                        src={ep.stillImage}
-                        alt={ep.title}
-                        className="w-full h-full object-cover group-hover/ep:scale-105 transition-transform duration-300"
-                        loading="lazy"
-                      />
-                      {ep.runtime && ep.runtime !== 'N/A' && (
-                        <span className="absolute bottom-1 right-1 bg-black/80 text-white font-mono text-[9px] px-1.5 py-0.5">
-                          {ep.runtime}
-                        </span>
-                      )}
-                    </div>
-
-                    {/* Episode Meta & Synopsis */}
-                    <div className="space-y-1.5 min-w-0 flex-grow">
-                      <div className="flex flex-wrap items-center gap-2 text-[10px] font-mono text-[#8E8E93]">
-                        <span className="text-[#E43D3D] font-bold">EPISODE {ep.episodeNumber}</span>
-                        {ep.airDate && <span>• {ep.airDate}</span>}
-                        {ep.rating > 0 && (
-                          <>
-                            <span>•</span>
-                            <span className="text-[#E43D3D] font-bold">★ {ep.rating.toFixed(1)}</span>
-                          </>
-                        )}
-                      </div>
-
-                      <h4 className="font-serif font-bold text-base sm:text-lg text-[#F2F0EC] group-hover/ep:text-[#E43D3D] transition-colors truncate">
-                        {ep.title}
-                      </h4>
-
-                      <p className="text-xs font-light text-[#8E8E93] line-clamp-2 max-w-3xl leading-relaxed">
-                        {ep.synopsis}
-                      </p>
-
-                      {ep.guestStars && ep.guestStars.length > 0 && (
-                        <div className="text-[10px] font-mono text-[#8E8E93]/70 pt-0.5">
-                          Guest Stars: <span className="text-[#8E8E93]">{ep.guestStars.join(', ')}</span>
-                        </div>
-                      )}
-                    </div>
-
-                  </div>
-
-                  {playableVideos.length > 0 && (
-                    <button
-                      onClick={() => openVideoPlayer(playableVideos, 0, `${series.title} - S${ep.seasonNumber}E${ep.episodeNumber}: ${ep.title}`)}
-                      className="bg-white/5 hover:bg-[#E43D3D] border border-white/10 text-[#F2F0EC] hover:text-white text-[10px] font-mono tracking-widest px-4 py-2 self-end md:self-center flex-shrink-0 transition-colors"
-                    >
-                      <span>PREVIEW</span>
-                    </button>
-                  )}
-                </div>
-              ))}
-            </div>
-          )}
-
-        </section>
+        </div>
       )}
 
       {/* ==================================================
-          6. TV VIDEOS (REAL TMDB VIDEOS SECTION)
+          6. TV VIDEOS — REAL TMDB MEDIA GRID + TYPE FILTER
          ================================================== */}
       {playableVideos.length > 0 && (
-        <section id="videos-section" className="mt-20 sm:mt-28 px-4 sm:px-8 md:px-12 mx-auto max-w-7xl space-y-6 scroll-mt-24">
-          <SectionHeader
-            label="OFFICIAL MEDIA"
-            title="VIDEOS"
-            description="Official series trailers, promos, teasers, and featurettes."
-          />
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-            {playableVideos.map((video, idx) => {
-              const youtubeThumb = `https://img.youtube.com/vi/${video.key}/hqdefault.jpg`;
-
-              return (
-                <div
-                  key={video.id || idx}
-                  onClick={() => openVideoPlayer(playableVideos, idx, series.title)}
-                  className="group/video bg-[#111114] border border-white/10 hover:border-[#E43D3D] transition-all duration-300 cursor-pointer flex flex-col justify-between overflow-hidden"
-                >
-                  <div className="relative aspect-video w-full bg-black overflow-hidden">
-                    <img
-                      src={youtubeThumb}
-                      alt={video.name}
-                      className="w-full h-full object-cover group-hover/video:scale-105 transition-transform duration-500"
-                      loading="lazy"
-                    />
-                    <div className="absolute inset-0 bg-black/40 group-hover/video:bg-black/20 transition-colors" />
-
-                    {/* Play Badge */}
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <div className="w-10 h-10 bg-[#E43D3D] text-white flex items-center justify-center shadow-lg group-hover/video:scale-110 transition-transform">
-                        <Play className="w-4 h-4 fill-white pl-0.5" />
-                      </div>
-                    </div>
-
-                    {/* Video Type Badge & Official Status */}
-                    <div className="absolute top-2 left-2 flex items-center gap-1.5">
-                      <span className="text-[9px] font-mono font-extrabold uppercase px-2 py-0.5 bg-black/80 text-white border border-white/20">
-                        {video.type}
-                      </span>
-                      {video.official && (
-                        <span className="text-[8px] font-mono font-bold uppercase px-1.5 py-0.5 bg-[#E43D3D] text-white">
-                          OFFICIAL
-                        </span>
-                      )}
-                    </div>
-                  </div>
-
-                  <div className="p-3 space-y-1">
-                    <h4 className="font-serif font-bold text-sm text-[#F2F0EC] group-hover/video:text-[#E43D3D] transition-colors line-clamp-1">
-                      {video.name}
-                    </h4>
-                    <div className="text-[11px] font-mono text-[#8E8E93]">
-                      <span>{video.site}</span> • <span className="uppercase text-[#E43D3D] font-bold">{video.type}</span>
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </section>
+        <div className="mt-20 sm:mt-28 px-4 sm:px-8 md:px-12 mx-auto max-w-7xl">
+          <MediaVideosSection id="videos-section" videos={playableVideos} parentTitle={series.title} />
+        </div>
       )}
 
       {/* ==================================================
-          7. TV PHOTOS (EDITORIAL GALLERY + LIGHTBOX)
+          7. TV PHOTOS — BACKDROPS & POSTERS GALLERIES
          ================================================== */}
-      {photos.length > 0 && (
-        <section id="photos-section" className="mt-20 sm:mt-28 px-4 sm:px-8 md:px-12 mx-auto max-w-7xl space-y-6">
-          <div className="flex items-end justify-between border-b border-white/10 pb-4">
-            <div>
-              <span className="text-[10px] font-mono tracking-[0.2em] text-[#E43D3D] uppercase block mb-1">
-                VISUAL ARCHIVE
-              </span>
-              <h2 className="text-2xl sm:text-3xl font-serif font-bold text-[#F2F0EC] uppercase">
-                PHOTOS ({photos.length})
-              </h2>
-            </div>
-            <button
-              onClick={() => openLightboxAt(0)}
-              className="text-xs font-mono tracking-wider text-[#8E8E93] hover:text-[#E43D3D] flex items-center gap-1.5 transition-colors"
-            >
-              <ImageIcon className="w-4 h-4 text-[#E43D3D]" />
-              <span>OPEN FULL GALLERY</span>
-            </button>
-          </div>
-
-          {/* Curated Editorial Layout: 1 Featured Large + Grid of Supporting */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
-            
-            {/* Large Featured Photo */}
-            <div
-              onClick={() => openLightboxAt(0)}
-              className="lg:col-span-8 aspect-video bg-[#111114] border border-white/10 overflow-hidden relative group/img cursor-pointer"
-            >
-              <img
-                src={photos[0]}
-                alt={`${series.title} photo 1`}
-                className="w-full h-full object-cover group-hover/img:scale-105 transition-transform duration-700"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-80" />
-              <div className="absolute bottom-3 left-3 flex items-center gap-2">
-                <span className="text-[10px] font-mono tracking-widest bg-black/80 text-[#F2F0EC] px-2.5 py-1 border border-white/10">
-                  FEATURED STILL 01
-                </span>
-                <span className="text-[10px] font-mono text-[#8E8E93] bg-black/80 px-2 py-1 border border-white/10">
-                  CLICK TO EXPAND
-                </span>
-              </div>
-            </div>
-
-            {/* Supporting Photos Column */}
-            <div className="lg:col-span-4 grid grid-cols-2 lg:grid-cols-1 gap-4">
-              {photos.slice(1, 3).map((img, idx) => (
-                <div
-                  key={idx}
-                  onClick={() => openLightboxAt(idx + 1)}
-                  className="aspect-video bg-[#111114] border border-white/10 overflow-hidden relative group/img cursor-pointer"
-                >
-                  <img
-                    src={img}
-                    alt={`${series.title} photo ${idx + 2}`}
-                    className="w-full h-full object-cover group-hover/img:scale-105 transition-transform duration-500"
-                    loading="lazy"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-70" />
-                  <span className="absolute bottom-2 left-2 text-[9px] font-mono tracking-widest bg-black/80 text-[#8E8E93] px-2 py-0.5 border border-white/10">
-                    PHOTO 0{idx + 2}
-                  </span>
-                </div>
-              ))}
-            </div>
-
-          </div>
-
-          {/* Additional Supporting Stills Horizontal Grid */}
-          {photos.length > 3 && (
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 pt-2">
-              {photos.slice(3, 9).map((img, idx) => (
-                <div
-                  key={idx}
-                  onClick={() => openLightboxAt(idx + 3)}
-                  className="aspect-video bg-[#111114] border border-white/10 overflow-hidden relative group/img cursor-pointer"
-                >
-                  <img
-                    src={img}
-                    alt={`${series.title} gallery ${idx + 4}`}
-                    className="w-full h-full object-cover group-hover/img:scale-105 transition-transform duration-300"
-                    loading="lazy"
-                  />
-                  <div className="absolute inset-0 bg-black/30 group-hover/img:bg-transparent transition-colors" />
-                  <span className="absolute bottom-1.5 left-1.5 text-[8px] font-mono bg-black/80 text-[#8E8E93] px-1.5 py-0.5">
-                    0{idx + 4}
-                  </span>
-                </div>
-              ))}
-            </div>
-          )}
-
-        </section>
+      {totalPhotosCount > 0 && (
+        <div className="mt-20 sm:mt-28 px-4 sm:px-8 md:px-12 mx-auto max-w-7xl">
+          <MediaPhotosSection
+            id="photos-section"
+            backdrops={backdropImages}
+            posters={posterImages}
+            parentTitle={series.title}
+          />
+        </div>
       )}
 
       {/* ==================================================
-          8. TV NETWORK / PRODUCTION SUPPORTING SECTION
+          8. NETWORKS & PRODUCTION COMPANIES
          ================================================== */}
       {((series.networks && series.networks.length > 0) || (series.productionCompanies && series.productionCompanies.length > 0)) && (
         <section className="mt-20 sm:mt-28 px-4 sm:px-8 md:px-12 mx-auto max-w-7xl space-y-6">
-          
           <SectionHeader
-            label="NETWORKS & STUDIOS"
-            title="BROADCASTERS & PRODUCTION"
-            description="Broadcast networks and production entities behind the show."
+            label="STUDIO DOSSIER"
+            title="NETWORKS & PRODUCTION"
+            description="Broadcast networks and production entities financing the title."
           />
 
-          <div className="flex flex-wrap gap-4">
-            {series.networks?.map(network => (
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4">
+            {(series.networks || series.productionCompanies || []).map((company, idx) => (
               <div
-                key={network.id}
-                className="bg-[#111114] border border-white/10 p-4 flex items-center gap-3 text-xs font-mono text-[#F2F0EC]"
+                key={company.id || idx}
+                className="bg-[#111114] border border-white/10 p-4 flex flex-col justify-between items-center text-center gap-3"
               >
-                <Tv className="w-4 h-4 text-[#E43D3D]" />
-                <div>
-                  <span className="block font-bold text-[#F2F0EC]">{network.name}</span>
-                  <span className="text-[10px] text-[#E43D3D] uppercase">BROADCAST NETWORK</span>
-                </div>
-              </div>
-            ))}
-            {series.productionCompanies?.map(company => (
-              <div
-                key={company.id}
-                className="bg-[#111114] border border-white/10 p-4 flex items-center gap-3 text-xs font-mono text-[#F2F0EC]"
-              >
-                <Building2 className="w-4 h-4 text-[#8E8E93]" />
-                <div>
-                  <span className="block font-bold text-[#F2F0EC]">{company.name}</span>
-                  {company.country && <span className="text-[10px] text-[#8E8E93]">{company.country}</span>}
-                </div>
+                {company.logo ? (
+                  <div className="h-10 w-full flex items-center justify-center p-1">
+                    <img
+                      src={company.logo}
+                      alt={company.name}
+                      className="max-h-full max-w-full object-contain filter invert contrast-200 opacity-80"
+                    />
+                  </div>
+                ) : (
+                  <div className="h-10 w-full flex items-center justify-center text-[#8E8E93]">
+                    <Building2 className="w-6 h-6" />
+                  </div>
+                )}
+                <span className="text-xs font-mono text-[#F2F0EC] line-clamp-1">
+                  {company.name}
+                </span>
               </div>
             ))}
           </div>
-
         </section>
       )}
 
       {/* ==================================================
-          9. TV RELATED SHOWS
+          9. RELATED TV SHOWS
          ================================================== */}
       {relatedSeries.length > 0 && (
         <section className="mt-20 sm:mt-28 px-4 sm:px-8 md:px-12 mx-auto max-w-7xl space-y-8">
-          
           <SectionHeader
             label="RECOMMENDATIONS"
-            title="RELATED SHOWS"
-            description="Television series sharing similar genre or narrative scope."
+            title="MORE LIKE THIS"
+            description="Television series sharing narrative depth and style."
           />
 
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4">
             {relatedSeries.slice(0, 6).map(item => (
               <MediaCard key={item.id} item={item} variant="poster" />
             ))}
           </div>
-
         </section>
       )}
-
-      {/* Photo Lightbox Modal */}
-      <PhotoLightboxModal
-        images={photos}
-        initialIndex={lightboxIndex}
-        isOpen={lightboxOpen}
-        onClose={() => setLightboxOpen(false)}
-        title={series.title}
-      />
 
     </div>
   );

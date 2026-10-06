@@ -152,6 +152,8 @@ export function transformTmdbMovie(item: any): Movie {
     collection,
     videos,
     images,
+    backdrops: backdropImages,
+    posters: posterImages,
     recommendations,
     similar,
     primaryVideo: selectPrimaryVideo(videos, item.original_language || 'en') || undefined,
@@ -261,6 +263,8 @@ export function transformTmdbTv(item: any): Series {
     keywords,
     videos,
     images,
+    backdrops: backdropImages,
+    posters: posterImages,
     recommendations,
     similar,
     seasons: item.seasons ? item.seasons.map((s: any) => ({

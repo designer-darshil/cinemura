@@ -104,6 +104,8 @@ export interface Movie {
   collection?: MovieCollection;
   videos?: VideoItem[];
   images?: string[];
+  backdrops?: string[];
+  posters?: string[];
   recommendations?: Movie[];
   similar?: Movie[];
   trailerUrl?: string;
@@ -150,6 +152,8 @@ export interface Series {
   keywords?: string[];
   videos?: VideoItem[];
   images?: string[];
+  backdrops?: string[];
+  posters?: string[];
   recommendations?: Series[];
   similar?: Series[];
   seasons: Season[];

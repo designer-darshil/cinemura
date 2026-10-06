@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { getMoviesList, getTvList, getMovieGenres, GenreItem } from '../services/tmdb';
-import { MediaItem } from '../types';
-import { MediaCard } from '../components/MediaCard';
+import { getMoviesList, getTvList, getMovieGenres, searchTmdb, GenreItem } from '../services/tmdb';
+import { MediaItem, Movie, Series, Person } from '../types';
+import { MediaCard, PersonCard } from '../components/MediaCard';
 import { SectionHeader } from '../components/SectionHeader';
 import {
   CardGridSkeleton,
@@ -18,19 +18,44 @@ export const DiscoverPage: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const genreParam = searchParams.get('genre') || 'All';
   const queryParam = searchParams.get('q') || '';
-  const [activeTab, setActiveTab] = useState<'all' | 'movie' | 'tv'>('all');
 
+  const [activeTab, setActiveTab] = useState<'all' | 'movie' | 'tv'>('all');
   const [items, setItems] = useState<MediaItem[]>([]);
   const [genres, setGenres] = useState<GenreItem[]>([]);
+  const [searchResults, setSearchResults] = useState<{ movies: Movie[]; series: Series[]; people: Person[] } | null>(null);
+
   const [page, setPage] = useState(1);
-  
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
   const [error, setError] = useState(false);
   const [errorMore, setErrorMore] = useState(false);
   const [hasMore, setHasMore] = useState(true);
 
+  // Perform search query when q searchParam is present
+  useEffect(() => {
+    if (queryParam.trim()) {
+      setLoading(true);
+      setError(false);
+      searchTmdb(queryParam.trim())
+        .then(res => {
+          setSearchResults(res);
+          setLoading(false);
+        })
+        .catch(err => {
+          console.error('Dedicated search failed', err);
+          setError(true);
+          setLoading(false);
+        });
+    } else {
+      setSearchResults(null);
+      setPage(1);
+      fetchDiscoveryData(1, false);
+    }
+  }, [queryParam, genreParam]);
+
   const fetchDiscoveryData = async (targetPage: number = 1, append: boolean = false) => {
+    if (queryParam.trim()) return;
+
     if (append) {
       setLoadingMore(true);
       setErrorMore(false);
@@ -83,107 +108,160 @@ export const DiscoverPage: React.FC = () => {
     }
   };
 
-  useEffect(() => {
-    setPage(1);
-    fetchDiscoveryData(1, false);
-  }, [genreParam]);
-
   const handleLoadMore = useCallback(() => {
-    if (loadingMore || !hasMore) return;
+    if (loadingMore || !hasMore || queryParam.trim()) return;
     const nextPage = page + 1;
     setPage(nextPage);
     fetchDiscoveryData(nextPage, true);
-  }, [page, loadingMore, hasMore]);
+  }, [page, loadingMore, hasMore, queryParam]);
 
   const sentinelRef = useInfiniteScroll({
     loading: loading || loadingMore,
-    hasMore,
+    hasMore: hasMore && !queryParam.trim(),
     onLoadMore: handleLoadMore
   });
 
   const filteredItems = items.filter(item => {
-    if (queryParam && !item.title.toLowerCase().includes(queryParam.toLowerCase())) {
-      return false;
-    }
     if (activeTab === 'movie') return item.type === 'movie';
     if (activeTab === 'tv') return item.type === 'tv';
     return true;
   });
 
   return (
-    <div className="min-h-screen bg-[#0B0B0D] text-[#F2F0EC] pt-24 pb-16 px-4 sm:px-8 mx-auto space-y-8">
+    <div className="min-h-screen bg-[#0B0B0D] text-[#F2F0EC] pt-28 pb-20 px-4 sm:px-8 md:px-12 mx-auto max-w-7xl space-y-8">
       
       <SectionHeader
-        label="DISCOVERY"
-        title="DISCOVER TITLES"
-        description="Explore curated genres, live categories, and award-winning titles across the CINEMURA catalog."
+        label={queryParam ? 'SEARCH RESULTS' : 'DISCOVERY'}
+        title={queryParam ? `SEARCH FOR "${queryParam.toUpperCase()}"` : 'DISCOVER TITLES'}
+        description={queryParam ? 'Live catalog search results.' : 'Explore genres and curated media across the CINEMURA catalog.'}
       />
 
-      {/* Selector Control Bar */}
-      <div className="bg-[#111114] border border-white/10 p-4 space-y-4">
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-          <span className="type-label text-[#929298]">MEDIA TYPE:</span>
-          <div className="flex items-center gap-2">
-            {(['all', 'movie', 'tv'] as const).map(tab => (
-              <button
-                key={tab}
-                onClick={() => setActiveTab(tab)}
-                className={`text-xs px-3 py-1 font-bold uppercase tracking-wider transition-all ${
-                  activeTab === tab ? 'bg-[#E43D3D] text-white' : 'text-[#929298] hover:text-white border border-white/10'
-                }`}
-              >
-                {tab === 'tv' ? 'TV SHOWS' : tab === 'movie' ? 'MOVIES' : 'ALL MEDIA'}
-              </button>
-            ))}
+      {/* Discovery Genre Controls (When Not Searching) */}
+      {!queryParam && (
+        <div className="bg-[#111114] border border-white/10 p-4 space-y-4">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <span className="text-xs font-mono text-[#8E8E93]">MEDIA TYPE:</span>
+            <div className="flex items-center gap-2">
+              {(['all', 'movie', 'tv'] as const).map(tab => (
+                <button
+                  key={tab}
+                  onClick={() => setActiveTab(tab)}
+                  className={`text-xs px-3.5 py-1.5 font-mono font-bold uppercase tracking-wider transition-all ${
+                    activeTab === tab ? 'bg-[#E43D3D] text-white' : 'text-[#8E8E93] hover:text-white border border-white/10'
+                  }`}
+                >
+                  {tab === 'tv' ? 'TV SHOWS' : tab === 'movie' ? 'MOVIES' : 'ALL MEDIA'}
+                </button>
+              ))}
+            </div>
           </div>
-        </div>
 
-        {genres.length > 0 && (
-          <div className="flex flex-wrap gap-1.5 pt-3 border-t border-white/10">
-            <button
-              onClick={() => setSearchParams({})}
-              className={`text-xs px-2.5 py-0.5 font-bold uppercase transition-all ${
-                genreParam === 'All'
-                  ? 'bg-[#E43D3D] text-white'
-                  : 'bg-[#0B0B0D] text-[#929298] hover:text-white border border-white/10'
-              }`}
-            >
-              ALL GENRES
-            </button>
-            {genres.map(g => (
+          {genres.length > 0 && (
+            <div className="flex flex-wrap gap-1.5 pt-3 border-t border-white/10">
               <button
-                key={g.id}
-                onClick={() => setSearchParams({ genre: g.id.toString() })}
-                className={`text-xs px-2.5 py-0.5 font-bold uppercase transition-all ${
-                  genreParam === g.id.toString()
+                onClick={() => setSearchParams({})}
+                className={`text-xs px-3 py-1 font-mono font-semibold uppercase transition-all ${
+                  genreParam === 'All'
                     ? 'bg-[#E43D3D] text-white'
-                    : 'bg-[#0B0B0D] text-[#929298] hover:text-white border border-white/10'
+                    : 'bg-[#0B0B0D] text-[#8E8E93] hover:text-white border border-white/10'
                 }`}
               >
-                {g.name}
+                ALL GENRES
               </button>
-            ))}
-          </div>
-        )}
-      </div>
+              {genres.map(g => (
+                <button
+                  key={g.id}
+                  onClick={() => setSearchParams({ genre: g.id.toString() })}
+                  className={`text-xs px-3 py-1 font-mono font-semibold uppercase transition-all ${
+                    genreParam === g.id.toString()
+                      ? 'bg-[#E43D3D] text-white'
+                      : 'bg-[#0B0B0D] text-[#8E8E93] hover:text-white border border-white/10'
+                  }`}
+                >
+                  {g.name}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
 
-      {/* Grid Results */}
+      {/* Content Results Display */}
       {loading ? (
         <CardGridSkeleton count={12} />
       ) : error ? (
         <ErrorState
-          title="DISCOVERY ENGINE OFFLINE"
-          message="Could not connect to live media discovery catalog database."
-          onRetry={() => fetchDiscoveryData(1, false)}
+          title="SEARCH ENGINE OFFLINE"
+          message="Could not connect to live database catalog."
+          onRetry={() => queryParam ? searchTmdb(queryParam) : fetchDiscoveryData(1, false)}
         />
+      ) : searchResults ? (
+        /* Dedicated Search Results View */
+        <div className="space-y-12">
+          {searchResults.movies.length === 0 && searchResults.series.length === 0 && searchResults.people.length === 0 ? (
+            <EmptyState
+              variant="search"
+              onAction={() => setSearchParams({})}
+            />
+          ) : (
+            <>
+              {searchResults.movies.length > 0 && (
+                <div className="space-y-4">
+                  <div className="border-b border-white/10 pb-2 text-xs font-mono font-bold tracking-widest text-[#E43D3D] uppercase">
+                    MOVIES ({searchResults.movies.length})
+                  </div>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4">
+                    {searchResults.movies.map(movie => (
+                      <MediaCard key={movie.id} item={movie} variant="poster" />
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {searchResults.series.length > 0 && (
+                <div className="space-y-4">
+                  <div className="border-b border-white/10 pb-2 text-xs font-mono font-bold tracking-widest text-[#E43D3D] uppercase">
+                    TV SHOWS ({searchResults.series.length})
+                  </div>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4">
+                    {searchResults.series.map(show => (
+                      <MediaCard key={show.id} item={show} variant="poster" />
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {searchResults.people.length > 0 && (
+                <div className="space-y-4">
+                  <div className="border-b border-white/10 pb-2 text-xs font-mono font-bold tracking-widest text-[#E43D3D] uppercase">
+                    PEOPLE ({searchResults.people.length})
+                  </div>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4">
+                    {searchResults.people.map(person => (
+                      <PersonCard
+                        key={person.id}
+                        id={person.id}
+                        name={person.name}
+                        role={person.role}
+                        knownFor={person.knownFor}
+                        portrait={person.portrait}
+                        slug={person.slug}
+                      />
+                    ))}
+                  </div>
+                </div>
+              )}
+            </>
+          )}
+        </div>
       ) : filteredItems.length === 0 ? (
         <EmptyState
-          variant={queryParam ? 'search' : 'genre'}
+          variant="genre"
           onAction={() => setSearchParams({})}
         />
       ) : (
         <div className="space-y-6">
-          <div className="type-label text-[#929298] border-b border-white/10 pb-2">
+          <div className="text-xs font-mono text-[#8E8E93] border-b border-white/10 pb-2">
             DISPLAYING {filteredItems.length} TITLES
           </div>
 
@@ -211,3 +289,5 @@ export const DiscoverPage: React.FC = () => {
     </div>
   );
 };
+
+export default DiscoverPage;

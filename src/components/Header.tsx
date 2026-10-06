@@ -41,7 +41,7 @@ export const Header: React.FC = () => {
         
         {/* Brand Logo */}
         <Link to="/" className="flex items-center gap-2 group">
-          <span className="type-h3 text-xl text-[#F2F0EC] group-hover:text-[#E43D3D] transition-colors leading-none tracking-widest">
+          <span className="font-display font-bold text-xl text-[#F2F0EC] group-hover:text-[#E43D3D] transition-colors leading-none tracking-widest">
             CINEMURA
           </span>
           <span className="w-1.5 h-1.5 bg-[#E43D3D] rounded-full inline-block" />
@@ -58,7 +58,7 @@ export const Header: React.FC = () => {
                 className={`type-label transition-colors relative py-1 ${
                   isActive
                     ? 'text-[#E43D3D]'
-                    : 'text-[#929298] hover:text-[#F2F0EC]'
+                    : 'text-[#8E8E93] hover:text-[#F2F0EC]'
                 }`}
               >
                 {link.name}
@@ -70,23 +70,20 @@ export const Header: React.FC = () => {
           })}
         </nav>
 
-        {/* Right Search Action */}
-        <div className="flex items-center gap-4">
+        {/* Right Search Action: ICON ONLY */}
+        <div className="flex items-center gap-2">
           <button
+            id="header-search-trigger"
             onClick={openSearch}
-            aria-label="Open Search"
-            className="flex items-center gap-2 text-[#929298] hover:text-[#F2F0EC] transition-colors text-xs font-mono"
+            aria-label="Open search"
+            className="p-2 text-[#8E8E93] hover:text-[#E43D3D] focus-visible:text-[#E43D3D] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#E43D3D] transition-colors"
           >
-            <Search className="w-4 h-4 text-[#E43D3D]" />
-            <span className="hidden sm:inline type-label">SEARCH</span>
-            <kbd className="hidden lg:inline text-[9px] bg-white/5 border border-white/10 px-1.5 py-0.5 text-[#626269]">
-              ⌘K
-            </kbd>
+            <Search className="w-5 h-5" />
           </button>
 
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="md:hidden p-1.5 text-white hover:text-[#E43D3D] transition-colors"
+            className="md:hidden p-2 text-[#F2F0EC] hover:text-[#E43D3D] transition-colors"
             aria-label="Toggle menu"
           >
             {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
@@ -108,8 +105,8 @@ export const Header: React.FC = () => {
                 <Link
                   key={link.path}
                   to={link.path}
-                  className={`type-h2 text-2xl uppercase transition-colors ${
-                    isActive ? 'text-[#E43D3D] pl-2 border-l-2 border-[#E43D3D]' : 'text-[#929298] hover:text-white'
+                  className={`font-display font-bold text-2xl uppercase transition-colors ${
+                    isActive ? 'text-[#E43D3D] pl-2 border-l-2 border-[#E43D3D]' : 'text-[#8E8E93] hover:text-white'
                   }`}
                 >
                   {link.name}
@@ -124,10 +121,11 @@ export const Header: React.FC = () => {
                 setMobileMenuOpen(false);
                 openSearch();
               }}
+              aria-label="Open search"
               className="w-full btn-secondary text-xs uppercase flex items-center justify-center gap-2"
             >
               <Search className="w-4 h-4 text-[#E43D3D]" />
-              <span>SEARCH ALL MEDIA</span>
+              <span>SEARCH CATALOG</span>
             </button>
           </div>
         </div>
@@ -135,3 +133,5 @@ export const Header: React.FC = () => {
     </header>
   );
 };
+
+export default Header;

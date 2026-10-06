@@ -1,42 +1,106 @@
-import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { Search, X, Film, Tv, User, Star } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { X } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { searchTmdb } from '../services/tmdb';
 import { Movie, Series, Person } from '../types';
+import { MediaCard, PersonCard } from './MediaCard';
+import { CardGridSkeleton } from './StateViews';
 
 export const SearchModal: React.FC = () => {
   const { isSearchOpen, closeSearch } = useApp();
   const [query, setQuery] = useState('');
-  const [activeTab, setActiveTab] = useState<'all' | 'movies' | 'series' | 'people'>('all');
-  
+  const [searching, setSearching] = useState(false);
   const [results, setResults] = useState<{ movies: Movie[]; series: Series[]; people: Person[] }>({
     movies: [],
     series: [],
     people: []
   });
-  const [searching, setSearching] = useState(false);
 
+  const inputRef = useRef<HTMLInputElement | null>(null);
+  const modalRef = useRef<HTMLDivElement | null>(null);
+  const requestIdRef = useRef<number>(0);
+
+  // Auto-focus input and handle focus restoration
   useEffect(() => {
-    if (!query.trim()) {
+    if (isSearchOpen) {
+      setTimeout(() => {
+        inputRef.current?.focus();
+      }, 50);
+    } else {
+      setQuery('');
       setResults({ movies: [], series: [], people: [] });
+      setSearching(false);
+      
+      // Restore focus to original header trigger
+      const trigger = document.getElementById('header-search-trigger');
+      if (trigger) {
+        trigger.focus();
+      }
+    }
+  }, [isSearchOpen]);
+
+  // Handle focus trap & Escape key
+  useEffect(() => {
+    if (!isSearchOpen) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        closeSearch();
+      } else if (e.key === 'Tab' && modalRef.current) {
+        const focusables = modalRef.current.querySelectorAll<HTMLElement>(
+          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        );
+        if (focusables.length === 0) return;
+
+        const first = focusables[0];
+        const last = focusables[focusables.length - 1];
+
+        if (e.shiftKey && document.activeElement === first) {
+          e.preventDefault();
+          last.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+          e.preventDefault();
+          first.focus();
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isSearchOpen, closeSearch]);
+
+  // Debounced search logic with request cancellation
+  useEffect(() => {
+    const trimmed = query.trim();
+    if (!trimmed) {
+      setResults({ movies: [], series: [], people: [] });
+      setSearching(false);
       return;
     }
 
+    setSearching(true);
+    const currentRequestId = ++requestIdRef.current;
+
     const timer = setTimeout(async () => {
-      setSearching(true);
       try {
-        const res = await searchTmdb(query);
-        if (res) {
-          setResults(res);
-        } else {
-          setResults({ movies: [], series: [], people: [] });
+        const data = await searchTmdb(trimmed);
+        // Ignore stale requests
+        if (currentRequestId === requestIdRef.current) {
+          if (data) {
+            setResults(data);
+          } else {
+            setResults({ movies: [], series: [], people: [] });
+          }
         }
       } catch (err) {
-        console.error('Search failed', err);
-        setResults({ movies: [], series: [], people: [] });
+        console.error('Search query failed:', err);
+        if (currentRequestId === requestIdRef.current) {
+          setResults({ movies: [], series: [], people: [] });
+        }
       } finally {
-        setSearching(false);
+        if (currentRequestId === requestIdRef.current) {
+          setSearching(false);
+        }
       }
     }, 300);
 
@@ -48,213 +112,153 @@ export const SearchModal: React.FC = () => {
   const totalResults = results.movies.length + results.series.length + results.people.length;
 
   return (
-    <div className="fixed inset-0 z-50 bg-[#0B0B0D]/95 backdrop-blur-xl flex flex-col p-4 sm:p-8 animate-fadeIn overflow-y-auto text-[#F2F0EC]">
+    <div
+      ref={modalRef}
+      role="dialog"
+      aria-modal="true"
+      aria-label="Search Catalog"
+      className="fixed inset-0 z-50 bg-[#0B0B0D] overflow-y-auto text-[#F2F0EC] p-4 sm:p-8 md:p-12 animate-fadeIn selection:bg-[#E43D3D] selection:text-white"
+    >
       
-      {/* Top Search Header */}
-      <div className="max-w-4xl w-full mx-auto space-y-6">
+      <div className="max-w-7xl mx-auto space-y-8 sm:space-y-12">
         
-        <div className="flex items-center justify-between border-b border-white/12 pb-4">
+        {/* Top Minimal Controls Header */}
+        <div className="flex items-center justify-between border-b border-white/10 pb-4">
           <div className="flex items-center gap-3">
-            <span className="text-xs font-bold tracking-widest text-[#E43D3D] uppercase">LIVE CATALOG SEARCH</span>
-            <span className="text-xs text-[#8E8E93] font-mono">PRESS ESC TO CLOSE</span>
+            <span className="text-[10px] font-mono font-extrabold tracking-[0.2em] text-[#E43D3D] uppercase">
+              SEARCH
+            </span>
+            <kbd className="text-[9px] font-mono bg-white/5 border border-white/10 px-2 py-0.5 text-[#8E8E93]">
+              ESC
+            </kbd>
           </div>
 
           <button
             onClick={closeSearch}
-            className="p-2 text-[#8E8E93] hover:text-[#E43D3D] transition-colors"
             aria-label="Close search"
+            className="p-2 text-[#8E8E93] hover:text-[#E43D3D] focus-visible:text-[#E43D3D] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#E43D3D] transition-colors"
           >
             <X className="w-6 h-6" />
           </button>
         </div>
 
-        {/* Big Search Input Field */}
-        <div className="relative">
-          <Search className="absolute left-0 top-1/2 -translate-y-1/2 w-8 h-8 text-[#E43D3D]" />
-          <input
-            type="text"
-            autoFocus
-            placeholder="Search movies, TV shows, actors, directors..."
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            className="w-full bg-transparent border-0 border-b-2 border-white/20 focus:border-[#E43D3D] text-2xl sm:text-4xl font-editorial-heading text-white pl-12 pr-12 py-4 outline-none tracking-wider placeholder:text-[#8E8E93]/40"
-          />
-          {query && (
-            <button
-              onClick={() => setQuery('')}
-              className="absolute right-2 top-1/2 -translate-y-1/2 p-2 text-[#8E8E93] hover:text-white"
-            >
-              <X className="w-5 h-5" />
-            </button>
-          )}
+        {/* Large Editorial Search Field */}
+        <div className="space-y-3">
+          <div className="relative border-b-2 border-white/20 focus-within:border-[#E43D3D] transition-colors pb-2">
+            <input
+              ref={inputRef}
+              type="text"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Search movies, TV shows or people..."
+              className="w-full bg-transparent font-display font-semibold text-2xl sm:text-4xl lg:text-5xl text-[#F2F0EC] placeholder:text-[#8E8E93]/40 outline-none tracking-tight pr-10"
+            />
+            {query && (
+              <button
+                onClick={() => setQuery('')}
+                aria-label="Clear search input"
+                className="absolute right-0 top-1/2 -translate-y-1/2 p-2 text-[#8E8E93] hover:text-[#F2F0EC] transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            )}
+          </div>
         </div>
 
-        {/* Filter Tabs */}
-        {query.trim() && (
-          <div className="flex items-center gap-3 border-b border-white/10 pb-3 text-xs">
-            {(['all', 'movies', 'series', 'people'] as const).map(tab => (
-              <button
-                key={tab}
-                onClick={() => setActiveTab(tab)}
-                className={`px-4 py-1.5 font-semibold uppercase tracking-wider transition-all ${
-                  activeTab === tab
-                    ? 'bg-[#E43D3D] text-white'
-                    : 'bg-white/5 text-[#8E8E93] hover:text-white hover:bg-white/10'
-                }`}
-              >
-                {tab} {tab === 'all' ? `(${totalResults})` : tab === 'movies' ? `(${results.movies.length})` : tab === 'series' ? `(${results.series.length})` : `(${results.people.length})`}
-              </button>
-            ))}
-          </div>
-        )}
-
-        {/* Quick Suggestions */}
+        {/* Initial Prompt (Before Query) */}
         {!query.trim() && (
-          <div className="pt-6 space-y-4">
-            <span className="text-xs text-[#8E8E93] uppercase tracking-widest font-semibold block">
-              SEARCH SUGGESTIONS
+          <div className="py-16 text-center space-y-2">
+            <span className="text-xs font-mono tracking-[0.2em] text-[#8E8E93] uppercase">
+              SEARCH MOVIES, TV SHOWS OR PEOPLE
             </span>
-            <div className="flex flex-wrap gap-2">
-              {['Avatar', 'Inception', 'Breaking Bad', 'Batman', 'Spider-Man', 'Interstellar'].map(suggestion => (
-                <button
-                  key={suggestion}
-                  onClick={() => setQuery(suggestion)}
-                  className="px-4 py-2 border border-white/12 hover:border-[#E43D3D] text-xs text-white/80 hover:text-[#E43D3D] bg-white/5 transition-colors"
-                >
-                  {suggestion}
-                </button>
-              ))}
-            </div>
           </div>
         )}
 
-        {/* Results Container */}
-        {searching ? (
-          <div className="py-12 text-center text-xs font-mono text-[#8E8E93] uppercase animate-pulse">
-            SEARCHING LIVE CATALOG FOR "{query.toUpperCase()}"...
+        {/* Loading Skeletons State */}
+        {searching && (
+          <div className="space-y-4 pt-4">
+            <div className="text-xs font-mono text-[#8E8E93] uppercase animate-pulse">
+              SEARCHING LIVE CATALOG...
+            </div>
+            <CardGridSkeleton count={12} />
           </div>
-        ) : query.trim() && (
-          <div className="pt-4 space-y-8">
+        )}
+
+        {/* Search Results Display */}
+        {!searching && query.trim() > '' && (
+          <div className="space-y-12 pt-2">
             
+            {/* Zero Results State */}
             {totalResults === 0 && (
-              <div className="text-center py-16 space-y-3 bg-[#121215] border border-white/12 p-8">
-                <p className="font-editorial-heading text-2xl text-white">NO LIVE MATCHES FOUND</p>
-                <p className="text-xs text-[#8E8E93]">No results returned from the live database for "{query}".</p>
+              <div className="py-16 text-center space-y-2 border border-white/10 bg-[#111114] p-8">
+                <h3 className="font-display font-bold text-xl text-[#F2F0EC] uppercase">
+                  NO RESULTS
+                </h3>
+                <p className="text-xs font-mono text-[#8E8E93]">
+                  Nothing matched your search query "{query}".
+                </p>
               </div>
             )}
 
-            {/* Movies Results */}
-            {(activeTab === 'all' || activeTab === 'movies') && results.movies.length > 0 && (
+            {/* Movies Group */}
+            {results.movies.length > 0 && (
               <div className="space-y-4">
-                <div className="flex items-center gap-2 text-xs font-bold text-[#E43D3D] tracking-widest border-b border-white/10 pb-2">
-                  <Film className="w-4 h-4" />
-                  <span>MOVIES ({results.movies.length})</span>
+                <div className="flex items-center justify-between border-b border-white/10 pb-2">
+                  <span className="text-xs font-mono font-bold tracking-widest text-[#E43D3D] uppercase">
+                    MOVIES ({results.movies.length})
+                  </span>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4">
                   {results.movies.map(movie => (
-                    <Link
-                      key={movie.id}
-                      to={`/movie/${movie.id}`}
-                      onClick={closeSearch}
-                      className="flex gap-4 p-3 bg-[#121215] border border-white/12 hover:border-[#E43D3D] transition-all group"
-                    >
-                      <img
-                        src={movie.poster}
-                        alt={movie.title}
-                        className="w-16 h-24 object-cover flex-shrink-0 group-hover:scale-105 transition-transform duration-300"
-                      />
-                      <div className="flex flex-col justify-between py-1">
-                        <div>
-                          <div className="flex items-center gap-2 mb-1">
-                            <span className="text-[9px] bg-[#E43D3D]/20 text-[#E43D3D] px-1.5 py-0.5 font-bold uppercase">MOVIE</span>
-                            <span className="text-xs text-[#8E8E93]">{movie.year}</span>
-                          </div>
-                          <h4 className="font-editorial-heading text-lg text-white group-hover:text-[#E43D3D] transition-colors leading-tight">
-                            {movie.title}
-                          </h4>
-                        </div>
-                        <div className="flex items-center gap-1 text-xs text-[#E43D3D] font-bold">
-                          <Star className="w-3 h-3 fill-[#E43D3D]" />
-                          <span>{movie.rating.toFixed(1)}</span>
-                        </div>
-                      </div>
-                    </Link>
+                    <div key={movie.id} onClick={closeSearch}>
+                      <MediaCard item={movie} variant="poster" />
+                    </div>
                   ))}
                 </div>
               </div>
             )}
 
-            {/* Series Results */}
-            {(activeTab === 'all' || activeTab === 'series') && results.series.length > 0 && (
+            {/* TV Shows Group */}
+            {results.series.length > 0 && (
               <div className="space-y-4">
-                <div className="flex items-center gap-2 text-xs font-bold text-[#E43D3D] tracking-widest border-b border-white/10 pb-2">
-                  <Tv className="w-4 h-4" />
-                  <span>TV SHOWS ({results.series.length})</span>
+                <div className="flex items-center justify-between border-b border-white/10 pb-2">
+                  <span className="text-xs font-mono font-bold tracking-widest text-[#E43D3D] uppercase">
+                    TV SHOWS ({results.series.length})
+                  </span>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  {results.series.map(series => (
-                    <Link
-                      key={series.id}
-                      to={`/tv/${series.id}`}
-                      onClick={closeSearch}
-                      className="flex gap-4 p-3 bg-[#121215] border border-white/12 hover:border-[#E43D3D] transition-all group"
-                    >
-                      <img
-                        src={series.poster}
-                        alt={series.title}
-                        className="w-16 h-24 object-cover flex-shrink-0 group-hover:scale-105 transition-transform duration-300"
-                      />
-                      <div className="flex flex-col justify-between py-1">
-                        <div>
-                          <div className="flex items-center gap-2 mb-1">
-                            <span className="text-[9px] bg-white/20 text-white px-1.5 py-0.5 font-bold uppercase">TV</span>
-                            <span className="text-xs text-[#8E8E93]">{series.seasonsCount} Seasons</span>
-                          </div>
-                          <h4 className="font-editorial-heading text-lg text-white group-hover:text-[#E43D3D] transition-colors leading-tight">
-                            {series.title}
-                          </h4>
-                        </div>
-                        <div className="flex items-center gap-1 text-xs text-[#E43D3D] font-bold">
-                          <Star className="w-3 h-3 fill-[#E43D3D]" />
-                          <span>{series.rating.toFixed(1)}</span>
-                        </div>
-                      </div>
-                    </Link>
+                <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4">
+                  {results.series.map(show => (
+                    <div key={show.id} onClick={closeSearch}>
+                      <MediaCard item={show} variant="poster" />
+                    </div>
                   ))}
                 </div>
               </div>
             )}
 
-            {/* People Results */}
-            {(activeTab === 'all' || activeTab === 'people') && results.people.length > 0 && (
+            {/* People Group */}
+            {results.people.length > 0 && (
               <div className="space-y-4">
-                <div className="flex items-center gap-2 text-xs font-bold text-[#E43D3D] tracking-widest border-b border-white/10 pb-2">
-                  <User className="w-4 h-4" />
-                  <span>PEOPLE ({results.people.length})</span>
+                <div className="flex items-center justify-between border-b border-white/10 pb-2">
+                  <span className="text-xs font-mono font-bold tracking-widest text-[#E43D3D] uppercase">
+                    PEOPLE ({results.people.length})
+                  </span>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4">
                   {results.people.map(person => (
-                    <Link
-                      key={person.id}
-                      to={`/person/${person.id}`}
-                      onClick={closeSearch}
-                      className="flex gap-4 p-3 bg-[#121215] border border-white/12 hover:border-[#E43D3D] transition-all group"
-                    >
-                      <img
-                        src={person.portrait}
-                        alt={person.name}
-                        className="w-16 h-20 object-cover flex-shrink-0 group-hover:scale-105 transition-transform duration-300"
+                    <div key={person.id} onClick={closeSearch}>
+                      <PersonCard
+                        id={person.id}
+                        name={person.name}
+                        role={person.role}
+                        knownFor={person.knownFor}
+                        portrait={person.portrait}
+                        slug={person.slug}
                       />
-                      <div className="flex flex-col justify-center py-1">
-                        <span className="text-[9px] text-[#E43D3D] font-bold uppercase tracking-wider">{person.role}</span>
-                        <h4 className="font-editorial-heading text-lg text-white group-hover:text-[#E43D3D] transition-colors">
-                          {person.name}
-                        </h4>
-                      </div>
-                    </Link>
+                    </div>
                   ))}
                 </div>
               </div>
@@ -267,3 +271,5 @@ export const SearchModal: React.FC = () => {
     </div>
   );
 };
+
+export default SearchModal;

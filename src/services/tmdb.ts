@@ -404,6 +404,22 @@ export async function getTvDetail(id: string): Promise<Series | null> {
   return transformTmdbTv(data);
 }
 
+export async function getMovieCategory(category: string, page: number = 1): Promise<Movie[] | null> {
+  const normalized = category.toLowerCase().replace('-', '_');
+  const endpoint = `/movie/${normalized}`;
+  const data = await fetchFromTmdb<any>(endpoint, { page: page.toString() });
+  if (!data || !data.results) return null;
+  return data.results.map(transformTmdbMovie);
+}
+
+export async function getTvCategory(category: string, page: number = 1): Promise<Series[] | null> {
+  const normalized = category.toLowerCase().replace('-', '_');
+  const endpoint = `/tv/${normalized}`;
+  const data = await fetchFromTmdb<any>(endpoint, { page: page.toString() });
+  if (!data || !data.results) return null;
+  return data.results.map(transformTmdbTv);
+}
+
 export async function getTvSeasonDetail(tvId: string, seasonNumber: number): Promise<Season | null> {
   const data = await fetchFromTmdb<any>(`/tv/${tvId}/season/${seasonNumber}`);
   if (!data) return null;

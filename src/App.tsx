@@ -58,12 +58,14 @@ export function App() {
               <Route path="/movies" element={<MoviesPage />} />
               <Route path="/movie/:slug" element={<MovieDetailPage />} />
               <Route path="/movie/category/:name" element={<MoviesPage />} />
+              <Route path="/movies/category/:name" element={<MoviesPage />} />
               
               <Route path="/tv" element={<SeriesPage />} />
               <Route path="/series" element={<SeriesPage />} />
               <Route path="/tv/:slug" element={<SeriesDetailPage />} />
               <Route path="/series/:slug" element={<SeriesDetailPage />} />
               <Route path="/tv/category/:name" element={<SeriesPage />} />
+              <Route path="/series/category/:name" element={<SeriesPage />} />
               
               <Route path="/person/:slug" element={<PersonDetailPage />} />
               <Route path="/people" element={<PeoplePage />} />

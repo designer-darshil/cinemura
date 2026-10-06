@@ -5,6 +5,7 @@ import { getMovieDetail, formatCurrency } from '../services/tmdb';
 import { Movie } from '../types';
 import { useApp } from '../context/AppContext';
 import { selectPrimaryVideo, sortVideosWithPrimaryFirst, getVideoButtonLabel } from '../utils/trailer';
+import { isMoviePlayable } from '../utils/vidlink';
 import { MediaCard } from '../components/MediaCard';
 import { SectionHeader } from '../components/SectionHeader';
 import { MovieDetailPageSkeleton, ErrorState } from '../components/StateViews';
@@ -20,7 +21,7 @@ import { EntityAwardsData } from '../types';
 export const MovieDetailPage: React.FC = () => {
   const { id, slug } = useParams<{ id?: string; slug?: string }>();
   const movieId = id || slug;
-  const { openVideoPlayer } = useApp();
+  const { openVideoPlayer, openVidLinkMovie } = useApp();
 
   const [movie, setMovie] = useState<Movie | null>(null);
   const [awards, setAwards] = useState<EntityAwardsData | null>(null);
@@ -209,13 +210,24 @@ export const MovieDetailPage: React.FC = () => {
 
             {/* Actions */}
             <div className="flex flex-wrap items-center gap-4 pt-3">
+              {isMoviePlayable(movie) && (
+                <button
+                  type="button"
+                  onClick={() => openVidLinkMovie(movie.id, movie.title)}
+                  className="bg-[#E43D3D] hover:bg-[#c02e2e] text-white px-7 py-3.5 text-xs font-mono font-bold tracking-widest uppercase flex items-center gap-3 transition-all transform hover:-translate-y-0.5 shadow-lg"
+                >
+                  <Play className="w-4 h-4 fill-white" />
+                  <span>WATCH MOVIE</span>
+                </button>
+              )}
+
               {primaryVideo && (
                 <button
                   type="button"
                   onClick={() => openVideoPlayer(playableVideos, 0, movie.title)}
-                  className="bg-[#E43D3D] hover:bg-[#c02e2e] text-white px-7 py-3.5 text-xs font-mono font-bold tracking-widest uppercase flex items-center gap-3 transition-all transform hover:-translate-y-0.5 shadow-lg"
+                  className={`${isMoviePlayable(movie) ? 'bg-transparent hover:bg-white/5 border border-white/20 text-[#F2F0EC]' : 'bg-[#E43D3D] hover:bg-[#c02e2e] text-white shadow-lg transform hover:-translate-y-0.5'} px-7 py-3.5 text-xs font-mono font-bold tracking-widest uppercase flex items-center gap-3 transition-all`}
                 >
-                  <Play className="w-4 h-4 fill-white" />
+                  <Play className={`w-4 h-4 ${isMoviePlayable(movie) ? 'text-[#E43D3D]' : 'fill-white'}`} />
                   <span>{primaryVideoLabel}</span>
                 </button>
               )}

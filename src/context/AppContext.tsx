@@ -8,8 +8,16 @@ export interface ActiveVideoSession {
   parentTitle?: string;
 }
 
+export interface VidLinkSession {
+  type: 'movie' | 'tv';
+  tmdbId: string | number;
+  season?: number;
+  episode?: number;
+  title?: string;
+}
+
 interface AppContextType {
-  // Video Modal
+  // Video / Trailer Modal
   videoSession: ActiveVideoSession | null;
   trailerUrl: string | null;
   trailerTitle: string | null;
@@ -19,6 +27,12 @@ interface AppContextType {
   nextVideo: () => void;
   prevVideo: () => void;
   selectVideoIndex: (index: number) => void;
+
+  // VidLink Fullscreen Playback Modal
+  vidLinkSession: VidLinkSession | null;
+  openVidLinkMovie: (tmdbId: string | number, title?: string) => void;
+  openVidLinkTv: (tmdbId: string | number, season: number, episode: number, title?: string) => void;
+  closeVidLink: () => void;
   
   // Search Modal
   isSearchOpen: boolean;
@@ -47,6 +61,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [videoSession, setVideoSession] = useState<ActiveVideoSession | null>(null);
   const [trailerUrl, setTrailerUrl] = useState<string | null>(null);
   const [trailerTitle, setTrailerTitle] = useState<string | null>(null);
+  const [vidLinkSession, setVidLinkSession] = useState<VidLinkSession | null>(null);
   const [isSearchOpen, setIsSearchOpen] = useState<boolean>(false);
 
   // Keyboard shortcuts (Cmd+K or / to search, Escape to close modals)
@@ -63,6 +78,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         setVideoSession(null);
         setTrailerUrl(null);
         setTrailerTitle(null);
+        setVidLinkSession(null);
       }
     };
     window.addEventListener('keydown', handleKeyDown);
@@ -138,6 +154,30 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const closeSearch = () => setIsSearchOpen(false);
   const toggleSearch = () => setIsSearchOpen(prev => !prev);
 
+  const openVidLinkMovie = (tmdbId: string | number, title?: string) => {
+    if (!tmdbId) return;
+    setVidLinkSession({
+      type: 'movie',
+      tmdbId,
+      title
+    });
+  };
+
+  const openVidLinkTv = (tmdbId: string | number, season: number, episode: number, title?: string) => {
+    if (!tmdbId || season === undefined || episode === undefined) return;
+    setVidLinkSession({
+      type: 'tv',
+      tmdbId,
+      season,
+      episode,
+      title
+    });
+  };
+
+  const closeVidLink = () => {
+    setVidLinkSession(null);
+  };
+
   return (
     <AppContext.Provider
       value={{
@@ -150,6 +190,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         nextVideo,
         prevVideo,
         selectVideoIndex,
+        vidLinkSession,
+        openVidLinkMovie,
+        openVidLinkTv,
+        closeVidLink,
         isSearchOpen,
         openSearch,
         closeSearch,

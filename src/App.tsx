@@ -4,6 +4,7 @@ import { AppProvider } from './context/AppContext';
 import { Header } from './components/Header';
 import { Footer } from './components/Footer';
 import { TrailerModal } from './components/TrailerModal';
+import { VidLinkModal } from './components/VidLinkModal';
 import { SearchModal } from './components/SearchModal';
 
 import { AppLoader } from './components/AppLoader';
@@ -120,6 +121,7 @@ export function App() {
 
           {/* Interactive Modals */}
           <TrailerModal />
+          <VidLinkModal />
           <SearchModal />
         </div>
       </Router>

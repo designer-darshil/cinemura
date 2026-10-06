@@ -5,12 +5,17 @@ import { getPersonDetail } from '../services/tmdb';
 import { Person } from '../types';
 import { SectionHeader } from '../components/SectionHeader';
 import { PersonDetailSkeleton, ErrorState } from '../components/StateViews';
+import { AwardsSection } from '../components/AwardsSection';
+import { getPersonAwards } from '../services/awardsService';
+import { EntityAwardsData } from '../types';
 
 export const PersonDetailPage: React.FC = () => {
   const { id, slug } = useParams<{ id?: string; slug?: string }>();
   const personId = id || slug;
 
   const [person, setPerson] = useState<Person | null>(null);
+  const [awards, setAwards] = useState<EntityAwardsData | null>(null);
+  const [awardsLoading, setAwardsLoading] = useState(false);
   const [filmoFilter, setFilmoFilter] = useState<'all' | 'movie' | 'tv'>('all');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
@@ -21,6 +26,19 @@ export const PersonDetailPage: React.FC = () => {
     activeIdRef.current = personId;
     setLoading(true);
     setError(false);
+    setAwardsLoading(true);
+
+    getPersonAwards(personId)
+      .then((res) => {
+        if (activeIdRef.current === personId) setAwards(res);
+      })
+      .catch(() => {
+        if (activeIdRef.current === personId) setAwards(null);
+      })
+      .finally(() => {
+        if (activeIdRef.current === personId) setAwardsLoading(false);
+      });
+
     try {
       const data = await getPersonDetail(personId);
       if (activeIdRef.current !== personId) return; // Stale request guard
@@ -260,6 +278,13 @@ export const PersonDetailPage: React.FC = () => {
 
         </section>
       )}
+
+      {/* ==================================================
+          AWARDS — REAL AUTHORIZED DATA ONLY (HIDDEN IF UNAVAILABLE)
+         ================================================== */}
+      <div className="w-full px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16">
+        <AwardsSection awards={awards} loading={awardsLoading} title="AWARDS & NOMINATIONS" label="CAREER HONORS" />
+      </div>
 
       {/* ==================================================
           4. PERSON FILMOGRAPHY — COMPACT EDITORIAL STREAM

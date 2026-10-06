@@ -197,3 +197,25 @@ export interface Genre {
   image: string;
   description: string;
 }
+
+export interface AwardItem {
+  id: string;
+  category: string;
+  year: number | string;
+  status: 'Winner' | 'Nominee';
+  recipients?: string[];
+  relatedTitle?: string;
+}
+
+export interface AwardOrganization {
+  id: string;
+  name: string;
+  awards: AwardItem[];
+}
+
+export interface EntityAwardsData {
+  wins: number;
+  nominations: number;
+  organizations: AwardOrganization[];
+}
+

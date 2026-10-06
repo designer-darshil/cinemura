@@ -13,6 +13,9 @@ import { DetailMediaNav } from '../components/DetailMediaNav';
 import { SeriesEpisodesSection } from '../components/SeriesEpisodesSection';
 import { MediaVideosSection } from '../components/MediaVideosSection';
 import { MediaPhotosSection } from '../components/MediaPhotosSection';
+import { AwardsSection } from '../components/AwardsSection';
+import { getTvAwards } from '../services/awardsService';
+import { EntityAwardsData } from '../types';
 
 export const SeriesDetailPage: React.FC = () => {
   const { id, slug } = useParams<{ id?: string; slug?: string }>();
@@ -20,6 +23,8 @@ export const SeriesDetailPage: React.FC = () => {
   const { openVideoPlayer } = useApp();
 
   const [series, setSeries] = useState<Series | null>(null);
+  const [awards, setAwards] = useState<EntityAwardsData | null>(null);
+  const [awardsLoading, setAwardsLoading] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const activeIdRef = React.useRef<string | undefined>(seriesId);
@@ -29,6 +34,19 @@ export const SeriesDetailPage: React.FC = () => {
     activeIdRef.current = seriesId;
     setLoading(true);
     setError(false);
+    setAwardsLoading(true);
+
+    getTvAwards(seriesId)
+      .then((res) => {
+        if (activeIdRef.current === seriesId) setAwards(res);
+      })
+      .catch(() => {
+        if (activeIdRef.current === seriesId) setAwards(null);
+      })
+      .finally(() => {
+        if (activeIdRef.current === seriesId) setAwardsLoading(false);
+      });
+
     try {
       const data = await getTvDetail(seriesId);
       if (activeIdRef.current !== seriesId) return; // Stale request guard
@@ -484,6 +502,13 @@ export const SeriesDetailPage: React.FC = () => {
           </div>
         </section>
       )}
+
+      {/* ==================================================
+          AWARDS — REAL AUTHORIZED DATA ONLY (HIDDEN IF UNAVAILABLE)
+         ================================================== */}
+      <div className="w-full px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16">
+        <AwardsSection awards={awards} loading={awardsLoading} />
+      </div>
 
       {/* ==================================================
           9. RELATED TV SHOWS

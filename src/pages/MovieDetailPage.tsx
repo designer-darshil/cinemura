@@ -12,6 +12,9 @@ import { CastCarousel } from '../components/CastCarousel';
 import { DetailMediaNav } from '../components/DetailMediaNav';
 import { MediaVideosSection } from '../components/MediaVideosSection';
 import { MediaPhotosSection } from '../components/MediaPhotosSection';
+import { AwardsSection } from '../components/AwardsSection';
+import { getMovieAwards } from '../services/awardsService';
+import { EntityAwardsData } from '../types';
 
 export const MovieDetailPage: React.FC = () => {
   const { id, slug } = useParams<{ id?: string; slug?: string }>();
@@ -19,6 +22,8 @@ export const MovieDetailPage: React.FC = () => {
   const { openVideoPlayer } = useApp();
 
   const [movie, setMovie] = useState<Movie | null>(null);
+  const [awards, setAwards] = useState<EntityAwardsData | null>(null);
+  const [awardsLoading, setAwardsLoading] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const activeIdRef = React.useRef<string | undefined>(movieId);
@@ -28,6 +33,19 @@ export const MovieDetailPage: React.FC = () => {
     activeIdRef.current = movieId;
     setLoading(true);
     setError(false);
+    setAwardsLoading(true);
+
+    getMovieAwards(movieId)
+      .then((res) => {
+        if (activeIdRef.current === movieId) setAwards(res);
+      })
+      .catch(() => {
+        if (activeIdRef.current === movieId) setAwards(null);
+      })
+      .finally(() => {
+        if (activeIdRef.current === movieId) setAwardsLoading(false);
+      });
+
     try {
       const data = await getMovieDetail(movieId);
       if (activeIdRef.current !== movieId) return; // Stale request guard
@@ -441,6 +459,13 @@ export const MovieDetailPage: React.FC = () => {
 
         </section>
       )}
+
+      {/* ==================================================
+          AWARDS — REAL AUTHORIZED DATA ONLY (HIDDEN IF UNAVAILABLE)
+         ================================================== */}
+      <div className="w-full px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16">
+        <AwardsSection awards={awards} loading={awardsLoading} />
+      </div>
 
       {/* ==================================================
           7. RELATED MOVIES

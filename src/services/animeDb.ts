@@ -10,63 +10,13 @@ import {
 const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
 const responseCache = new Map<string, { timestamp: number; data: any }>();
 
-// Environment variables
-const ENV_KEY =
-  (import.meta.env.VITE_RAPIDAPI_KEY as string) ||
-  (import.meta.env.RAPIDAPI_KEY as string) ||
-  '';
-
-const ENV_HOST =
-  (import.meta.env.VITE_RAPIDAPI_ANIME_HOST as string) ||
-  (import.meta.env.RAPIDAPI_ANIME_HOST as string) ||
-  'anime-db.p.rapidapi.com';
-
-const BASE_URL = `https://${ENV_HOST}`;
+const API_BASE = '/api/anime';
 
 /**
- * Retrieve the active RapidAPI key (environment or localStorage override)
+ * Fetch wrapper for server-side Anime DB API proxy
  */
-export const getAnimeApiKey = (): string => {
-  if (typeof window !== 'undefined') {
-    const localOverride = localStorage.getItem('RAPIDAPI_ANIME_KEY');
-    if (localOverride && localOverride.trim()) {
-      return localOverride.trim();
-    }
-  }
-  return ENV_KEY.trim();
-};
-
-/**
- * Allow runtime API key override for local testing/demo without rebuilding
- */
-export const setAnimeApiKey = (key: string): void => {
-  if (typeof window !== 'undefined') {
-    if (key.trim()) {
-      localStorage.setItem('RAPIDAPI_ANIME_KEY', key.trim());
-    } else {
-      localStorage.removeItem('RAPIDAPI_ANIME_KEY');
-    }
-    responseCache.clear();
-  }
-};
-
-/**
- * Fetch wrapper for RapidAPI Anime DB
- */
-async function fetchAnimeDb<T>(endpoint: string, params?: Record<string, any>): Promise<T> {
-  const apiKey = getAnimeApiKey();
-
-  // If no API key is provided, return structured error
-  if (!apiKey) {
-    const err: AnimeApiError = {
-      code: 'MISSING_KEY',
-      message: 'RapidAPI Key is not configured. Please set RAPIDAPI_KEY in your environment or provide a key.'
-    };
-    throw err;
-  }
-
-  // Construct URL with query parameters
-  const url = new URL(`${BASE_URL}${endpoint}`);
+async function fetchAnimeDb<T>(path: string, params?: Record<string, any>): Promise<T> {
+  const url = new URL(path, window.location.origin);
   if (params) {
     Object.entries(params).forEach(([key, val]) => {
       if (val !== undefined && val !== null && val !== '') {
@@ -81,39 +31,38 @@ async function fetchAnimeDb<T>(endpoint: string, params?: Record<string, any>): 
     return cached.data as T;
   }
 
-  const headers: Record<string, string> = {
-    'x-rapidapi-key': apiKey,
-    'x-rapidapi-host': ENV_HOST,
-    Accept: 'application/json'
-  };
-
   let response: Response;
   try {
     response = await fetch(url.toString(), {
       method: 'GET',
-      headers
+      headers: {
+        Accept: 'application/json'
+      }
     });
   } catch (netErr: any) {
     const err: AnimeApiError = {
       code: 'NETWORK_ERROR',
-      message: `Failed to connect to Anime DB API: ${netErr.message || 'Network error'}`
+      message: 'Failed to connect to anime service. Please check your network connection.'
     };
     throw err;
   }
 
   if (!response.ok) {
     let errorCode: AnimeApiErrorCode = 'UNKNOWN';
-    let errorMessage = `API request failed with status ${response.status} (${response.statusText})`;
+    let errorMessage = 'Anime data is currently unavailable.';
 
-    if (response.status === 401 || response.status === 403) {
+    if (response.status === 503 || response.status === 500) {
+      errorCode = 'SERVER_ERROR';
+      errorMessage = 'Anime service is currently unavailable.';
+    } else if (response.status === 401 || response.status === 403) {
       errorCode = 'AUTH_FAILED';
-      errorMessage = 'RapidAPI authentication failed. Check your API key and subscription to Anime DB.';
+      errorMessage = 'Anime service authentication error.';
     } else if (response.status === 429) {
       errorCode = 'RATE_LIMITED';
-      errorMessage = 'RapidAPI rate limit or quota exceeded for Anime DB.';
+      errorMessage = 'Rate limit reached. Please try again shortly.';
     } else if (response.status === 404) {
       errorCode = 'NOT_FOUND';
-      errorMessage = 'Requested Anime resource was not found.';
+      errorMessage = 'Requested anime record was not found.';
     }
 
     const err: AnimeApiError = {
@@ -148,7 +97,7 @@ const normalizeAnimeItem = (raw: any): AnimeItem => {
 
 /**
  * Get paginated list of anime with optional filters
- * Endpoint: GET /anime
+ * Endpoint: /api/anime
  */
 export const getAnimeList = async (options: AnimeFilterOptions = {}): Promise<AnimeResponse> => {
   const page = options.page || 1;
@@ -164,15 +113,14 @@ export const getAnimeList = async (options: AnimeFilterOptions = {}): Promise<An
   if (options.sortBy) params.sortBy = options.sortBy;
   if (options.sortOrder) params.sortOrder = options.sortOrder;
 
-  const raw = await fetchAnimeDb<any>('/anime', params);
+  const raw = await fetchAnimeDb<any>(API_BASE, params);
 
-  // The endpoint returns { data: [...], meta: {...} } or [...]
   const rawList = Array.isArray(raw) ? raw : Array.isArray(raw?.data) ? raw.data : [];
   const normalizedList = rawList.map(normalizeAnimeItem);
 
   return {
     data: normalizedList,
-    meta: raw.meta || {
+    meta: raw?.meta || {
       page,
       size,
       totalData: normalizedList.length,
@@ -183,7 +131,7 @@ export const getAnimeList = async (options: AnimeFilterOptions = {}): Promise<An
 
 /**
  * Fetch detailed anime by ID
- * Endpoint: GET /anime/{id}
+ * Endpoint: /api/anime/:id
  */
 export const getAnimeById = async (id: string): Promise<AnimeItem> => {
   if (!id) {
@@ -193,13 +141,13 @@ export const getAnimeById = async (id: string): Promise<AnimeItem> => {
     } as AnimeApiError;
   }
 
-  const raw = await fetchAnimeDb<any>(`/anime/${encodeURIComponent(id)}`);
+  const raw = await fetchAnimeDb<any>(`${API_BASE}/${encodeURIComponent(id)}`);
   return normalizeAnimeItem(raw);
 };
 
 /**
  * Search anime by title
- * Endpoint: GET /anime?search={query}
+ * Endpoint: /api/anime?search={query}
  */
 export const searchAnime = async (
   query: string,
@@ -219,7 +167,7 @@ export const searchAnime = async (
 
 /**
  * Fetch top-ranked anime
- * Endpoint: GET /anime?sortBy=ranking&sortOrder=asc
+ * Endpoint: /api/anime?sortBy=ranking&sortOrder=asc
  */
 export const getAnimeRankings = async (
   page: number = 1,
@@ -235,11 +183,11 @@ export const getAnimeRankings = async (
 
 /**
  * Get available Anime genres list
- * Endpoint: GET /genres
+ * Endpoint: /api/anime/genres
  */
 export const getAnimeGenres = async (): Promise<string[]> => {
   try {
-    const raw = await fetchAnimeDb<any>('/genres');
+    const raw = await fetchAnimeDb<any>(`${API_BASE}/genres`);
     if (Array.isArray(raw)) {
       return raw.map((g: any) => (typeof g === 'string' ? g : g.name || String(g)));
     }

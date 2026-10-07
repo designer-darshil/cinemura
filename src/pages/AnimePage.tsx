@@ -5,7 +5,6 @@ import { useApp } from '../context/AppContext';
 import { AnimeItem, AnimeApiError } from '../types/anime';
 import { getAnimeList, getAnimeRankings, getAnimeGenres } from '../services/animeDb';
 import { AnimeCard, AnimeCardSkeleton } from '../components/AnimeCard';
-import { AnimeApiKeyNotice } from '../components/AnimeApiKeyNotice';
 import { SectionHeader } from '../components/SectionHeader';
 
 export const AnimePage: React.FC = () => {
@@ -135,7 +134,7 @@ export const AnimePage: React.FC = () => {
             <div className="flex items-center gap-2">
               <span className="w-2.5 h-2.5 bg-[#E43D3D] inline-block" />
               <span className="text-[11px] font-mono tracking-[0.25em] text-[#E43D3D] uppercase font-bold">
-                ANIME DB PROVIDER
+                ANIMATION
               </span>
             </div>
 
@@ -144,7 +143,7 @@ export const AnimePage: React.FC = () => {
             </h1>
 
             <p className="text-xs sm:text-sm font-sans text-[#8E8E93] max-w-2xl leading-relaxed">
-              Explore live rankings, series, and features powered by the dedicated RapidAPI Anime DB service.
+              Explore live rankings, series, and features from our curated anime directory.
             </p>
           </div>
 
@@ -172,18 +171,25 @@ export const AnimePage: React.FC = () => {
 
       {/* Main Content Area */}
       <main className="px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 space-y-10 sm:space-y-12 mt-8 sm:mt-12">
-        {/* API Key Notification if missing or error */}
+        {/* API Error State (clean fallback, no config forms or keys) */}
         {apiError && (
-          <AnimeApiKeyNotice
-            errorType={
-              apiError.code === 'AUTH_FAILED'
-                ? 'AUTH_FAILED'
-                : apiError.code === 'RATE_LIMITED'
-                ? 'RATE_LIMITED'
-                : 'MISSING_KEY'
-            }
-            onKeySaved={loadInitialData}
-          />
+          <div className="bg-[#111114] border border-white/10 p-12 text-center max-w-md mx-auto space-y-4">
+            <div className="w-2.5 h-2.5 bg-[#E43D3D] mx-auto" />
+            <h3 className="font-display font-bold text-lg text-white uppercase tracking-wider">
+              ANIME DATA UNAVAILABLE
+            </h3>
+            <p className="text-xs font-sans text-[#8E8E93] leading-relaxed">
+              {apiError.message || 'Anime data service is currently unavailable.'}
+            </p>
+            <button
+              type="button"
+              onClick={loadInitialData}
+              className="btn-primary min-h-[44px] px-6 text-xs uppercase inline-flex items-center gap-2"
+            >
+              <RotateCcw className="w-3.5 h-3.5" />
+              <span>RETRY</span>
+            </button>
+          </div>
         )}
 
         {/* Genre Filter Control */}

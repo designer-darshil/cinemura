@@ -4,7 +4,6 @@ import { ArrowLeft, Award } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { AnimeItem, AnimeApiError } from '../types/anime';
 import { getAnimeById } from '../services/animeDb';
-import { AnimeApiKeyNotice } from '../components/AnimeApiKeyNotice';
 
 export const AnimeDetailPage: React.FC = () => {
   const { markAppReady } = useApp();
@@ -49,25 +48,30 @@ export const AnimeDetailPage: React.FC = () => {
           </Link>
 
           <span className="text-[10px] font-mono tracking-[0.25em] text-[#8E8E93] uppercase">
-            ANIME DB RECORD
+            OVERVIEW
           </span>
         </div>
       </div>
 
       {/* Main Container */}
       <div className="px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 mt-8">
-        {/* Error / API Key Notice */}
+        {/* Error State */}
         {apiError && (
-          <AnimeApiKeyNotice
-            errorType={
-              apiError.code === 'AUTH_FAILED'
-                ? 'AUTH_FAILED'
-                : apiError.code === 'RATE_LIMITED'
-                ? 'RATE_LIMITED'
-                : 'MISSING_KEY'
-            }
-            onKeySaved={() => id && getAnimeById(id).then(setAnime).catch(setApiError)}
-          />
+          <div className="bg-[#111114] border border-white/10 p-12 text-center max-w-md mx-auto space-y-4">
+            <div className="w-2.5 h-2.5 bg-[#E43D3D] mx-auto" />
+            <h3 className="font-display font-bold text-lg text-white uppercase tracking-wider">
+              ANIME DATA UNAVAILABLE
+            </h3>
+            <p className="text-xs font-sans text-[#8E8E93] leading-relaxed">
+              {apiError.message || 'Unable to retrieve anime details at this time.'}
+            </p>
+            <Link
+              to="/anime"
+              className="btn-primary min-h-[44px] px-6 text-xs uppercase inline-flex items-center gap-2"
+            >
+              <span>BACK TO ANIME CATALOG</span>
+            </Link>
+          </div>
         )}
 
         {/* Loading Skeleton */}

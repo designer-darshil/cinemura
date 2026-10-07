@@ -33,6 +33,7 @@ export interface AnimeFilterOptions {
 
 export type AnimeApiErrorCode =
   | 'MISSING_KEY'
+  | 'SERVER_ERROR'
   | 'AUTH_FAILED'
   | 'RATE_LIMITED'
   | 'NOT_FOUND'

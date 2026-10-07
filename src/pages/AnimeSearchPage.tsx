@@ -5,7 +5,6 @@ import { useApp } from '../context/AppContext';
 import { AnimeItem, AnimeApiError } from '../types/anime';
 import { searchAnime } from '../services/animeDb';
 import { AnimeCard, AnimeCardSkeleton } from '../components/AnimeCard';
-import { AnimeApiKeyNotice } from '../components/AnimeApiKeyNotice';
 import { SectionHeader } from '../components/SectionHeader';
 
 export const AnimeSearchPage: React.FC = () => {
@@ -148,34 +147,44 @@ export const AnimeSearchPage: React.FC = () => {
 
       {/* Main Results Container */}
       <main className="px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 mt-8 sm:mt-12 space-y-8">
-        {/* API Key error notice */}
+        {/* API Error state (clean fallback, no config forms or keys) */}
         {apiError && (
-          <AnimeApiKeyNotice
-            errorType={
-              apiError.code === 'AUTH_FAILED'
-                ? 'AUTH_FAILED'
-                : apiError.code === 'RATE_LIMITED'
-                ? 'RATE_LIMITED'
-                : 'MISSING_KEY'
-            }
-            onKeySaved={() => {
-              const trimmed = query.trim();
-              if (trimmed) {
-                setLoading(true);
-                searchAnime(trimmed, 1, 18).then((r) => setResults(r.data)).finally(() => setLoading(false));
-              }
-            }}
-          />
+          <div className="bg-[#111114] border border-white/10 p-12 text-center max-w-md mx-auto space-y-4">
+            <div className="w-2.5 h-2.5 bg-[#E43D3D] mx-auto" />
+            <h3 className="font-display font-bold text-lg text-white uppercase tracking-wider">
+              ANIME DATA UNAVAILABLE
+            </h3>
+            <p className="text-xs font-sans text-[#8E8E93] leading-relaxed">
+              {apiError.message || 'Unable to complete search at this time.'}
+            </p>
+            <button
+              type="button"
+              onClick={() => {
+                const trimmed = query.trim();
+                if (trimmed) {
+                  setLoading(true);
+                  setApiError(null);
+                  searchAnime(trimmed, 1, 18)
+                    .then((r) => setResults(r.data))
+                    .catch((err) => setApiError(err))
+                    .finally(() => setLoading(false));
+                }
+              }}
+              className="btn-primary min-h-[44px] px-6 text-xs uppercase inline-flex items-center gap-2"
+            >
+              <span>RETRY SEARCH</span>
+            </button>
+          </div>
         )}
 
         {/* Section Header */}
         {!apiError && query.trim() && (
           <SectionHeader
-            label="RAPIDAPI LIVE RESULTS"
+            label="SEARCH RESULTS"
             title={`RESULTS FOR "${query.toUpperCase()}"`}
             description={
               loading
-                ? 'Querying Anime DB catalog...'
+                ? 'Searching anime catalog...'
                 : `Found ${results.length} titles matching your keyword.`
             }
           />

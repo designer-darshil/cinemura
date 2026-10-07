@@ -278,7 +278,9 @@
   .animate-pulse,
   .skeleton-pulse,
   .animate-cinemaDrift,
-  .animate-cinemaGlow {
+  .animate-cinemaGlow,
+  .animate-menuSlideIn,
+  .animate-menuItemFade {
     animation: none !important;
   }
   
@@ -356,6 +358,39 @@
     rgba(228, 61, 61, 0.06),
     transparent 60%
   );
+}
+
+/* ==================================================
+   MOBILE FULLSCREEN CINEMA MENU ANIMATION
+   ================================================== */
+@keyframes menuSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes menuItemFade {
+  from {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.animate-menuSlideIn {
+  animation: menuSlideIn 260ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-menuItemFade {
+  animation: menuItemFade 300ms cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
 

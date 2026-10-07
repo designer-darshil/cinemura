@@ -14,8 +14,10 @@ import {
 } from '../components/StateViews';
 import { useInfiniteScroll } from '../hooks/useInfiniteScroll';
 import { DiscoveryFilters, FilterState } from '../components/DiscoveryFilters';
+import { useApp } from '../context/AppContext';
 
 export const DiscoverPage: React.FC = () => {
+  const { markAppReady } = useApp();
   const [searchParams, setSearchParams] = useSearchParams();
   const genreParam = searchParams.get('genre') || 'All';
   const queryParam = searchParams.get('q') || '';
@@ -150,6 +152,7 @@ export const DiscoverPage: React.FC = () => {
       if (currentReqId === requestIdRef.current) {
         setLoading(false);
         setLoadingMore(false);
+        markAppReady();
       }
     }
   };

@@ -21,6 +21,7 @@ import {
   EndOfContentState
 } from '../components/StateViews';
 import { useInfiniteScroll } from '../hooks/useInfiniteScroll';
+import { useApp } from '../context/AppContext';
 
 // Map URL category slug to friendly display title
 const CATEGORY_TITLES: Record<string, string> = {
@@ -31,6 +32,7 @@ const CATEGORY_TITLES: Record<string, string> = {
 };
 
 export const SeriesPage: React.FC = () => {
+  const { markAppReady } = useApp();
   const { id: genreIdParam, name: categoryNameParam } = useParams<{ id?: string; name?: string }>();
 
   // Determine if this is a Category Listing View or the Main TV Shows Index
@@ -106,12 +108,14 @@ export const SeriesPage: React.FC = () => {
         }
 
         setIndexLoading(false);
+        markAppReady();
       })
       .catch((err) => {
         console.error('Failed to load TV categories:', err);
         if (mounted) {
           setIndexError(true);
           setIndexLoading(false);
+          markAppReady();
         }
       });
 
@@ -176,6 +180,7 @@ export const SeriesPage: React.FC = () => {
         if (currentReqId === catRequestIdRef.current) {
           setCatLoading(false);
           setCatLoadingMore(false);
+          markAppReady();
         }
       }
     },

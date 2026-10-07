@@ -31,57 +31,9 @@ const ScrollToTop: React.FC = () => {
 };
 
 export function App() {
-  const [booting, setBooting] = React.useState(true);
-  const [progress, setProgress] = React.useState(12);
-  const [isFadingOut, setIsFadingOut] = React.useState(false);
-
-  useEffect(() => {
-    // Stage 1: Document and router runtime readiness
-    const step1 = setTimeout(() => {
-      setProgress(38);
-    }, 50);
-
-    // Stage 2: Theme tokens and fonts readiness
-    const step2 = setTimeout(() => {
-      setProgress(72);
-    }, 140);
-
-    // Stage 3: Critical UI context setup
-    const step3 = setTimeout(() => {
-      setProgress(94);
-    }, 230);
-
-    // Stage 4: Application initialization complete (100%)
-    let finishTimer: ReturnType<typeof setTimeout>;
-    let exitTimer: ReturnType<typeof setTimeout>;
-
-    const step4 = setTimeout(() => {
-      setProgress(100);
-
-      // Brief hold at 100% before smooth fade-out (70ms)
-      finishTimer = setTimeout(() => {
-        setIsFadingOut(true);
-
-        // Complete unmount after 200ms fade-out transition
-        exitTimer = setTimeout(() => {
-          setBooting(false);
-        }, 200);
-      }, 70);
-    }, 320);
-
-    return () => {
-      clearTimeout(step1);
-      clearTimeout(step2);
-      clearTimeout(step3);
-      clearTimeout(step4);
-      clearTimeout(finishTimer);
-      clearTimeout(exitTimer);
-    };
-  }, []);
-
   return (
     <AppProvider>
-      {booting && <AppLoader progress={progress} isFadingOut={isFadingOut} />}
+      <AppLoader />
       <Router>
         <ScrollToTop />
         <div className="flex flex-col min-h-screen bg-[#0B0B0D] text-[#F2F0EC] selection:bg-[#E43D3D] selection:text-white font-sans antialiased">

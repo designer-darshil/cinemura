@@ -21,7 +21,7 @@ import { selectPrimaryVideo, sortVideosWithPrimaryFirst, getVideoButtonLabel } f
 const LAST_HERO_SESSION_KEY = 'cinemura_last_hero_id';
 
 export const HomePage: React.FC = () => {
-  const { openVideoPlayer } = useApp();
+  const { openVideoPlayer, markAppReady } = useApp();
 
   const [heroItem, setHeroItem] = useState<Movie | Series | null>(null);
   const [trendingMovies, setTrendingMovies] = useState<Movie[]>([]);
@@ -128,7 +128,10 @@ export const HomePage: React.FC = () => {
       console.error('Failed to load homepage live data', err);
       if (isMounted) setError(true);
     } finally {
-      if (isMounted) setLoading(false);
+      if (isMounted) {
+        setLoading(false);
+        markAppReady();
+      }
     }
   };
 

@@ -21,7 +21,7 @@ import { EntityAwardsData } from '../types';
 export const SeriesDetailPage: React.FC = () => {
   const { id, slug } = useParams<{ id?: string; slug?: string }>();
   const seriesId = id || slug;
-  const { openVideoPlayer } = useApp();
+  const { openVideoPlayer, markAppReady } = useApp();
 
   const [series, setSeries] = useState<Series | null>(null);
   const [awards, setAwards] = useState<EntityAwardsData | null>(null);
@@ -71,7 +71,10 @@ export const SeriesDetailPage: React.FC = () => {
       console.error('Failed to load series detail', err);
       if (activeIdRef.current === seriesId) setError(true);
     } finally {
-      if (activeIdRef.current === seriesId) setLoading(false);
+      if (activeIdRef.current === seriesId) {
+        setLoading(false);
+        markAppReady();
+      }
     }
   };
 

@@ -21,7 +21,7 @@ import { EntityAwardsData } from '../types';
 export const MovieDetailPage: React.FC = () => {
   const { id, slug } = useParams<{ id?: string; slug?: string }>();
   const movieId = id || slug;
-  const { openVideoPlayer, openVidLinkMovie } = useApp();
+  const { openVideoPlayer, openVidLinkMovie, markAppReady } = useApp();
 
   const [movie, setMovie] = useState<Movie | null>(null);
   const [awards, setAwards] = useState<EntityAwardsData | null>(null);
@@ -71,7 +71,10 @@ export const MovieDetailPage: React.FC = () => {
       console.error('Failed to load movie detail', err);
       if (activeIdRef.current === movieId) setError(true);
     } finally {
-      if (activeIdRef.current === movieId) setLoading(false);
+      if (activeIdRef.current === movieId) {
+        setLoading(false);
+        markAppReady();
+      }
     }
   };
 

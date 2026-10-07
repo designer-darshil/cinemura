@@ -11,8 +11,10 @@ import {
   EndOfContentState
 } from '../components/StateViews';
 import { useInfiniteScroll } from '../hooks/useInfiniteScroll';
+import { useApp } from '../context/AppContext';
 
 export const PeoplePage: React.FC = () => {
+  const { markAppReady } = useApp();
   const [people, setPeople] = useState<Person[]>([]);
   const [page, setPage] = useState<number>(1);
   const [loading, setLoading] = useState<boolean>(true);
@@ -70,6 +72,7 @@ export const PeoplePage: React.FC = () => {
         if (currentReqId === requestIdRef.current) {
           setLoading(false);
           setLoadingMore(false);
+          markAppReady();
         }
       }
     },

@@ -8,8 +8,10 @@ import { PersonDetailSkeleton, ErrorState } from '../components/StateViews';
 import { AwardsSection } from '../components/AwardsSection';
 import { getPersonAwards } from '../services/awardsService';
 import { EntityAwardsData } from '../types';
+import { useApp } from '../context/AppContext';
 
 export const PersonDetailPage: React.FC = () => {
+  const { markAppReady } = useApp();
   const { id, slug } = useParams<{ id?: string; slug?: string }>();
   const personId = id || slug;
 
@@ -62,7 +64,10 @@ export const PersonDetailPage: React.FC = () => {
       console.error('Failed to load person detail', err);
       if (activeIdRef.current === personId) setError(true);
     } finally {
-      if (activeIdRef.current === personId) setLoading(false);
+      if (activeIdRef.current === personId) {
+        setLoading(false);
+        markAppReady();
+      }
     }
   };
 

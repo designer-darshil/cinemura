@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { VideoItem } from '../types';
 import { getVideoEmbedUrl } from '../utils/trailer';
 
@@ -17,6 +17,10 @@ export interface VidLinkSession {
 }
 
 interface AppContextType {
+  // Application Boot Readiness
+  isAppReady: boolean;
+  markAppReady: () => void;
+
   // Video / Trailer Modal
   videoSession: ActiveVideoSession | null;
   trailerUrl: string | null;
@@ -58,6 +62,32 @@ function extractYouTubeKey(url: string): string {
 }
 
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [isAppReady, setIsAppReady] = useState<boolean>(false);
+  const markAppReady = useCallback(() => {
+    setIsAppReady(true);
+  }, []);
+
+  // Failsafe boot readiness: wait for fonts or fallback timer
+  useEffect(() => {
+    let mounted = true;
+    if (typeof document !== 'undefined' && document.fonts) {
+      document.fonts.ready.then(() => {
+        // Document fonts ready
+      }).catch(() => {});
+    }
+
+    const safetyTimer = setTimeout(() => {
+      if (mounted) {
+        setIsAppReady(true);
+      }
+    }, 2500);
+
+    return () => {
+      mounted = false;
+      clearTimeout(safetyTimer);
+    };
+  }, []);
+
   const [videoSession, setVideoSession] = useState<ActiveVideoSession | null>(null);
   const [trailerUrl, setTrailerUrl] = useState<string | null>(null);
   const [trailerTitle, setTrailerTitle] = useState<string | null>(null);
@@ -181,6 +211,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   return (
     <AppContext.Provider
       value={{
+        isAppReady,
+        markAppReady,
         videoSession,
         trailerUrl,
         trailerTitle,

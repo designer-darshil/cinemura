@@ -6,6 +6,7 @@ import { Footer } from './components/Footer';
 import { TrailerModal } from './components/TrailerModal';
 import { VidLinkModal } from './components/VidLinkModal';
 import { SearchModal } from './components/SearchModal';
+import { ProfileModal } from './components/ProfileModal';
 
 import { AppLoader } from './components/AppLoader';
 
@@ -15,6 +16,7 @@ import { SeriesPage } from './pages/SeriesPage';
 import { MovieDetailPage } from './pages/MovieDetailPage';
 import { SeriesDetailPage } from './pages/SeriesDetailPage';
 import { DiscoverPage } from './pages/DiscoverPage';
+import { WatchlistPage } from './pages/WatchlistPage';
 import { PeoplePage } from './pages/PeoplePage';
 import { PersonDetailPage } from './pages/PersonDetailPage';
 import { NotFoundPage } from './pages/NotFoundPage';
@@ -64,6 +66,7 @@ export function App() {
               <Route path="/genre/:id/tv" element={<SeriesPage />} />
               <Route path="/discover" element={<DiscoverPage />} />
               <Route path="/search" element={<DiscoverPage />} />
+              <Route path="/watchlist" element={<WatchlistPage />} />
               
               <Route path="*" element={<NotFoundPage />} />
             </Routes>
@@ -75,6 +78,7 @@ export function App() {
           <TrailerModal />
           <VidLinkModal />
           <SearchModal />
+          <ProfileModal />
         </div>
       </Router>
     </AppProvider>

@@ -276,7 +276,9 @@
 /* ACCESSIBILITY: RESPECT PREFERS-REDUCED-MOTION */
 @media (prefers-reduced-motion: reduce) {
   .animate-pulse,
-  .skeleton-pulse {
+  .skeleton-pulse,
+  .animate-cinemaDrift,
+  .animate-cinemaGlow {
     animation: none !important;
   }
   
@@ -285,6 +287,75 @@
     opacity: 1 !important;
     transform: none !important;
   }
+}
+
+/* ==================================================
+   CINEMATIC AMBIENCE & MOTION SYSTEM
+   ================================================== */
+
+@keyframes cinemaDrift {
+  0% {
+    transform: scale(1) translate3d(0, 0, 0);
+  }
+  50% {
+    transform: scale(1.04) translate3d(-1%, -0.5%, 0);
+  }
+  100% {
+    transform: scale(1.02) translate3d(1%, 0.5%, 0);
+  }
+}
+
+.animate-cinemaDrift {
+  animation: cinemaDrift 28s cubic-bezier(0.25, 1, 0.5, 1) infinite alternate;
+  will-change: transform;
+}
+
+@keyframes cinemaGlow {
+  0%, 100% {
+    opacity: 0.18;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.28;
+    transform: scale(1.06);
+  }
+}
+
+.animate-cinemaGlow {
+  animation: cinemaGlow 10s ease-in-out infinite;
+  will-change: opacity, transform;
+}
+
+/* Cinema Film Strip Perforations Pattern */
+.cinema-perforations {
+  background-image: repeating-linear-gradient(
+    to bottom,
+    transparent 0px,
+    transparent 12px,
+    rgba(255, 255, 255, 0.08) 12px,
+    rgba(255, 255, 255, 0.08) 18px
+  );
+}
+
+/* Card Hover Elevation & Smooth 350ms Physics */
+.cinema-card-transition {
+  transition: transform 380ms cubic-bezier(0.16, 1, 0.3, 1),
+              border-color 300ms cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 380ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+.cinema-card-transition:hover {
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 0 16px 36px -10px rgba(0, 0, 0, 0.8),
+              0 0 24px -4px rgba(228, 61, 61, 0.15);
+}
+
+/* Cinema Spotlight Beam Overlay */
+.cinema-spotlight-radial {
+  background: radial-gradient(
+    600px circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+    rgba(228, 61, 61, 0.06),
+    transparent 60%
+  );
 }
 
 

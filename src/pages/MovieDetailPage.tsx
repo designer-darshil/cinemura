@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { Play, Star, ArrowLeft, Globe, Film } from 'lucide-react';
+import { Play, Star, ArrowLeft, Globe, Film, Bookmark } from 'lucide-react';
 import { getMovieDetail, formatCurrency } from '../services/tmdb';
 import { Movie } from '../types';
 import { useApp } from '../context/AppContext';
@@ -21,7 +21,7 @@ import { EntityAwardsData } from '../types';
 export const MovieDetailPage: React.FC = () => {
   const { id, slug } = useParams<{ id?: string; slug?: string }>();
   const movieId = id || slug;
-  const { openVideoPlayer, openVidLinkMovie, markAppReady } = useApp();
+  const { openVideoPlayer, openVidLinkMovie, markAppReady, toggleWatchlist, isInWatchlist } = useApp();
 
   const [movie, setMovie] = useState<Movie | null>(null);
   const [awards, setAwards] = useState<EntityAwardsData | null>(null);
@@ -125,6 +125,8 @@ export const MovieDetailPage: React.FC = () => {
     ...(playableVideos.length > 0 ? [{ id: 'videos-section', label: 'VIDEOS', count: playableVideos.length }] : []),
     ...(totalPhotosCount > 0 ? [{ id: 'photos-section', label: 'PHOTOS', count: totalPhotosCount }] : [])
   ];
+
+  const isSaved = isInWatchlist(movie.id);
 
   return (
     <div className="min-h-screen bg-[#0B0B0D] text-[#F2F0EC] pb-24 selection:bg-[#E43D3D] selection:text-white">
@@ -234,6 +236,20 @@ export const MovieDetailPage: React.FC = () => {
                   <span>{primaryVideoLabel}</span>
                 </button>
               )}
+
+              {/* Watchlist Toggle CTA */}
+              <button
+                type="button"
+                onClick={() => toggleWatchlist(movie)}
+                className={`px-6 py-3.5 text-xs font-mono font-bold tracking-widest uppercase flex items-center gap-2.5 transition-all border ${
+                  isSaved
+                    ? 'bg-[#E43D3D] text-white border-[#E43D3D]'
+                    : 'bg-transparent hover:bg-white/5 border-white/20 text-[#F2F0EC]'
+                }`}
+              >
+                <Bookmark className={`w-3.5 h-3.5 ${isSaved ? 'fill-white' : ''}`} />
+                <span>{isSaved ? 'SAVED TO WATCHLIST' : 'ADD TO WATCHLIST'}</span>
+              </button>
 
               {movie.cast && movie.cast.length > 0 && (
                 <button

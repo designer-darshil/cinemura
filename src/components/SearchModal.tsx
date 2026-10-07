@@ -1,15 +1,27 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { X } from 'lucide-react';
+import { X, TrendingUp, Sparkles } from 'lucide-react';
 import { useApp } from '../context/AppContext';
-import { searchTmdb } from '../services/tmdb';
+import { searchTmdb, getTrendingMovies } from '../services/tmdb';
 import { Movie, Series, Person } from '../types';
 import { MediaCard, PersonCard } from './MediaCard';
 import { CardGridSkeleton } from './StateViews';
+
+const TRENDING_SEARCH_TAGS = [
+  'Dune',
+  'Oppenheimer',
+  'Interstellar',
+  'Blade Runner 2049',
+  'The Batman',
+  'Severance',
+  'Succession',
+  'Christopher Nolan'
+];
 
 export const SearchModal: React.FC = () => {
   const { isSearchOpen, closeSearch } = useApp();
   const [query, setQuery] = useState('');
   const [searching, setSearching] = useState(false);
+  const [suggestions, setSuggestions] = useState<Movie[]>([]);
   const [results, setResults] = useState<{ movies: Movie[]; series: Series[]; people: Person[] }>({
     movies: [],
     series: [],
@@ -19,6 +31,19 @@ export const SearchModal: React.FC = () => {
   const inputRef = useRef<HTMLInputElement | null>(null);
   const modalRef = useRef<HTMLDivElement | null>(null);
   const requestIdRef = useRef<number>(0);
+
+  // Load curated suggestions once
+  useEffect(() => {
+    if (isSearchOpen && suggestions.length === 0) {
+      getTrendingMovies('week')
+        .then(movies => {
+          if (movies && movies.length > 0) {
+            setSuggestions(movies.slice(0, 6));
+          }
+        })
+        .catch(() => {});
+    }
+  }, [isSearchOpen, suggestions.length]);
 
   // Auto-focus input and handle focus restoration
   useEffect(() => {
@@ -166,12 +191,52 @@ export const SearchModal: React.FC = () => {
           </div>
         </div>
 
-        {/* Initial Prompt (Before Query) */}
+        {/* Initial Prompt with Trending Searches & Suggestions */}
         {!query.trim() && (
-          <div className="py-16 text-center space-y-2">
-            <span className="text-xs font-mono tracking-[0.2em] text-[#8E8E93] uppercase">
-              SEARCH MOVIES, TV SHOWS OR PEOPLE
-            </span>
+          <div className="space-y-10 pt-2">
+            {/* Trending Search Keywords */}
+            <div className="space-y-3">
+              <div className="flex items-center gap-2">
+                <TrendingUp className="w-3.5 h-3.5 text-[#E43D3D]" />
+                <span className="text-[11px] font-mono font-bold tracking-[0.2em] text-[#8E8E93] uppercase">
+                  TRENDING SEARCHES
+                </span>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {TRENDING_SEARCH_TAGS.map((tag) => (
+                  <button
+                    key={tag}
+                    type="button"
+                    onClick={() => setQuery(tag)}
+                    className="px-3.5 py-1.5 bg-[#17171B] hover:bg-[#E43D3D] text-[#F2F0EC] hover:text-white border border-white/10 hover:border-[#E43D3D] text-xs font-mono tracking-wider uppercase transition-all duration-200"
+                  >
+                    {tag}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Curated Cinema Suggestions */}
+            {suggestions.length > 0 && (
+              <div className="space-y-4 pt-4 border-t border-white/10">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Sparkles className="w-3.5 h-3.5 text-[#E43D3D]" />
+                    <span className="text-[11px] font-mono font-bold tracking-[0.2em] text-[#F2F0EC] uppercase">
+                      CURATED CINEMA SUGGESTIONS
+                    </span>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3 sm:gap-4">
+                  {suggestions.map((movie) => (
+                    <div key={movie.id} onClick={closeSearch}>
+                      <MediaCard item={movie} variant="poster" />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         )}
 

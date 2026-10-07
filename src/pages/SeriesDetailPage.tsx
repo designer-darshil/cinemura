@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { Play, Star, ArrowLeft, Building2, Globe } from 'lucide-react';
+import { Play, Star, ArrowLeft, Building2, Globe, Bookmark } from 'lucide-react';
 import { getTvDetail } from '../services/tmdb';
 import { Series } from '../types';
 import { useApp } from '../context/AppContext';
@@ -21,7 +21,7 @@ import { EntityAwardsData } from '../types';
 export const SeriesDetailPage: React.FC = () => {
   const { id, slug } = useParams<{ id?: string; slug?: string }>();
   const seriesId = id || slug;
-  const { openVideoPlayer, markAppReady } = useApp();
+  const { openVideoPlayer, markAppReady, toggleWatchlist, isInWatchlist } = useApp();
 
   const [series, setSeries] = useState<Series | null>(null);
   const [awards, setAwards] = useState<EntityAwardsData | null>(null);
@@ -127,6 +127,8 @@ export const SeriesDetailPage: React.FC = () => {
     ...(playableVideos.length > 0 ? [{ id: 'videos-section', label: 'VIDEOS', count: playableVideos.length }] : []),
     ...(totalPhotosCount > 0 ? [{ id: 'photos-section', label: 'PHOTOS', count: totalPhotosCount }] : [])
   ];
+
+  const isSaved = series ? isInWatchlist(series.id) : false;
 
   return (
     <div className="min-h-screen bg-[#0B0B0D] text-[#F2F0EC] pb-24 selection:bg-[#E43D3D] selection:text-white">
@@ -243,6 +245,20 @@ export const SeriesDetailPage: React.FC = () => {
                   <span>{primaryVideoLabel}</span>
                 </button>
               )}
+
+              {/* Watchlist Toggle CTA */}
+              <button
+                type="button"
+                onClick={() => toggleWatchlist(series)}
+                className={`px-6 py-3.5 text-xs font-mono font-bold tracking-widest uppercase flex items-center gap-2.5 transition-all border ${
+                  isSaved
+                    ? 'bg-[#E43D3D] text-white border-[#E43D3D]'
+                    : 'bg-transparent hover:bg-white/5 border-white/20 text-[#F2F0EC]'
+                }`}
+              >
+                <Bookmark className={`w-3.5 h-3.5 ${isSaved ? 'fill-white' : ''}`} />
+                <span>{isSaved ? 'SAVED TO WATCHLIST' : 'ADD TO WATCHLIST'}</span>
+              </button>
 
               {series.seasons && series.seasons.length > 0 && (
                 <button

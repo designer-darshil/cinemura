@@ -1,6 +1,18 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import { VideoItem } from '../types';
+import { VideoItem, MediaItem } from '../types';
 import { getVideoEmbedUrl } from '../utils/trailer';
+
+export interface WatchlistItem {
+  id: string;
+  type: 'movie' | 'tv';
+  title: string;
+  poster: string;
+  backdrop?: string;
+  rating: number;
+  year: number;
+  genres?: string[];
+  addedAt: number;
+}
 
 export interface ActiveVideoSession {
   videos: VideoItem[];
@@ -43,6 +55,20 @@ interface AppContextType {
   openSearch: () => void;
   closeSearch: () => void;
   toggleSearch: () => void;
+
+  // Watchlist State & Methods
+  watchlist: WatchlistItem[];
+  addToWatchlist: (item: MediaItem) => void;
+  removeFromWatchlist: (id: string) => void;
+  toggleWatchlist: (item: MediaItem) => boolean;
+  isInWatchlist: (id: string) => boolean;
+  clearWatchlist: () => void;
+
+  // Profile Modal / Cinema Pass
+  isProfileOpen: boolean;
+  openProfile: () => void;
+  closeProfile: () => void;
+  toggleProfile: () => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -93,6 +119,88 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [trailerTitle, setTrailerTitle] = useState<string | null>(null);
   const [vidLinkSession, setVidLinkSession] = useState<VidLinkSession | null>(null);
   const [isSearchOpen, setIsSearchOpen] = useState<boolean>(false);
+  const [isProfileOpen, setIsProfileOpen] = useState<boolean>(false);
+
+  // Watchlist Persistent Storage
+  const WATCHLIST_STORAGE_KEY = 'cinemura_watchlist';
+  const [watchlist, setWatchlist] = useState<WatchlistItem[]>(() => {
+    try {
+      const stored = localStorage.getItem(WATCHLIST_STORAGE_KEY);
+      return stored ? JSON.parse(stored) : [];
+    } catch {
+      return [];
+    }
+  });
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(WATCHLIST_STORAGE_KEY, JSON.stringify(watchlist));
+    } catch (e) {
+      console.warn('Failed to save watchlist to localStorage', e);
+    }
+  }, [watchlist]);
+
+  const addToWatchlist = useCallback((item: MediaItem) => {
+    if (!item || !item.id) return;
+    setWatchlist(prev => {
+      if (prev.some(w => w.id === item.id)) return prev;
+      const newItem: WatchlistItem = {
+        id: item.id,
+        type: item.type,
+        title: item.title,
+        poster: item.poster || '',
+        backdrop: item.backdrop || '',
+        rating: item.rating || 0,
+        year: item.year || new Date().getFullYear(),
+        genres: item.genres || [],
+        addedAt: Date.now()
+      };
+      return [newItem, ...prev];
+    });
+  }, []);
+
+  const removeFromWatchlist = useCallback((id: string) => {
+    setWatchlist(prev => prev.filter(w => w.id !== id));
+  }, []);
+
+  const isInWatchlist = useCallback((id: string) => {
+    return watchlist.some(w => w.id === id);
+  }, [watchlist]);
+
+  const toggleWatchlist = useCallback((item: MediaItem) => {
+    if (!item || !item.id) return false;
+    let added = false;
+    setWatchlist(prev => {
+      const exists = prev.some(w => w.id === item.id);
+      if (exists) {
+        added = false;
+        return prev.filter(w => w.id !== item.id);
+      } else {
+        added = true;
+        const newItem: WatchlistItem = {
+          id: item.id,
+          type: item.type,
+          title: item.title,
+          poster: item.poster || '',
+          backdrop: item.backdrop || '',
+          rating: item.rating || 0,
+          year: item.year || new Date().getFullYear(),
+          genres: item.genres || [],
+          addedAt: Date.now()
+        };
+        return [newItem, ...prev];
+      }
+    });
+    return added;
+  }, []);
+
+  const clearWatchlist = useCallback(() => {
+    setWatchlist([]);
+  }, []);
+
+  const openProfile = () => setIsProfileOpen(true);
+  const closeProfile = () => setIsProfileOpen(false);
+  const toggleProfile = () => setIsProfileOpen(prev => !prev);
 
   // Keyboard shortcuts (Cmd+K or / to search, Escape to close modals)
   useEffect(() => {
@@ -105,6 +213,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         setIsSearchOpen(true);
       } else if (e.key === 'Escape') {
         setIsSearchOpen(false);
+        setIsProfileOpen(false);
         setVideoSession(null);
         setTrailerUrl(null);
         setTrailerTitle(null);
@@ -230,6 +339,16 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         openSearch,
         closeSearch,
         toggleSearch,
+        watchlist,
+        addToWatchlist,
+        removeFromWatchlist,
+        toggleWatchlist,
+        isInWatchlist,
+        clearWatchlist,
+        isProfileOpen,
+        openProfile,
+        closeProfile,
+        toggleProfile,
       }}
     >
       {children}

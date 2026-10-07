@@ -195,9 +195,9 @@ export const HomePage: React.FC = () => {
       <div className="pointer-events-none fixed inset-0 z-10 cinema-spotlight-radial opacity-60 transition-opacity duration-300" />
 
       {/* ==================================================
-          SECTION 01 — HERO
+          SECTION 01 — HERO (MOBILE-OPTIMIZED)
          ================================================== */}
-      <section className="relative min-h-[78vh] lg:min-h-[85vh] flex flex-col justify-end pt-24 pb-12 sm:pb-16 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 w-full overflow-hidden border-b border-white/10">
+      <section className="relative min-h-[62vh] sm:min-h-[72vh] lg:min-h-[85vh] flex flex-col justify-end pt-20 sm:pt-24 pb-8 sm:pb-12 md:pb-16 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 w-full overflow-hidden border-b border-white/10">
         
         {/* Full-width Movie Artwork with Ambient Movement */}
         <div className="absolute inset-0 z-0 overflow-hidden">
@@ -216,15 +216,15 @@ export const HomePage: React.FC = () => {
 
         {/* Hero Content Canvas */}
         <div className="relative z-20 w-full grid grid-cols-1 lg:grid-cols-12 gap-8 items-end">
-          <div className="lg:col-span-9 space-y-5">
+          <div className="lg:col-span-9 space-y-4 sm:space-y-5">
             
             {/* Headline */}
-            <h1 className="font-display font-bold text-4xl sm:text-6xl lg:text-7xl xl:text-8xl text-white tracking-tight uppercase leading-[0.94]">
+            <h1 className="font-display font-bold text-3xl sm:text-5xl lg:text-7xl xl:text-8xl text-white tracking-tight uppercase leading-[0.96]">
               {heroItem.title}
             </h1>
 
             {/* Metadata Row */}
-            <div className="flex flex-wrap items-center gap-3 text-xs sm:text-sm font-mono text-[#8E8E93]">
+            <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 text-xs sm:text-sm font-mono text-[#8E8E93]">
               <span className="text-white font-semibold">{heroItem.year}</span>
               {heroDurationOrSeasons && (
                 <>
@@ -235,14 +235,14 @@ export const HomePage: React.FC = () => {
               {heroItem.genres.length > 0 && (
                 <>
                   <span className="text-white/30">•</span>
-                  <span className="text-[#F2F0EC] uppercase tracking-wider">{heroItem.genres.slice(0, 3).join(' / ')}</span>
+                  <span className="text-[#F2F0EC] uppercase tracking-wider">{heroItem.genres.slice(0, 2).join(' / ')}</span>
                 </>
               )}
               {heroItem.rating > 0 && (
                 <>
                   <span className="text-white/30">•</span>
                   <span className="flex items-center gap-1.5 text-[#E43D3D] font-bold">
-                    <Star className="w-4 h-4 fill-[#E43D3D]" />
+                    <Star className="w-3.5 h-3.5 fill-[#E43D3D]" />
                     {heroItem.rating.toFixed(1)}
                   </span>
                 </>
@@ -256,12 +256,12 @@ export const HomePage: React.FC = () => {
               </p>
             )}
 
-            {/* Primary & Secondary CTAs */}
-            <div className="flex flex-wrap items-center gap-4 pt-3">
+            {/* Primary & Secondary CTAs (Touch-friendly >= 44px) */}
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4 pt-2">
               <button
                 type="button"
                 onClick={scrollToDiscovery}
-                className="btn-primary px-8 py-3.5 text-xs font-mono font-bold tracking-widest uppercase flex items-center gap-2.5 shadow-2xl"
+                className="btn-primary min-h-[44px] px-6 sm:px-8 py-3 text-xs font-mono font-bold tracking-widest uppercase flex items-center justify-center gap-2.5 shadow-2xl w-full sm:w-auto"
               >
                 <Compass className="w-4 h-4" />
                 <span>EXPLORE MOVIES</span>
@@ -275,7 +275,7 @@ export const HomePage: React.FC = () => {
                     0,
                     heroItem.title
                   )}
-                  className="btn-secondary px-6 py-3.5 text-xs font-mono font-bold tracking-widest uppercase flex items-center gap-2.5"
+                  className="btn-secondary min-h-[44px] px-5 sm:px-6 py-3 text-xs font-mono font-bold tracking-widest uppercase flex items-center justify-center gap-2.5 w-full sm:w-auto"
                 >
                   <Play className="w-3.5 h-3.5 fill-[#E43D3D] text-[#E43D3D]" />
                   <span>{heroTrailerLabel || 'WATCH TRAILER'}</span>

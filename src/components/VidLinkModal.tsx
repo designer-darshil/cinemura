@@ -104,18 +104,22 @@ export const VidLinkModal: React.FC = () => {
       aria-label="VidLink Player Lightbox"
       tabIndex={-1}
       onClick={closeVidLink}
-      className="fixed inset-0 z-[100] flex items-center justify-center bg-black/95 backdrop-blur-sm transition-opacity duration-200 select-none p-3 sm:p-6 md:p-10"
+      className="fixed inset-0 z-[100] flex items-center justify-center bg-black transition-opacity duration-200 select-none p-2 sm:p-6 md:p-10"
       style={{ width: '100vw', height: '100vh' }}
     >
       {/* ==================================================
-          MINIMAL CLOSE CONTROL (UPPER-RIGHT CORNER)
+          MINIMAL CLOSE CONTROL (UPPER-RIGHT CORNER WITH SAFE AREA)
          ================================================== */}
       <button
         ref={closeButtonRef}
         type="button"
         onClick={closeVidLink}
         aria-label="Close playback"
-        className="absolute top-4 right-4 sm:top-6 sm:right-6 z-50 p-2 sm:p-2.5 text-white/70 hover:text-white bg-black/60 hover:bg-black/90 border border-white/10 hover:border-white/30 rounded-full transition-all focus:outline-none focus:ring-2 focus:ring-white/40"
+        style={{
+          top: 'max(1rem, env(safe-area-inset-top, 1rem))',
+          right: 'max(1rem, env(safe-area-inset-right, 1rem))'
+        }}
+        className="absolute z-50 p-2 sm:p-2.5 text-white/70 hover:text-white bg-black/70 hover:bg-black/95 border border-white/10 hover:border-white/30 rounded-full transition-all focus:outline-none focus:ring-2 focus:ring-white/40"
       >
         <X className="w-6 h-6 sm:w-7 sm:h-7" />
       </button>
@@ -129,8 +133,8 @@ export const VidLinkModal: React.FC = () => {
       <div
         onClick={(e) => e.stopPropagation()}
         style={{
-          width: 'min(calc(100vw - 32px), calc((100dvh - 80px) * (16 / 9)))',
-          maxWidth: 'min(calc(100vw - 32px), calc((100dvh - 80px) * (16 / 9)))',
+          width: 'min(calc(100vw - 16px), calc((100dvh - 80px) * (16 / 9)))',
+          maxWidth: 'min(calc(100vw - 16px), calc((100dvh - 80px) * (16 / 9)))',
           maxHeight: 'calc(100dvh - 80px)',
           aspectRatio: '16 / 9',
           position: 'relative'

@@ -140,7 +140,7 @@ export const Header: React.FC = () => {
 
           {/* Right Action Controls */}
           <div className="flex items-center gap-2 sm:gap-3">
-            {/* Desktop-Only Search Trigger */}
+            {/* Desktop Search Trigger */}
             <button
               id="header-search-trigger"
               onClick={openSearch}
@@ -153,7 +153,7 @@ export const Header: React.FC = () => {
               </span>
             </button>
 
-            {/* Desktop-Only Profile Button */}
+            {/* Desktop Profile Button */}
             <button
               onClick={openProfile}
               aria-label="Profile"
@@ -166,7 +166,16 @@ export const Header: React.FC = () => {
               </span>
             </button>
 
-            {/* Mobile-Only Menu Button */}
+            {/* Mobile-Only Search Trigger (Touch Target >= 44px) */}
+            <button
+              onClick={openSearch}
+              className="md:hidden w-11 h-11 flex items-center justify-center text-[#F2F0EC] hover:text-[#E43D3D] active:text-[#E43D3D] border border-white/10 active:border-[#E43D3D] bg-[#111114] transition-colors"
+              aria-label="Open search"
+            >
+              <Search className="w-5 h-5" />
+            </button>
+
+            {/* Mobile-Only Menu Button (Touch Target >= 44px) */}
             <button
               onClick={() => setMobileMenuOpen(true)}
               className="md:hidden w-11 h-11 flex items-center justify-center text-[#F2F0EC] hover:text-[#E43D3D] active:text-[#E43D3D] border border-white/10 active:border-[#E43D3D] bg-[#111114] transition-colors"

@@ -308,7 +308,7 @@ export const SeriesPage: React.FC = () => {
      Hero -> Popular -> Top Rated -> On The Air -> Airing Today
      ==================================================== */
   return (
-    <div className="min-h-screen bg-[#0B0B0D] text-[#F2F0EC] space-y-16 lg:space-y-20 pb-20 selection:bg-[#E43D3D] selection:text-white">
+    <div className="min-h-screen bg-[#0B0B0D] text-[#F2F0EC] space-y-12 sm:space-y-16 lg:space-y-20 pb-20 selection:bg-[#E43D3D] selection:text-white">
       {/* 1. HERO BANNER */}
       {heroSeries && <HeroBanner item={heroSeries} badgeLabel="TELEVISION" />}
 

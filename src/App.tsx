@@ -38,10 +38,10 @@ export function App() {
       <AppLoader />
       <Router>
         <ScrollToTop />
-        <div className="flex flex-col min-h-screen bg-[#0B0B0D] text-[#F2F0EC] selection:bg-[#E43D3D] selection:text-white font-sans antialiased">
+        <div className="flex flex-col min-h-screen bg-[#0B0B0D] text-[#F2F0EC] selection:bg-[#E43D3D] selection:text-white font-sans antialiased overflow-x-hidden w-full relative">
           <Header />
 
-          <main className="flex-grow">
+          <main className="flex-grow w-full">
             <Routes>
               {/* Product Routes */}
               <Route path="/" element={<HomePage />} />

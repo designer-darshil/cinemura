@@ -63,7 +63,7 @@ export const DiscoveryFilters: React.FC<DiscoveryFiltersProps> = ({
           <select
             value={filters.sortBy}
             onChange={(e) => onChange({ sortBy: e.target.value })}
-            className="w-full bg-black/60 border border-white/10 text-xs font-mono text-[#F2F0EC] px-2 py-1.5 rounded-none focus:border-[#E43D3D] outline-none"
+            className="w-full bg-black/60 border border-white/10 text-xs font-mono text-[#F2F0EC] px-2.5 py-2.5 sm:py-1.5 min-h-[44px] sm:min-h-0 rounded-none focus:border-[#E43D3D] outline-none"
           >
             <option value="popularity.desc">POPULARITY ↓</option>
             <option value="vote_average.desc">RATING ↓</option>
@@ -80,7 +80,7 @@ export const DiscoveryFilters: React.FC<DiscoveryFiltersProps> = ({
           <select
             value={filters.year}
             onChange={(e) => onChange({ year: e.target.value })}
-            className="w-full bg-black/60 border border-white/10 text-xs font-mono text-[#F2F0EC] px-2 py-1.5 rounded-none focus:border-[#E43D3D] outline-none"
+            className="w-full bg-black/60 border border-white/10 text-xs font-mono text-[#F2F0EC] px-2.5 py-2.5 sm:py-1.5 min-h-[44px] sm:min-h-0 rounded-none focus:border-[#E43D3D] outline-none"
           >
             <option value="All">ALL YEARS</option>
             <option value="2026">2026</option>
@@ -105,7 +105,7 @@ export const DiscoveryFilters: React.FC<DiscoveryFiltersProps> = ({
           <select
             value={filters.minRating}
             onChange={(e) => onChange({ minRating: e.target.value })}
-            className="w-full bg-black/60 border border-white/10 text-xs font-mono text-[#F2F0EC] px-2 py-1.5 rounded-none focus:border-[#E43D3D] outline-none"
+            className="w-full bg-black/60 border border-white/10 text-xs font-mono text-[#F2F0EC] px-2.5 py-2.5 sm:py-1.5 min-h-[44px] sm:min-h-0 rounded-none focus:border-[#E43D3D] outline-none"
           >
             <option value="All">ANY RATING</option>
             <option value="8.0">★ 8.0 & ABOVE</option>
@@ -123,7 +123,7 @@ export const DiscoveryFilters: React.FC<DiscoveryFiltersProps> = ({
           <select
             value={filters.voteCountGte}
             onChange={(e) => onChange({ voteCountGte: e.target.value })}
-            className="w-full bg-black/60 border border-white/10 text-xs font-mono text-[#F2F0EC] px-2 py-1.5 rounded-none focus:border-[#E43D3D] outline-none"
+            className="w-full bg-black/60 border border-white/10 text-xs font-mono text-[#F2F0EC] px-2.5 py-2.5 sm:py-1.5 min-h-[44px] sm:min-h-0 rounded-none focus:border-[#E43D3D] outline-none"
           >
             <option value="All">ANY VOTES</option>
             <option value="100">100+ VOTES</option>
@@ -141,7 +141,7 @@ export const DiscoveryFilters: React.FC<DiscoveryFiltersProps> = ({
           <select
             value={filters.language}
             onChange={(e) => onChange({ language: e.target.value })}
-            className="w-full bg-black/60 border border-white/10 text-xs font-mono text-[#F2F0EC] px-2 py-1.5 rounded-none focus:border-[#E43D3D] outline-none"
+            className="w-full bg-black/60 border border-white/10 text-xs font-mono text-[#F2F0EC] px-2.5 py-2.5 sm:py-1.5 min-h-[44px] sm:min-h-0 rounded-none focus:border-[#E43D3D] outline-none"
           >
             <option value="All">ALL LANGUAGES</option>
             <option value="en">ENGLISH</option>
@@ -162,7 +162,7 @@ export const DiscoveryFilters: React.FC<DiscoveryFiltersProps> = ({
           <select
             value={filters.certification}
             onChange={(e) => onChange({ certification: e.target.value })}
-            className="w-full bg-black/60 border border-white/10 text-xs font-mono text-[#F2F0EC] px-2 py-1.5 rounded-none focus:border-[#E43D3D] outline-none"
+            className="w-full bg-black/60 border border-white/10 text-xs font-mono text-[#F2F0EC] px-2.5 py-2.5 sm:py-1.5 min-h-[44px] sm:min-h-0 rounded-none focus:border-[#E43D3D] outline-none"
           >
             <option value="All">ALL RATINGS</option>
             <option value="G">G (GENERAL)</option>

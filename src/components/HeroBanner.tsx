@@ -28,7 +28,7 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({ item, badgeLabel }) => {
     : undefined;
 
   return (
-    <section className="relative min-h-[65vh] lg:min-h-[72vh] flex flex-col justify-end pt-20 pb-8 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 w-full overflow-hidden border-b border-white/10">
+    <section className="relative min-h-[58vh] sm:min-h-[66vh] lg:min-h-[72vh] flex flex-col justify-end pt-20 pb-8 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 w-full overflow-hidden border-b border-white/10">
       {/* Real Backdrop Background Field */}
       <div className="absolute inset-0 z-0">
         <img
@@ -56,12 +56,12 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({ item, badgeLabel }) => {
           </div>
 
           {/* Real Title */}
-          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-serif font-bold text-white tracking-tight uppercase leading-none">
+          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-display font-bold text-white tracking-tight uppercase leading-none">
             {item.title}
           </h1>
 
           {/* Essential Metadata Row */}
-          <div className="flex flex-wrap items-center gap-3 text-xs font-mono text-[#8E8E93]">
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 text-xs font-mono text-[#8E8E93]">
             <span>{item.year}</span>
             {durationOrSeasons && (
               <>
@@ -72,7 +72,7 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({ item, badgeLabel }) => {
             {item.genres && item.genres.length > 0 && (
               <>
                 <span>•</span>
-                <span className="text-[#F2F0EC] uppercase">{item.genres.slice(0, 3).join(' / ')}</span>
+                <span className="text-[#F2F0EC] uppercase">{item.genres.slice(0, 2).join(' / ')}</span>
               </>
             )}
             {item.rating > 0 && (
@@ -94,7 +94,7 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({ item, badgeLabel }) => {
           )}
 
           {/* Actions: Watch Trailer CTA & Explore Title Link */}
-          <div className="flex flex-wrap items-center gap-4 pt-2">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4 pt-2">
             {primaryVideo && (
               <button
                 type="button"
@@ -105,7 +105,7 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({ item, badgeLabel }) => {
                     item.title
                   )
                 }
-                className="bg-[#E43D3D] hover:bg-[#c02e2e] text-white px-6 py-3 text-xs font-mono font-bold tracking-widest uppercase flex items-center gap-2.5 transition-all transform hover:-translate-y-0.5 shadow-lg"
+                className="bg-[#E43D3D] hover:bg-[#c02e2e] text-white min-h-[44px] px-6 py-3 text-xs font-mono font-bold tracking-widest uppercase flex items-center justify-center gap-2.5 transition-all shadow-lg w-full sm:w-auto"
               >
                 <Play className="w-3.5 h-3.5 fill-white" />
                 <span>{trailerLabel}</span>
@@ -114,7 +114,7 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({ item, badgeLabel }) => {
 
             <Link
               to={detailPath}
-              className="btn-link inline-flex items-center gap-2 text-white text-sm font-mono font-bold tracking-wider uppercase hover:text-[#E43D3D] transition-colors"
+              className="btn-secondary min-h-[44px] inline-flex items-center justify-center gap-2 text-white text-xs font-mono font-bold tracking-wider uppercase transition-colors w-full sm:w-auto"
             >
               <span>EXPLORE TITLE</span>
               <ArrowRight className="w-3.5 h-3.5 text-[#E43D3D]" />

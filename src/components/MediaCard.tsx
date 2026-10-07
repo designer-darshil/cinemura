@@ -156,21 +156,21 @@ export const MediaCard = React.forwardRef<any, MediaCardProps>(({
             toggleWatchlist(item);
           }}
           aria-label={isSaved ? 'Remove from Watchlist' : 'Add to Watchlist'}
-          className={`absolute top-2 right-2 z-20 p-1.5 transition-all duration-300 ${
+          className={`absolute top-2 right-2 z-20 p-2 transition-all duration-300 min-w-[36px] min-h-[36px] flex items-center justify-center ${
             isSaved
-              ? 'bg-[#E43D3D] text-white opacity-100'
-              : 'bg-[#111114] text-[#8E8E93] hover:text-white opacity-0 group-hover:opacity-100 border border-white/10'
+              ? 'bg-[#E43D3D] text-white opacity-100 shadow-md'
+              : 'bg-[#111114]/90 text-[#8E8E93] hover:text-white opacity-100 md:opacity-0 md:group-hover:opacity-100 border border-white/10'
           }`}
           title={isSaved ? 'In Watchlist' : 'Save to Watchlist'}
         >
           <Bookmark className="w-3.5 h-3.5 fill-current" />
         </button>
 
-        {/* Center Play Trailer Action Control */}
+        {/* Center Play Trailer Action Control (Desktop Only Hover Feature) */}
         {item.trailerUrl && (
           <button
             onClick={handleTrailerClick}
-            className="absolute inset-0 m-auto w-11 h-11 bg-[#E43D3D] text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 transform scale-75 group-hover:scale-100 z-20 shadow-xl cursor-pointer"
+            className="hidden md:flex absolute inset-0 m-auto w-11 h-11 bg-[#E43D3D] text-white items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 transform scale-75 group-hover:scale-100 z-20 shadow-xl cursor-pointer"
             aria-label="Play Trailer"
           >
             <Play className="w-4 h-4 fill-white pl-0.5" />

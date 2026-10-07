@@ -86,7 +86,7 @@ export const SeriesEpisodesSection: React.FC<SeriesEpisodesSectionProps> = ({
         </div>
 
         {/* Compact Real Season Selector Pills */}
-        <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-1">
+        <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-1 -mx-4 px-4 sm:mx-0 sm:px-0">
           {seasons.map((season) => {
             const isActive = selectedSeasonNumber === season.seasonNumber;
             return (
@@ -94,7 +94,7 @@ export const SeriesEpisodesSection: React.FC<SeriesEpisodesSectionProps> = ({
                 key={season.seasonNumber}
                 type="button"
                 onClick={() => setSelectedSeasonNumber(season.seasonNumber)}
-                className={`px-3 py-1.5 text-xs font-mono tracking-wider uppercase transition-all whitespace-nowrap border ${
+                className={`px-3.5 py-2 sm:py-1.5 min-h-[40px] sm:min-h-[36px] text-xs font-mono tracking-wider uppercase transition-all whitespace-nowrap border flex items-center shrink-0 ${
                   isActive
                     ? 'bg-[#E43D3D] border-[#E43D3D] text-white font-bold'
                     : 'bg-[#111114] border-white/15 text-[#8E8E93] hover:text-[#F2F0EC] hover:border-white/30'
@@ -217,7 +217,7 @@ export const SeriesEpisodesSection: React.FC<SeriesEpisodesSectionProps> = ({
                       <button
                         type="button"
                         onClick={() => openVidLinkTv(seriesId, ep.seasonNumber, ep.episodeNumber, `${seriesTitle} S${ep.seasonNumber}E${ep.episodeNumber}: ${ep.title}`)}
-                        className="w-full bg-[#18181D] hover:bg-[#E43D3D] text-[#F2F0EC] hover:text-white border border-white/15 hover:border-[#E43D3D] py-2 px-3 text-[11px] font-mono font-bold tracking-widest uppercase flex items-center justify-center gap-2 transition-all duration-200 group/btn"
+                        className="w-full bg-[#18181D] hover:bg-[#E43D3D] text-[#F2F0EC] hover:text-white border border-white/15 hover:border-[#E43D3D] min-h-[44px] py-2 px-3 text-[11px] font-mono font-bold tracking-widest uppercase flex items-center justify-center gap-2 transition-all duration-200 group/btn"
                       >
                         <Play className="w-3 h-3 fill-current text-[#E43D3D] group-hover/btn:text-white group-hover/btn:fill-white" />
                         <span>WATCH EPISODE</span>

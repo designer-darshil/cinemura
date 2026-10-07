@@ -143,10 +143,14 @@ export const SearchModal: React.FC = () => {
       role="dialog"
       aria-modal="true"
       aria-label="Search Catalog"
-      className="fixed inset-0 z-50 bg-[#0B0B0D] overflow-y-auto text-[#F2F0EC] px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 py-6 sm:py-10 animate-fadeIn selection:bg-[#E43D3D] selection:text-white"
+      style={{
+        paddingTop: 'max(1.5rem, env(safe-area-inset-top, 1.5rem))',
+        paddingBottom: 'max(2rem, env(safe-area-inset-bottom, 2rem))'
+      }}
+      className="fixed inset-0 z-50 bg-[#0B0B0D] overflow-y-auto text-[#F2F0EC] px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 animate-fadeIn selection:bg-[#E43D3D] selection:text-white"
     >
       
-      <div className="w-full space-y-8 sm:space-y-12">
+      <div className="w-full space-y-6 sm:space-y-12">
         
         {/* Top Minimal Controls Header */}
         <div className="flex items-center justify-between border-b border-white/10 pb-4">
@@ -154,7 +158,7 @@ export const SearchModal: React.FC = () => {
             <span className="text-[10px] font-mono font-extrabold tracking-[0.2em] text-[#E43D3D] uppercase">
               SEARCH
             </span>
-            <kbd className="text-[9px] font-mono bg-white/5 border border-white/10 px-2 py-0.5 text-[#8E8E93]">
+            <kbd className="hidden sm:inline-block text-[9px] font-mono bg-white/5 border border-white/10 px-2 py-0.5 text-[#8E8E93]">
               ESC
             </kbd>
           </div>
@@ -162,7 +166,7 @@ export const SearchModal: React.FC = () => {
           <button
             onClick={closeSearch}
             aria-label="Close search"
-            className="p-2 text-[#8E8E93] hover:text-[#E43D3D] focus-visible:text-[#E43D3D] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#E43D3D] transition-colors"
+            className="w-11 h-11 flex items-center justify-center text-[#8E8E93] hover:text-[#E43D3D] focus-visible:text-[#E43D3D] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#E43D3D] transition-colors -mr-2"
           >
             <X className="w-6 h-6" />
           </button>
@@ -183,7 +187,7 @@ export const SearchModal: React.FC = () => {
               <button
                 onClick={() => setQuery('')}
                 aria-label="Clear search input"
-                className="absolute right-0 top-1/2 -translate-y-1/2 p-2 text-[#8E8E93] hover:text-[#F2F0EC] transition-colors"
+                className="absolute right-0 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center text-[#8E8E93] hover:text-[#F2F0EC] transition-colors"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -193,7 +197,7 @@ export const SearchModal: React.FC = () => {
 
         {/* Initial Prompt with Trending Searches & Suggestions */}
         {!query.trim() && (
-          <div className="space-y-10 pt-2">
+          <div className="space-y-8 sm:space-y-10 pt-2">
             {/* Trending Search Keywords */}
             <div className="space-y-3">
               <div className="flex items-center gap-2">
@@ -208,7 +212,7 @@ export const SearchModal: React.FC = () => {
                     key={tag}
                     type="button"
                     onClick={() => setQuery(tag)}
-                    className="px-3.5 py-1.5 bg-[#17171B] hover:bg-[#E43D3D] text-[#F2F0EC] hover:text-white border border-white/10 hover:border-[#E43D3D] text-xs font-mono tracking-wider uppercase transition-all duration-200"
+                    className="px-3.5 py-2 sm:py-1.5 min-h-[40px] sm:min-h-0 flex items-center bg-[#17171B] hover:bg-[#E43D3D] text-[#F2F0EC] hover:text-white border border-white/10 hover:border-[#E43D3D] text-xs font-mono tracking-wider uppercase transition-all duration-200"
                   >
                     {tag}
                   </button>

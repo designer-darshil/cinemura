@@ -258,12 +258,12 @@ export const DiscoverPage: React.FC = () => {
         <div className="bg-[#111114] border border-white/10 p-4 space-y-4">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <span className="text-xs font-mono text-[#8E8E93]">MEDIA TYPE:</span>
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2">
               {(['all', 'movie', 'tv'] as const).map(tab => (
                 <button
                   key={tab}
                   onClick={() => setActiveTab(tab)}
-                  className={`text-xs px-3.5 py-1.5 font-mono font-bold uppercase tracking-wider transition-all ${
+                  className={`text-xs px-3.5 py-2 sm:py-1.5 min-h-[40px] sm:min-h-0 flex items-center font-mono font-bold uppercase tracking-wider transition-all ${
                     activeTab === tab ? 'bg-[#E43D3D] text-white' : 'text-[#8E8E93] hover:text-white border border-white/10'
                   }`}
                 >
@@ -277,7 +277,7 @@ export const DiscoverPage: React.FC = () => {
             <div className="flex flex-wrap gap-1.5 pt-3 border-t border-white/10">
               <button
                 onClick={() => setSearchParams({})}
-                className={`text-xs px-3 py-1 font-mono font-semibold uppercase transition-all ${
+                className={`text-xs px-3 py-1.5 sm:py-1 min-h-[36px] sm:min-h-0 flex items-center font-mono font-semibold uppercase transition-all ${
                   genreParam === 'All'
                     ? 'bg-[#E43D3D] text-white'
                     : 'bg-[#0B0B0D] text-[#8E8E93] hover:text-white border border-white/10'
@@ -289,7 +289,7 @@ export const DiscoverPage: React.FC = () => {
                 <button
                   key={g.id}
                   onClick={() => setSearchParams({ genre: g.id.toString() })}
-                  className={`text-xs px-3 py-1 font-mono font-semibold uppercase transition-all ${
+                  className={`text-xs px-3 py-1.5 sm:py-1 min-h-[36px] sm:min-h-0 flex items-center font-mono font-semibold uppercase transition-all ${
                     genreParam === g.id.toString()
                       ? 'bg-[#E43D3D] text-white'
                       : 'bg-[#0B0B0D] text-[#8E8E93] hover:text-white border border-white/10'

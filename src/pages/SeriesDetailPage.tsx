@@ -136,7 +136,7 @@ export const SeriesDetailPage: React.FC = () => {
       {/* ==================================================
           1. TV SERIES HERO — INFORMATION-DENSE IMMERSIVE COVER
          ================================================== */}
-      <section className="relative min-h-[85vh] flex flex-col justify-between pt-24 pb-12 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 w-full overflow-hidden">
+      <section className="relative min-h-[58vh] sm:min-h-[70vh] lg:min-h-[85vh] flex flex-col justify-between pt-20 sm:pt-24 pb-10 sm:pb-12 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 w-full overflow-hidden">
         
         {/* Backdrop Background Field */}
         <div className="absolute inset-0 z-0">
@@ -161,12 +161,12 @@ export const SeriesDetailPage: React.FC = () => {
         </div>
 
         {/* Hero Content */}
-        <div className="relative z-10 w-full grid grid-cols-1 lg:grid-cols-12 gap-8 items-end pt-10">
+        <div className="relative z-10 w-full grid grid-cols-1 lg:grid-cols-12 gap-8 items-end pt-8 sm:pt-10">
           
-          <div className="lg:col-span-9 space-y-6">
+          <div className="lg:col-span-9 space-y-4 sm:space-y-6">
             
             {/* Editorial Type Label & Badges */}
-            <div className="flex flex-wrap items-center gap-3">
+            <div className="flex flex-wrap items-center gap-2 sm:gap-3">
               <span className="text-[10px] font-mono font-extrabold tracking-[0.2em] px-2.5 py-1 uppercase bg-[#E43D3D] text-white">
                 TV SERIES
               </span>
@@ -197,12 +197,12 @@ export const SeriesDetailPage: React.FC = () => {
             )}
 
             {/* Title */}
-            <h1 className="text-4xl sm:text-6xl lg:text-7xl font-serif font-bold text-[#F2F0EC] tracking-tight uppercase leading-none">
+            <h1 className="text-3xl sm:text-5xl lg:text-7xl font-display font-bold text-[#F2F0EC] tracking-tight uppercase leading-none">
               {series.title}
             </h1>
 
             {/* Metadata Bar */}
-            <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-xs sm:text-sm font-mono text-[#8E8E93]">
+            <div className="flex flex-wrap items-center gap-x-4 sm:gap-x-5 gap-y-1.5 text-xs sm:text-sm font-mono text-[#8E8E93]">
               <span className="text-[#F2F0EC] font-semibold">{series.year}</span>
               {series.seasonsCount > 0 && (
                 <>
@@ -225,17 +225,19 @@ export const SeriesDetailPage: React.FC = () => {
             </div>
 
             {/* Overview Excerpt */}
-            <p className="text-sm sm:text-base font-light text-[#F2F0EC]/85 max-w-3xl line-clamp-3 leading-relaxed">
-              {series.synopsis}
-            </p>
+            {series.synopsis && (
+              <p className="text-sm sm:text-base font-light text-[#F2F0EC]/85 max-w-3xl line-clamp-3 leading-relaxed">
+                {series.synopsis}
+              </p>
+            )}
 
-            {/* Primary & Secondary Actions */}
-            <div className="flex flex-wrap items-center gap-4 pt-2">
+            {/* Primary & Secondary Actions (Touch-friendly min 44px) */}
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4 pt-2">
               {primaryVideo && (
                 <button
                   type="button"
                   onClick={() => openVideoPlayer(playableVideos, 0, series.title)}
-                  className="bg-[#E43D3D] hover:bg-[#c02e2e] text-white px-7 py-3.5 text-xs font-mono font-bold tracking-widest uppercase flex items-center gap-3 transition-all transform hover:-translate-y-0.5 shadow-lg"
+                  className="bg-[#E43D3D] hover:bg-[#c02e2e] text-white min-h-[44px] px-7 py-3 text-xs font-mono font-bold tracking-widest uppercase flex items-center justify-center gap-3 transition-all shadow-lg w-full sm:w-auto"
                 >
                   <Play className="w-4 h-4 fill-white" />
                   <span>{primaryVideoLabel}</span>
@@ -246,7 +248,7 @@ export const SeriesDetailPage: React.FC = () => {
               <button
                 type="button"
                 onClick={() => toggleWatchlist(series)}
-                className={`px-6 py-3.5 text-xs font-mono font-bold tracking-widest uppercase flex items-center gap-2.5 transition-all border ${
+                className={`min-h-[44px] px-6 py-3 text-xs font-mono font-bold tracking-widest uppercase flex items-center justify-center gap-2.5 transition-all border w-full sm:w-auto ${
                   isSaved
                     ? 'bg-[#E43D3D] text-white border-[#E43D3D]'
                     : 'bg-transparent hover:bg-white/5 border-white/20 text-[#F2F0EC]'
@@ -260,19 +262,9 @@ export const SeriesDetailPage: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => document.getElementById('episodes-section')?.scrollIntoView({ behavior: 'smooth' })}
-                  className="bg-transparent hover:bg-white/5 border border-white/20 text-[#F2F0EC] px-6 py-3.5 text-xs font-mono font-bold tracking-widest uppercase flex items-center gap-2 transition-all"
+                  className="bg-transparent hover:bg-white/5 border border-white/20 text-[#F2F0EC] min-h-[44px] px-6 py-3 text-xs font-mono font-bold tracking-widest uppercase flex items-center justify-center gap-2 transition-all w-full sm:w-auto"
                 >
                   <span>VIEW EPISODES</span>
-                </button>
-              )}
-
-              {series.cast && series.cast.length > 0 && (
-                <button
-                  type="button"
-                  onClick={() => document.getElementById('cast-section')?.scrollIntoView({ behavior: 'smooth' })}
-                  className="bg-transparent hover:bg-white/5 border border-white/20 text-[#8E8E93] hover:text-white px-5 py-3.5 text-xs font-mono font-bold tracking-widest uppercase flex items-center gap-2 transition-all"
-                >
-                  <span>CAST ({series.cast.length})</span>
                 </button>
               )}
             </div>
@@ -403,7 +395,7 @@ export const SeriesDetailPage: React.FC = () => {
           3. TV CREATORS (SHOWRUNNERS)
          ================================================== */}
       {((series.creatorDetails && series.creatorDetails.length > 0) || (series.creators && series.creators.length > 0)) && (
-        <section className="w-full mt-20 sm:mt-28 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 space-y-6">
+        <section className="w-full mt-12 sm:mt-16 lg:mt-24 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 space-y-6">
           <SectionHeader
             label="SHOWRUNNERS"
             title="CREATED BY"
@@ -438,7 +430,7 @@ export const SeriesDetailPage: React.FC = () => {
           4. CAST — HORIZONTAL CONTENT CAROUSEL
          ================================================== */}
       {series.cast && series.cast.length > 0 && (
-        <section id="cast-section" className="w-full mt-20 sm:mt-28 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 scroll-mt-28">
+        <section id="cast-section" className="w-full mt-12 sm:mt-16 lg:mt-24 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 scroll-mt-28">
           <CastCarousel cast={series.cast} title="CAST" />
         </section>
       )}
@@ -447,7 +439,7 @@ export const SeriesDetailPage: React.FC = () => {
           5. TV EPISODES — SEASON SELECTOR & DENSE GRID
          ================================================== */}
       {series.seasons && series.seasons.length > 0 && (
-        <div className="w-full mt-20 sm:mt-28 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16">
+        <div className="w-full mt-12 sm:mt-16 lg:mt-24 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16">
           <SeriesEpisodesSection
             id="episodes-section"
             seriesId={series.id}
@@ -461,7 +453,7 @@ export const SeriesDetailPage: React.FC = () => {
           6. TV VIDEOS — REAL TMDB MEDIA GRID + TYPE FILTER
          ================================================== */}
       {playableVideos.length > 0 && (
-        <div className="w-full mt-20 sm:mt-28 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16">
+        <div className="w-full mt-12 sm:mt-16 lg:mt-24 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16">
           <MediaVideosSection id="videos-section" videos={playableVideos} parentTitle={series.title} />
         </div>
       )}
@@ -470,7 +462,7 @@ export const SeriesDetailPage: React.FC = () => {
           7. TV PHOTOS — BACKDROPS & POSTERS GALLERIES
          ================================================== */}
       {totalPhotosCount > 0 && (
-        <div className="w-full mt-20 sm:mt-28 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16">
+        <div className="w-full mt-12 sm:mt-16 lg:mt-24 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16">
           <MediaPhotosSection
             id="photos-section"
             backdrops={backdropImages}
@@ -484,7 +476,7 @@ export const SeriesDetailPage: React.FC = () => {
           8. NETWORKS & PRODUCTION COMPANIES
          ================================================== */}
       {((series.networks && series.networks.length > 0) || (series.productionCompanies && series.productionCompanies.length > 0)) && (
-        <section className="w-full mt-20 sm:mt-28 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 space-y-6">
+        <section className="w-full mt-12 sm:mt-16 lg:mt-24 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 space-y-6">
           <SectionHeader
             label="STUDIO DOSSIER"
             title="NETWORKS & PRODUCTION"
@@ -539,7 +531,7 @@ export const SeriesDetailPage: React.FC = () => {
           9. RELATED TV SHOWS
          ================================================== */}
       {relatedSeries.length > 0 && (
-        <section className="w-full mt-20 sm:mt-28 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 space-y-8">
+        <section className="w-full mt-12 sm:mt-16 lg:mt-24 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 space-y-8">
           <SectionHeader
             label="RECOMMENDATIONS"
             title="MORE LIKE THIS"

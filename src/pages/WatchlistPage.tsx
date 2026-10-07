@@ -39,7 +39,7 @@ export const WatchlistPage: React.FC = () => {
             <div className="flex items-center bg-[#111114] border border-white/10 p-1">
               <button
                 onClick={() => setFilter('all')}
-                className={`px-3 py-1.5 text-xs font-mono uppercase tracking-wider transition-colors ${
+                className={`px-3.5 py-2 sm:py-1.5 min-h-[40px] sm:min-h-0 flex items-center text-xs font-mono uppercase tracking-wider transition-colors ${
                   filter === 'all' ? 'bg-[#E43D3D] text-white font-bold' : 'text-[#8E8E93] hover:text-white'
                 }`}
               >
@@ -47,7 +47,7 @@ export const WatchlistPage: React.FC = () => {
               </button>
               <button
                 onClick={() => setFilter('movie')}
-                className={`px-3 py-1.5 text-xs font-mono uppercase tracking-wider transition-colors ${
+                className={`px-3.5 py-2 sm:py-1.5 min-h-[40px] sm:min-h-0 flex items-center text-xs font-mono uppercase tracking-wider transition-colors ${
                   filter === 'movie' ? 'bg-[#E43D3D] text-white font-bold' : 'text-[#8E8E93] hover:text-white'
                 }`}
               >
@@ -55,7 +55,7 @@ export const WatchlistPage: React.FC = () => {
               </button>
               <button
                 onClick={() => setFilter('tv')}
-                className={`px-3 py-1.5 text-xs font-mono uppercase tracking-wider transition-colors ${
+                className={`px-3.5 py-2 sm:py-1.5 min-h-[40px] sm:min-h-0 flex items-center text-xs font-mono uppercase tracking-wider transition-colors ${
                   filter === 'tv' ? 'bg-[#E43D3D] text-white font-bold' : 'text-[#8E8E93] hover:text-white'
                 }`}
               >
@@ -69,7 +69,7 @@ export const WatchlistPage: React.FC = () => {
                   clearWatchlist();
                 }
               }}
-              className="p-2.5 text-[#8E8E93] hover:text-[#E43D3D] border border-white/10 hover:border-[#E43D3D] transition-colors"
+              className="p-2.5 min-h-[40px] min-w-[40px] flex items-center justify-center text-[#8E8E93] hover:text-[#E43D3D] border border-white/10 hover:border-[#E43D3D] transition-colors"
               title="Clear all"
             >
               <Trash2 className="w-4 h-4" />
@@ -80,7 +80,7 @@ export const WatchlistPage: React.FC = () => {
 
       {/* Grid or Empty State */}
       {watchlist.length === 0 ? (
-        <div className="py-20 flex flex-col items-center justify-center text-center space-y-6 border border-white/10 bg-[#111114]/60 p-8 sm:p-12">
+        <div className="py-20 flex flex-col items-center justify-center text-center space-y-6 border border-white/10 bg-[#111114]/60 p-6 sm:p-12">
           <div className="w-16 h-16 rounded-full border border-white/20 bg-white/5 flex items-center justify-center text-[#E43D3D]">
             <Bookmark className="w-8 h-8" />
           </div>
@@ -94,17 +94,17 @@ export const WatchlistPage: React.FC = () => {
             </p>
           </div>
 
-          <div className="flex flex-wrap gap-4 pt-2">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4 pt-2 w-full sm:w-auto">
             <Link
               to="/movie"
-              className="btn-primary text-xs font-mono font-bold tracking-widest uppercase flex items-center gap-2"
+              className="btn-primary text-xs font-mono font-bold tracking-widest uppercase flex items-center justify-center gap-2 w-full sm:w-auto"
             >
               <span>EXPLORE MOVIES</span>
               <ArrowRight className="w-3.5 h-3.5" />
             </Link>
             <Link
               to="/tv"
-              className="btn-secondary text-xs font-mono font-bold tracking-widest uppercase flex items-center gap-2"
+              className="btn-secondary text-xs font-mono font-bold tracking-widest uppercase flex items-center justify-center gap-2 w-full sm:w-auto"
             >
               <span>DISCOVER TV SHOWS</span>
             </Link>

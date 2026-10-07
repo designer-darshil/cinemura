@@ -126,7 +126,7 @@ export const PersonDetailPage: React.FC = () => {
           <div className="absolute inset-0 film-grain pointer-events-none opacity-20" />
 
           {/* LEFT: Dominant Portrait Visual Anchor */}
-          <div className="lg:col-span-4 max-w-sm mx-auto lg:max-w-none w-full">
+          <div className="lg:col-span-4 max-w-[220px] sm:max-w-xs lg:max-w-none mx-auto w-full">
             <div className="relative aspect-[3/4] bg-black border border-white/20 overflow-hidden shadow-2xl group/portrait">
               <img
                 src={person.portrait}
@@ -143,13 +143,13 @@ export const PersonDetailPage: React.FC = () => {
           </div>
 
           {/* RIGHT: Name & Essential Identity Metadata */}
-          <div className="lg:col-span-8 space-y-6 text-center lg:text-left">
+          <div className="lg:col-span-8 space-y-5 sm:space-y-6 text-center lg:text-left">
             
             <div className="space-y-2">
               <span className="text-[10px] font-mono tracking-[0.25em] text-[#E43D3D] uppercase block">
                 EDITORIAL PROFILE
               </span>
-              <h1 className="text-4xl sm:text-6xl lg:text-7xl font-serif font-bold text-[#F2F0EC] tracking-tight uppercase leading-none">
+              <h1 className="text-3xl sm:text-5xl lg:text-7xl font-display font-bold text-[#F2F0EC] tracking-tight uppercase leading-none">
                 {person.name}
               </h1>
             </div>
@@ -212,9 +212,9 @@ export const PersonDetailPage: React.FC = () => {
       {/* ==================================================
           2. PERSON BIOGRAPHY — ABOUT SECTION
          ================================================== */}
-      <section className="mt-16 sm:mt-24 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 w-full space-y-6">
+      <section className="mt-10 sm:mt-16 lg:mt-24 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 w-full space-y-6">
         
-        <div className="border-t border-white/10 pt-12">
+        <div className="border-t border-white/10 pt-8 sm:pt-12">
           <SectionHeader
             label="BIOGRAPHY"
             title="ABOUT"
@@ -240,7 +240,7 @@ export const PersonDetailPage: React.FC = () => {
           3. KNOWN FOR — VISUALLY PROMINENT SECTION
          ================================================== */}
       {person.knownFor && person.knownFor.length > 0 && (
-        <section className="mt-16 sm:mt-24 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 w-full space-y-6">
+        <section className="mt-10 sm:mt-16 lg:mt-24 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 w-full space-y-6">
           
           <SectionHeader
             label="ACCLAIMED WORKS"
@@ -249,7 +249,7 @@ export const PersonDetailPage: React.FC = () => {
           />
 
           {/* Render Known For titles using credit items matching the titles */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4">
             {person.filmography.slice(0, 6).map(credit => (
               <Link
                 key={`known-${credit.id}`}
@@ -287,7 +287,7 @@ export const PersonDetailPage: React.FC = () => {
       {/* ==================================================
           AWARDS — REAL AUTHORIZED DATA ONLY (HIDDEN IF UNAVAILABLE)
          ================================================== */}
-      <div className="w-full px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16">
+      <div className="w-full mt-10 sm:mt-16 lg:mt-24 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16">
         <AwardsSection awards={awards} loading={awardsLoading} title="AWARDS & NOMINATIONS" label="CAREER HONORS" />
       </div>
 
@@ -295,7 +295,7 @@ export const PersonDetailPage: React.FC = () => {
           4. PERSON FILMOGRAPHY — COMPACT EDITORIAL STREAM
          ================================================== */}
       {person.filmography && person.filmography.length > 0 && (
-        <section className="mt-20 sm:mt-28 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 w-full space-y-8">
+        <section className="mt-12 sm:mt-16 lg:mt-24 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 w-full space-y-8">
           
           <SectionHeader
             label="FULL CREDIT RECORD"
@@ -306,7 +306,7 @@ export const PersonDetailPage: React.FC = () => {
                   <button
                     key={tab}
                     onClick={() => setFilmoFilter(tab)}
-                    className={`text-[10px] font-mono font-bold uppercase tracking-wider px-3.5 py-1.5 transition-colors ${
+                    className={`text-[10px] font-mono font-bold uppercase tracking-wider px-3 sm:px-3.5 py-2 sm:py-1.5 min-h-[40px] sm:min-h-0 transition-colors ${
                       filmoFilter === tab
                         ? 'bg-[#E43D3D] text-white'
                         : 'text-[#8E8E93] hover:text-[#F2F0EC]'

@@ -132,9 +132,9 @@ export const MovieDetailPage: React.FC = () => {
     <div className="min-h-screen bg-[#0B0B0D] text-[#F2F0EC] pb-24 selection:bg-[#E43D3D] selection:text-white">
       
       {/* ==================================================
-          1. HERO CONCEPT — IMMERSIVE MAGAZINE COVER
+          1. HERO CONCEPT — IMMERSIVE MAGAZINE COVER (MOBILE-OPTIMIZED)
          ================================================== */}
-      <section className="relative min-h-[85vh] lg:min-h-[90vh] flex flex-col justify-between pt-24 pb-12 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 w-full overflow-hidden">
+      <section className="relative min-h-[56vh] sm:min-h-[68vh] lg:min-h-[90vh] flex flex-col justify-between pt-20 sm:pt-24 pb-8 sm:pb-12 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 w-full overflow-hidden">
         
         {/* Dominant Backdrop Visual Field */}
         <div className="absolute inset-0 z-0">
@@ -171,9 +171,9 @@ export const MovieDetailPage: React.FC = () => {
         </div>
 
         {/* Hero Bottom Canvas: Title & High-Level Metadata */}
-        <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 items-end pt-20">
+        <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 items-end pt-12 sm:pt-20">
           
-          <div className="lg:col-span-9 space-y-5">
+          <div className="lg:col-span-9 space-y-4 sm:space-y-5">
             
             {/* Tagline or Editorial Kicker */}
             {movie.tagline && (
@@ -183,12 +183,12 @@ export const MovieDetailPage: React.FC = () => {
             )}
 
             {/* Movie Title */}
-            <h1 className="text-4xl sm:text-6xl lg:text-7xl font-serif font-bold text-[#F2F0EC] tracking-tight uppercase leading-none">
+            <h1 className="text-3xl sm:text-5xl lg:text-7xl font-display font-bold text-[#F2F0EC] tracking-tight uppercase leading-none">
               {movie.title}
             </h1>
 
             {/* Fast-Scannable Spec Row */}
-            <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-xs sm:text-sm font-mono text-[#8E8E93]">
+            <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 text-xs sm:text-sm font-mono text-[#8E8E93]">
               <span className="flex items-center gap-1.5 text-white font-bold">
                 <Star className="w-4 h-4 fill-[#E43D3D] text-[#E43D3D]" />
                 {movie.rating.toFixed(1)}
@@ -199,7 +199,7 @@ export const MovieDetailPage: React.FC = () => {
               <span>•</span>
               <span className="text-[#F2F0EC]">{movie.runtime}</span>
               <span>•</span>
-              <span className="text-[#F2F0EC] uppercase">{movie.genres.join(' / ')}</span>
+              <span className="text-[#F2F0EC] uppercase">{movie.genres.slice(0, 3).join(' / ')}</span>
               {movie.director !== 'N/A' && (
                 <>
                   <span>•</span>
@@ -209,28 +209,19 @@ export const MovieDetailPage: React.FC = () => {
             </div>
 
             {/* Short Overview Excerpt */}
-            <p className="text-sm sm:text-base font-light text-[#F2F0EC]/85 max-w-3xl line-clamp-3 leading-relaxed">
-              {movie.synopsis}
-            </p>
+            {movie.synopsis && (
+              <p className="text-sm sm:text-base font-light text-[#F2F0EC]/85 max-w-3xl line-clamp-3 leading-relaxed">
+                {movie.synopsis}
+              </p>
+            )}
 
-            {/* Actions */}
-            <div className="flex flex-wrap items-center gap-4 pt-3">
-              {/* {isMoviePlayable(movie) && (
-                <button
-                  type="button"
-                  onClick={() => openVidLinkMovie(movie.id, movie.title)}
-                  className="bg-[#E43D3D] hover:bg-[#c02e2e] text-white px-7 py-3.5 text-xs font-mono font-bold tracking-widest uppercase flex items-center gap-3 transition-all transform hover:-translate-y-0.5 shadow-lg"
-                >
-                  <Play className="w-4 h-4 fill-white" />
-                  <span>WATCH MOVIE</span>
-                </button>
-              )} */}
-
+            {/* Actions (Touch targets min 44px) */}
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4 pt-2">
               {primaryVideo && (
                 <button
                   type="button"
                   onClick={() => openVideoPlayer(playableVideos, 0, movie.title)}
-                  className={`${isMoviePlayable(movie) ? 'bg-transparent hover:bg-white/5 border border-white/20 text-[#F2F0EC]' : 'bg-[#E43D3D] hover:bg-[#c02e2e] text-white shadow-lg transform hover:-translate-y-0.5'} px-7 py-3.5 text-xs font-mono font-bold tracking-widest uppercase flex items-center gap-3 transition-all`}
+                  className={`${isMoviePlayable(movie) ? 'bg-transparent hover:bg-white/5 border border-white/20 text-[#F2F0EC]' : 'bg-[#E43D3D] hover:bg-[#c02e2e] text-white shadow-lg'} min-h-[44px] px-7 py-3 text-xs font-mono font-bold tracking-widest uppercase flex items-center justify-center gap-3 transition-all w-full sm:w-auto`}
                 >
                   <Play className={`w-4 h-4 ${isMoviePlayable(movie) ? 'text-[#E43D3D]' : 'fill-white'}`} />
                   <span>{primaryVideoLabel}</span>
@@ -241,7 +232,7 @@ export const MovieDetailPage: React.FC = () => {
               <button
                 type="button"
                 onClick={() => toggleWatchlist(movie)}
-                className={`px-6 py-3.5 text-xs font-mono font-bold tracking-widest uppercase flex items-center gap-2.5 transition-all border ${
+                className={`min-h-[44px] px-6 py-3 text-xs font-mono font-bold tracking-widest uppercase flex items-center justify-center gap-2.5 transition-all border w-full sm:w-auto ${
                   isSaved
                     ? 'bg-[#E43D3D] text-white border-[#E43D3D]'
                     : 'bg-transparent hover:bg-white/5 border-white/20 text-[#F2F0EC]'
@@ -250,27 +241,6 @@ export const MovieDetailPage: React.FC = () => {
                 <Bookmark className={`w-3.5 h-3.5 ${isSaved ? 'fill-white' : ''}`} />
                 <span>{isSaved ? 'SAVED TO WATCHLIST' : 'ADD TO WATCHLIST'}</span>
               </button>
-
-              {/* {movie.cast && movie.cast.length > 0 && (
-                <button
-                  type="button"
-                  onClick={() => document.getElementById('cast-section')?.scrollIntoView({ behavior: 'smooth' })}
-                  className="bg-transparent hover:bg-white/5 border border-white/20 text-[#F2F0EC] px-6 py-3.5 text-xs font-mono font-bold tracking-widest uppercase flex items-center gap-2 transition-all"
-                >
-                  <span>VIEW CAST & CREW</span>
-                </button>
-              )} */}
-
-              {/* {playableVideos.length > 0 && (
-                <button
-                  type="button"
-                  onClick={() => document.getElementById('videos-section')?.scrollIntoView({ behavior: 'smooth' })}
-                  className="bg-transparent hover:bg-white/5 border border-white/20 text-[#8E8E93] hover:text-white px-5 py-3.5 text-xs font-mono font-bold tracking-widest uppercase flex items-center gap-2 transition-all"
-                >
-                  <Film className="w-3.5 h-3.5 text-[#E43D3D]" />
-                  <span>VIDEOS ({playableVideos.length})</span>
-                </button>
-              )} */}
             </div>
 
           </div>
@@ -422,7 +392,7 @@ export const MovieDetailPage: React.FC = () => {
           3. CAST — HORIZONTAL CONTENT CAROUSEL
          ================================================== */}
       {movie.cast && movie.cast.length > 0 && (
-        <section id="cast-section" className="w-full mt-20 sm:mt-28 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 scroll-mt-28">
+        <section id="cast-section" className="w-full mt-12 sm:mt-16 lg:mt-24 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 scroll-mt-28">
           <CastCarousel cast={movie.cast} title="CAST" />
         </section>
       )}
@@ -431,7 +401,7 @@ export const MovieDetailPage: React.FC = () => {
           4. VIDEOS — REAL TMDB MEDIA GRID + TYPE FILTER
          ================================================== */}
       {playableVideos.length > 0 && (
-        <div className="w-full mt-20 sm:mt-28 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16">
+        <div className="w-full mt-12 sm:mt-16 lg:mt-24 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16">
           <MediaVideosSection id="videos-section" videos={playableVideos} parentTitle={movie.title} />
         </div>
       )}
@@ -440,7 +410,7 @@ export const MovieDetailPage: React.FC = () => {
           5. PHOTOS — BACKDROPS & POSTERS GALLERIES
          ================================================== */}
       {totalPhotosCount > 0 && (
-        <div className="w-full mt-20 sm:mt-28 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16">
+        <div className="w-full mt-12 sm:mt-16 lg:mt-24 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16">
           <MediaPhotosSection
             id="photos-section"
             backdrops={backdropImages}
@@ -454,7 +424,7 @@ export const MovieDetailPage: React.FC = () => {
           6. MOVIE COLLECTION / FRANCHISE
          ================================================== */}
       {movie.collection && (
-        <section className="w-full mt-20 sm:mt-28 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 space-y-6">
+        <section className="w-full mt-12 sm:mt-16 lg:mt-24 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 space-y-6">
           
           <SectionHeader
             label="FRANCHISE ARCHIVE"
@@ -512,7 +482,7 @@ export const MovieDetailPage: React.FC = () => {
           WHERE TO WATCH — REAL TMDB / JUSTWATCH PROVIDERS
          ================================================== */}
       {movie.watchProviders && (
-        <div className="w-full px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16">
+        <div className="w-full mt-12 sm:mt-16 lg:mt-24 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16">
           <WatchProvidersSection watchProviders={movie.watchProviders} />
         </div>
       )}
@@ -520,7 +490,7 @@ export const MovieDetailPage: React.FC = () => {
       {/* ==================================================
           AWARDS — REAL AUTHORIZED DATA ONLY (HIDDEN IF UNAVAILABLE)
          ================================================== */}
-      <div className="w-full px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16">
+      <div className="w-full mt-12 sm:mt-16 lg:mt-24 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16">
         <AwardsSection awards={awards} loading={awardsLoading} />
       </div>
 
@@ -528,7 +498,7 @@ export const MovieDetailPage: React.FC = () => {
           7. RELATED MOVIES
          ================================================== */}
       {relatedMovies.length > 0 && (
-        <section className="w-full mt-20 sm:mt-28 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 space-y-8">
+        <section className="w-full mt-12 sm:mt-16 lg:mt-24 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 space-y-8">
           
           <SectionHeader
             label="RECOMMENDATIONS"

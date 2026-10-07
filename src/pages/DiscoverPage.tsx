@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { getMoviesList, getTvList, getMovieGenres, searchTmdb, GenreItem } from '../services/tmdb';
 import { MediaItem, Movie, Series, Person } from '../types';
@@ -43,6 +43,11 @@ export const DiscoverPage: React.FC = () => {
   const [errorMore, setErrorMore] = useState(false);
   const [hasMore, setHasMore] = useState(true);
 
+  // Search pagination states
+  const [searchPage, setSearchPage] = useState(1);
+  const [searchLoadingMore, setSearchLoadingMore] = useState(false);
+  const [searchHasMore, setSearchHasMore] = useState(false);
+
   const requestIdRef = React.useRef<number>(0);
 
   // Perform search query when q searchParam is present, or discover filtering
@@ -51,10 +56,12 @@ export const DiscoverPage: React.FC = () => {
     if (queryParam.trim()) {
       setLoading(true);
       setError(false);
-      searchTmdb(queryParam.trim())
+      setSearchPage(1);
+      searchTmdb(queryParam.trim(), 1)
         .then(res => {
           if (currentReqId !== requestIdRef.current) return;
           setSearchResults(res);
+          setSearchHasMore((res?.totalPages || 1) > 1);
         })
         .catch(err => {
           if (currentReqId !== requestIdRef.current) return;
@@ -68,10 +75,52 @@ export const DiscoverPage: React.FC = () => {
         });
     } else {
       setSearchResults(null);
+      setSearchHasMore(false);
       setPage(1);
       fetchDiscoveryData(1, false, currentReqId);
     }
   }, [queryParam, genreParam, filterState]);
+
+  const handleSearchLoadMore = useCallback(async () => {
+    if (loading || searchLoadingMore || !searchHasMore || !queryParam.trim()) return;
+    const nextPage = searchPage + 1;
+    const currentReqId = requestIdRef.current;
+    setSearchLoadingMore(true);
+    try {
+      const res = await searchTmdb(queryParam.trim(), nextPage);
+      if (currentReqId !== requestIdRef.current) return;
+      if (!res) {
+        setSearchHasMore(false);
+      } else {
+        setSearchResults(prev => {
+          if (!prev) return res;
+          const existingMovieIds = new Set(prev.movies.map(m => m.id));
+          const newMovies = res.movies.filter(m => !existingMovieIds.has(m.id));
+
+          const existingSeriesIds = new Set(prev.series.map(s => s.id));
+          const newSeries = res.series.filter(s => !existingSeriesIds.has(s.id));
+
+          const existingPeopleIds = new Set(prev.people.map(p => p.id));
+          const newPeople = res.people.filter(p => !existingPeopleIds.has(p.id));
+
+          return {
+            movies: [...prev.movies, ...newMovies],
+            series: [...prev.series, ...newSeries],
+            people: [...prev.people, ...newPeople],
+            totalPages: res.totalPages
+          };
+        });
+        setSearchPage(nextPage);
+        setSearchHasMore(nextPage < (res.totalPages || 1));
+      }
+    } catch (err) {
+      console.error('Dedicated search load more failed', err);
+    } finally {
+      if (currentReqId === requestIdRef.current) {
+        setSearchLoadingMore(false);
+      }
+    }
+  }, [loading, searchLoadingMore, searchHasMore, queryParam, searchPage]);
 
   const fetchDiscoveryData = async (targetPage: number = 1, append: boolean = false, existingReqId?: number) => {
     if (queryParam.trim()) return;
@@ -158,16 +207,35 @@ export const DiscoverPage: React.FC = () => {
   };
 
   const handleLoadMore = useCallback(() => {
-    if (loadingMore || !hasMore || queryParam.trim()) return;
+    if (loading || loadingMore || !hasMore || queryParam.trim()) return;
     const nextPage = page + 1;
     setPage(nextPage);
     fetchDiscoveryData(nextPage, true);
-  }, [page, loadingMore, hasMore, queryParam]);
+  }, [page, loading, loadingMore, hasMore, queryParam]);
 
-  const sentinelRef = useInfiniteScroll({
+  // Last non-empty section in search mode to host the second-last row trigger
+  const lastSearchSection = useMemo(() => {
+    if (!searchResults) return null;
+    if (searchResults.people.length > 0) return { type: 'people' as const, count: searchResults.people.length };
+    if (searchResults.series.length > 0) return { type: 'series' as const, count: searchResults.series.length };
+    if (searchResults.movies.length > 0) return { type: 'movies' as const, count: searchResults.movies.length };
+    return null;
+  }, [searchResults]);
+
+  const { triggerIndex: searchTriggerIndex, triggerRef: searchTriggerRef } = useInfiniteScroll({
+    totalItems: lastSearchSection?.count || 0,
+    loading: loading || searchLoadingMore,
+    hasMore: searchHasMore && Boolean(queryParam.trim()),
+    onLoadMore: handleSearchLoadMore,
+    resetDeps: [queryParam]
+  });
+
+  const { triggerIndex: discoverTriggerIndex, triggerRef: discoverTriggerRef } = useInfiniteScroll({
+    totalItems: items.length,
     loading: loading || loadingMore,
     hasMore: hasMore && !queryParam.trim(),
-    onLoadMore: handleLoadMore
+    onLoadMore: handleLoadMore,
+    resetDeps: [queryParam, genreParam, activeTab, filterState]
   });
 
   const filteredItems = items.filter(item => {
@@ -276,8 +344,13 @@ export const DiscoverPage: React.FC = () => {
                     MOVIES ({searchResults.movies.length})
                   </div>
                   <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4">
-                    {searchResults.movies.map(movie => (
-                      <MediaCard key={movie.id} item={movie} variant="poster" />
+                    {searchResults.movies.map((movie, index) => (
+                      <MediaCard
+                        key={movie.id}
+                        item={movie}
+                        variant="poster"
+                        ref={lastSearchSection?.type === 'movies' && index === searchTriggerIndex ? searchTriggerRef : undefined}
+                      />
                     ))}
                   </div>
                 </div>
@@ -289,8 +362,13 @@ export const DiscoverPage: React.FC = () => {
                     TV SHOWS ({searchResults.series.length})
                   </div>
                   <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4">
-                    {searchResults.series.map(show => (
-                      <MediaCard key={show.id} item={show} variant="poster" />
+                    {searchResults.series.map((show, index) => (
+                      <MediaCard
+                        key={show.id}
+                        item={show}
+                        variant="poster"
+                        ref={lastSearchSection?.type === 'series' && index === searchTriggerIndex ? searchTriggerRef : undefined}
+                      />
                     ))}
                   </div>
                 </div>
@@ -302,7 +380,7 @@ export const DiscoverPage: React.FC = () => {
                     PEOPLE ({searchResults.people.length})
                   </div>
                   <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4">
-                    {searchResults.people.map(person => (
+                    {searchResults.people.map((person, index) => (
                       <PersonCard
                         key={person.id}
                         id={person.id}
@@ -311,11 +389,15 @@ export const DiscoverPage: React.FC = () => {
                         knownFor={person.knownFor}
                         portrait={person.portrait}
                         slug={person.slug}
+                        ref={lastSearchSection?.type === 'people' && index === searchTriggerIndex ? searchTriggerRef : undefined}
                       />
                     ))}
                   </div>
                 </div>
               )}
+
+              {searchLoadingMore && <InfiniteLoadingSkeleton count={6} />}
+              {!searchHasMore && lastSearchSection && <EndOfContentState />}
             </>
           )}
         </div>
@@ -331,13 +413,15 @@ export const DiscoverPage: React.FC = () => {
           </div>
 
           <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4">
-            {filteredItems.map(item => (
-              <MediaCard key={item.id} item={item} variant="poster" />
+            {filteredItems.map((item, index) => (
+              <MediaCard
+                key={item.id}
+                item={item}
+                variant="poster"
+                ref={index === discoverTriggerIndex ? discoverTriggerRef : undefined}
+              />
             ))}
           </div>
-
-          {/* Sentinel Element */}
-          <div ref={sentinelRef} className="h-1 w-full" />
 
           {loadingMore && <InfiniteLoadingSkeleton count={6} />}
 

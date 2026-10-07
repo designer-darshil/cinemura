@@ -208,8 +208,7 @@ export const HomePage: React.FC = () => {
           />
           
           {/* Dark Gradient Overlays for Readability */}
-          <div className="absolute inset-0 bg-gradient-to-r from-[#0B0B0D] via-[#0B0B0D]/85 to-transparent" />
-          <div className="absolute inset-0 bg-gradient-to-t from-[#0B0B0D] via-[#0B0B0D]/40 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t md:bg-gradient-to-r from-[#0B0B0D] via-[#0B0B0D]/85 to-transparent" />
           
           <div className="absolute top-1/4 -left-20 w-96 h-96 bg-[#E43D3D]/10 rounded-full blur-3xl pointer-events-none animate-cinemaGlow" />
           <div className="absolute inset-0 film-grain pointer-events-none opacity-30" />

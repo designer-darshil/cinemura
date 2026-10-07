@@ -613,10 +613,10 @@ export async function getTvGenres(): Promise<GenreItem[]> {
   return data?.genres || [];
 }
 
-export async function searchTmdb(query: string): Promise<{ movies: Movie[]; series: Series[]; people: Person[] } | null> {
+export async function searchTmdb(query: string, page: number = 1): Promise<{ movies: Movie[]; series: Series[]; people: Person[]; totalPages?: number } | null> {
   if (!query.trim()) return { movies: [], series: [], people: [] };
 
-  const data = await fetchFromTmdb<any>('/search/multi', { query });
+  const data = await fetchFromTmdb<any>('/search/multi', { query, page: page.toString() });
   if (!data || !data.results) return null;
 
   const movies = data.results.filter((r: any) => r.media_type === 'movie').map(transformTmdbMovie);
@@ -634,5 +634,5 @@ export async function searchTmdb(query: string): Promise<{ movies: Movie[]; seri
     filmography: []
   }));
 
-  return { movies, series, people };
+  return { movies, series, people, totalPages: data.total_pages || 1 };
 }

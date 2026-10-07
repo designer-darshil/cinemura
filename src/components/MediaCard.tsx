@@ -11,11 +11,11 @@ interface MediaCardProps {
   aspectRatio?: 'poster' | 'backdrop';
 }
 
-export const MediaCard: React.FC<MediaCardProps> = ({
+export const MediaCard = React.forwardRef<any, MediaCardProps>(({
   item,
   variant = 'poster',
   aspectRatio
-}) => {
+}, ref) => {
   const { openTrailer, toggleWatchlist, isInWatchlist } = useApp();
   const detailPath = item.type === 'movie' ? `/movie/${item.id}` : `/tv/${item.id}`;
   const effectiveRatio = aspectRatio || (variant === 'horizontal' ? 'backdrop' : 'poster');
@@ -43,7 +43,7 @@ export const MediaCard: React.FC<MediaCardProps> = ({
   // Variant 3: Large Editorial Feature Card
   if (variant === 'editorial') {
     return (
-      <div className="hidden group relative bg-[#111114] border border-white/10 hover:border-[#E43D3D] transition-all duration-300 transform hover:-translate-y-1 grid grid-cols-1 lg:grid-cols-12 overflow-hidden">
+      <div ref={ref} className="hidden group relative bg-[#111114] border border-white/10 hover:border-[#E43D3D] transition-all duration-300 transform hover:-translate-y-1 grid grid-cols-1 lg:grid-cols-12 overflow-hidden">
         <div className="lg:col-span-7 relative min-h-[300px] bg-[#141418] overflow-hidden">
           {!imageLoaded && <div className="absolute inset-0 skeleton-pulse" />}
           <img
@@ -116,6 +116,7 @@ export const MediaCard: React.FC<MediaCardProps> = ({
   // Universal Standard Card (ENTIRE CARD IS A SINGLE FULLY CLICKABLE TARGET)
   return (
     <Link
+      ref={ref}
       to={detailPath}
       tabIndex={0}
       className="group relative bg-[#111114] border border-white/10 hover:border-[#E43D3D] focus:outline-none focus:ring-1 focus:ring-[#E43D3D] transition-all duration-400 ease-out transform hover:scale-[1.03] hover:-translate-y-1.5 hover:shadow-2xl hover:shadow-black/80 flex flex-col justify-between overflow-hidden"
@@ -201,7 +202,9 @@ export const MediaCard: React.FC<MediaCardProps> = ({
       </div>
     </Link>
   );
-};
+});
+
+MediaCard.displayName = 'MediaCard';
 
 /* Unified Cast Card Component (ENTIRE CARD CLICKABLE) */
 export interface CastCardProps {
@@ -267,7 +270,7 @@ export interface PersonCardProps {
   slug: string;
 }
 
-export const PersonCard: React.FC<PersonCardProps> = ({ name, role, knownFor, portrait, slug }) => {
+export const PersonCard = React.forwardRef<HTMLAnchorElement, PersonCardProps>(({ name, role, knownFor, portrait, slug }, ref) => {
   const [loaded, setLoaded] = useState(false);
   const [src, setSrc] = useState(portrait);
 
@@ -278,6 +281,7 @@ export const PersonCard: React.FC<PersonCardProps> = ({ name, role, knownFor, po
 
   return (
     <Link
+      ref={ref}
       to={`/person/${slug}`}
       tabIndex={0}
       className="group relative bg-[#111114] border border-white/10 hover:border-[#E43D3D] focus:outline-none focus:ring-1 focus:ring-[#E43D3D] transition-all duration-300 transform hover:-translate-y-1 flex flex-col justify-between overflow-hidden"
@@ -317,4 +321,6 @@ export const PersonCard: React.FC<PersonCardProps> = ({ name, role, knownFor, po
       </div>
     </Link>
   );
-};
+});
+
+PersonCard.displayName = 'PersonCard';

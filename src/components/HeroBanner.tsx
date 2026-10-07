@@ -36,8 +36,7 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({ item, badgeLabel }) => {
           alt={item.title}
           className="w-full h-full object-cover opacity-45 filter brightness-90 contrast-110"
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-[#0B0B0D] via-[#0B0B0D]/80 to-transparent" />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#0B0B0D] via-transparent to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t md:bg-gradient-to-r from-[#0B0B0D] via-[#0B0B0D]/80 to-transparent" />
         <div className="absolute inset-0 film-grain pointer-events-none opacity-30" />
       </div>
 

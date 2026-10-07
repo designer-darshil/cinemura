@@ -211,11 +211,12 @@ export const MoviesPage: React.FC = () => {
     fetchCategoryData(nextPage, true);
   }, [catPage, catLoading, catLoadingMore, catHasMore, fetchCategoryData]);
 
-  const sentinelRef = useInfiniteScroll({
+  const { triggerIndex, triggerRef } = useInfiniteScroll({
+    totalItems: categoryItems.length,
     loading: catLoading || catLoadingMore,
     hasMore: catHasMore,
     onLoadMore: handleCatLoadMore,
-    rootMargin: '600px 0px'
+    resetDeps: [isCategoryView, categoryNameParam, genreIdParam]
   });
 
   /* ====================================================
@@ -276,8 +277,13 @@ export const MoviesPage: React.FC = () => {
         {!catLoading && !catError && categoryItems.length > 0 && (
           <div className="space-y-8">
             <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4">
-              {categoryItems.map((movie) => (
-                <MediaCard key={movie.id} item={movie} variant="poster" />
+              {categoryItems.map((movie, index) => (
+                <MediaCard
+                  key={movie.id}
+                  item={movie}
+                  variant="poster"
+                  ref={index === triggerIndex ? triggerRef : undefined}
+                />
               ))}
             </div>
 
@@ -291,9 +297,6 @@ export const MoviesPage: React.FC = () => {
 
             {/* End of content indicator */}
             {!catHasMore && categoryItems.length > 0 && <EndOfContentState />}
-
-            {/* Intersection Observer Sentinel for continuous prefetching */}
-            <div ref={sentinelRef} className="h-10 w-full pointer-events-none" />
           </div>
         )}
       </div>

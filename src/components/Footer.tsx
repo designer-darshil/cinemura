@@ -6,7 +6,7 @@ export const Footer: React.FC = () => {
   const { openSearch } = useApp();
 
   return (
-    <footer className="bg-[#0B0B0D] border-t border-white/10 text-[#F2F0EC] py-12">
+    <footer id="site-footer" className="bg-[#0B0B0D] border-t border-white/10 text-[#F2F0EC] py-12">
       <div className="w-full px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 space-y-8">
         
         {/* Brand & Statement */}

@@ -145,7 +145,7 @@ export const SeriesDetailPage: React.FC = () => {
             alt={series.title}
             className="w-full h-full object-cover filter brightness-50 contrast-110 scale-105 transition-transform duration-1000"
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-[#0B0B0D] via-[#0B0B0D]/50 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t md:bg-gradient-to-r from-[#0B0B0D] via-[#0B0B0D]/50 to-transparent" />
           <div className="absolute inset-0 film-grain pointer-events-none opacity-40" />
         </div>
 

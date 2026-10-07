@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { Play, Star, ArrowLeft, Globe, Film, Bookmark } from 'lucide-react';
+import { Play, Star, ArrowLeft, Globe, Bookmark } from 'lucide-react';
 import { getMovieDetail, formatCurrency } from '../services/tmdb';
 import { Movie } from '../types';
 import { useApp } from '../context/AppContext';
@@ -21,7 +21,7 @@ import { EntityAwardsData } from '../types';
 export const MovieDetailPage: React.FC = () => {
   const { id, slug } = useParams<{ id?: string; slug?: string }>();
   const movieId = id || slug;
-  const { openVideoPlayer, openVidLinkMovie, markAppReady, toggleWatchlist, isInWatchlist } = useApp();
+  const { openVideoPlayer, markAppReady, toggleWatchlist, isInWatchlist } = useApp();
 
   const [movie, setMovie] = useState<Movie | null>(null);
   const [awards, setAwards] = useState<EntityAwardsData | null>(null);
@@ -144,7 +144,7 @@ export const MovieDetailPage: React.FC = () => {
             className="w-full h-full object-cover filter brightness-60 contrast-110 scale-105 transition-transform duration-1000 ease-out"
           />
           {/* Gradient Vignette & Tint */}
-          <div className="absolute inset-0 bg-gradient-to-r from-[#0B0B0D] via-[#0B0B0D]/50 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t md:bg-gradient-to-r from-[#0B0B0D] via-[#0B0B0D]/50 to-transparent" />
           <div className="absolute inset-0 film-grain pointer-events-none opacity-40" />
         </div>
 
@@ -215,7 +215,7 @@ export const MovieDetailPage: React.FC = () => {
 
             {/* Actions */}
             <div className="flex flex-wrap items-center gap-4 pt-3">
-              {isMoviePlayable(movie) && (
+              {/* {isMoviePlayable(movie) && (
                 <button
                   type="button"
                   onClick={() => openVidLinkMovie(movie.id, movie.title)}
@@ -224,7 +224,7 @@ export const MovieDetailPage: React.FC = () => {
                   <Play className="w-4 h-4 fill-white" />
                   <span>WATCH MOVIE</span>
                 </button>
-              )}
+              )} */}
 
               {primaryVideo && (
                 <button
@@ -251,7 +251,7 @@ export const MovieDetailPage: React.FC = () => {
                 <span>{isSaved ? 'SAVED TO WATCHLIST' : 'ADD TO WATCHLIST'}</span>
               </button>
 
-              {movie.cast && movie.cast.length > 0 && (
+              {/* {movie.cast && movie.cast.length > 0 && (
                 <button
                   type="button"
                   onClick={() => document.getElementById('cast-section')?.scrollIntoView({ behavior: 'smooth' })}
@@ -259,9 +259,9 @@ export const MovieDetailPage: React.FC = () => {
                 >
                   <span>VIEW CAST & CREW</span>
                 </button>
-              )}
+              )} */}
 
-              {playableVideos.length > 0 && (
+              {/* {playableVideos.length > 0 && (
                 <button
                   type="button"
                   onClick={() => document.getElementById('videos-section')?.scrollIntoView({ behavior: 'smooth' })}
@@ -270,7 +270,7 @@ export const MovieDetailPage: React.FC = () => {
                   <Film className="w-3.5 h-3.5 text-[#E43D3D]" />
                   <span>VIDEOS ({playableVideos.length})</span>
                 </button>
-              )}
+              )} */}
             </div>
 
           </div>

@@ -1,6 +1,10 @@
 import { defineConfig, loadEnv, Plugin } from 'vite';
 import react from '@vitejs/plugin-react';
 
+// In-memory cache on the server proxy to avoid consuming RapidAPI quota on reloads
+const serverCache = new Map<string, { timestamp: number; status: number; body: string }>();
+const SERVER_CACHE_TTL = 30 * 60 * 1000; // 30 minutes
+
 /**
  * Server-side API middleware plugin for Anime DB
  * Proxies /api/anime requests to RapidAPI Anime DB server-side
@@ -18,9 +22,7 @@ function animeApiPlugin(apiKey?: string, apiHost?: string): Plugin {
       const search = parsedUrl.search;
 
       let upstreamPath = '/anime';
-      if (pathname === '/api/anime/genres') {
-        upstreamPath = '/genres';
-      } else if (pathname.startsWith('/api/anime/')) {
+      if (pathname.startsWith('/api/anime/')) {
         const rest = pathname.substring('/api/anime/'.length).trim();
         if (rest) {
           upstreamPath = `/anime/${rest}`;
@@ -44,6 +46,17 @@ function animeApiPlugin(apiKey?: string, apiHost?: string): Plugin {
       }
 
       const upstreamUrl = `https://${host}${upstreamPath}${search}`;
+
+      // Check server cache
+      const cached = serverCache.get(upstreamUrl);
+      if (cached && Date.now() - cached.timestamp < SERVER_CACHE_TTL) {
+        res.statusCode = cached.status;
+        res.setHeader('Content-Type', 'application/json');
+        res.setHeader('X-Cache', 'HIT');
+        res.end(cached.body);
+        return;
+      }
+
       const upstreamRes = await fetch(upstreamUrl, {
         method: 'GET',
         headers: {
@@ -54,8 +67,19 @@ function animeApiPlugin(apiKey?: string, apiHost?: string): Plugin {
       });
 
       const body = await upstreamRes.text();
+
+      // Only cache successful responses
+      if (upstreamRes.status === 200) {
+        serverCache.set(upstreamUrl, {
+          timestamp: Date.now(),
+          status: upstreamRes.status,
+          body
+        });
+      }
+
       res.statusCode = upstreamRes.status;
       res.setHeader('Content-Type', 'application/json');
+      res.setHeader('X-Cache', 'MISS');
       res.end(body);
     } catch (err: any) {
       console.error('[Anime Server API] Error fetching upstream data:', err?.message || err);

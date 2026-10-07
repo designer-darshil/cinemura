@@ -182,21 +182,25 @@ export const getAnimeRankings = async (
 };
 
 /**
+ * Verified Anime genres supported by Anime DB query parameters
+ */
+const ANIME_GENRES = [
+  'Action',
+  'Adventure',
+  'Comedy',
+  'Drama',
+  'Fantasy',
+  'Mystery',
+  'Romance',
+  'Sci-Fi',
+  'Slice of Life',
+  'Supernatural',
+  'Suspense'
+];
+
+/**
  * Get available Anime genres list
- * Endpoint: /api/anime/genres
  */
 export const getAnimeGenres = async (): Promise<string[]> => {
-  try {
-    const raw = await fetchAnimeDb<any>(`${API_BASE}/genres`);
-    if (Array.isArray(raw)) {
-      return raw.map((g: any) => (typeof g === 'string' ? g : g.name || String(g)));
-    }
-    if (Array.isArray(raw?.data)) {
-      return raw.data.map((g: any) => (typeof g === 'string' ? g : g.name || String(g)));
-    }
-    return [];
-  } catch (err) {
-    console.warn('Anime genres endpoint unavailable or failed:', err);
-    return [];
-  }
+  return ANIME_GENRES;
 };

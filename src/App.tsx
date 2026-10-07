@@ -20,6 +20,9 @@ import { WatchlistPage } from './pages/WatchlistPage';
 import { PeoplePage } from './pages/PeoplePage';
 import { PersonDetailPage } from './pages/PersonDetailPage';
 import { StyleGuidePage } from './pages/StyleGuidePage';
+import { AnimePage } from './pages/AnimePage';
+import { AnimeDetailPage } from './pages/AnimeDetailPage';
+import { AnimeSearchPage } from './pages/AnimeSearchPage';
 import { NotFoundPage } from './pages/NotFoundPage';
 
 // Scroll to top on route change
@@ -69,6 +72,11 @@ export function App() {
               <Route path="/search" element={<DiscoverPage />} />
               <Route path="/watchlist" element={<WatchlistPage />} />
               <Route path="/style-guide" element={<StyleGuidePage />} />
+              
+              {/* Dedicated RapidAPI Anime DB Routes */}
+              <Route path="/anime" element={<AnimePage />} />
+              <Route path="/anime/search" element={<AnimeSearchPage />} />
+              <Route path="/anime/:id" element={<AnimeDetailPage />} />
               
               <Route path="*" element={<NotFoundPage />} />
             </Routes>

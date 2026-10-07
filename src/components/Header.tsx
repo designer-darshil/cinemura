@@ -51,6 +51,7 @@ export const Header: React.FC = () => {
     { name: 'MOVIES', path: '/movie' },
     { name: 'DISCOVER', path: '/discover' },
     { name: 'GENRES', path: '/discover?genre=All' },
+    { name: 'TRENDING', path: '/movie?sort=popularity.desc' },
     { name: 'WATCHLIST', path: '/watchlist', badge: watchlist.length },
   ];
 
@@ -101,16 +102,22 @@ export const Header: React.FC = () => {
           </Link>
 
           {/* Center Navigation Links (Desktop Only) */}
-          <nav className="hidden md:flex items-center gap-7 lg:gap-9" aria-label="Main Navigation">
+          <nav className="hidden md:flex items-center gap-6 lg:gap-8" aria-label="Main Navigation">
             {navLinks.map(link => {
               const isActive = location.pathname === link.path;
               const isGenreLink = link.name === 'GENRES';
+              const isTrendingLink = link.name === 'TRENDING';
+
+              const handleClick = (e: React.MouseEvent) => {
+                if (isGenreLink) handleGenreClick(e);
+                else if (isTrendingLink) handleTrendingClick(e);
+              };
 
               return (
                 <Link
-                  key={link.path}
+                  key={link.name}
                   to={link.path}
-                  onClick={isGenreLink ? handleGenreClick : undefined}
+                  onClick={isGenreLink || isTrendingLink ? handleClick : undefined}
                   className={`type-label transition-colors relative py-1 flex items-center gap-1.5 ${
                     isActive
                       ? 'text-[#E43D3D]'
@@ -137,33 +144,33 @@ export const Header: React.FC = () => {
             <button
               id="header-search-trigger"
               onClick={openSearch}
-              aria-label="Open cinema search"
+              aria-label="Search"
               className="hidden md:flex p-2 text-[#8E8E93] hover:text-[#E43D3D] focus-visible:text-[#E43D3D] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#E43D3D] transition-colors items-center gap-2"
             >
               <Search className="w-4 h-4 sm:w-5 sm:h-5" />
-              <span className="hidden xl:inline text-[11px] font-mono text-[#8E8E93] tracking-widest">
+              <span className="hidden xl:inline text-[11px] font-mono text-[#8E8E93] tracking-widest uppercase">
                 SEARCH
               </span>
             </button>
 
-            {/* Desktop-Only VIP Cinema Pass Button */}
+            {/* Desktop-Only Profile Button */}
             <button
               onClick={openProfile}
-              aria-label="Open Cinema Pass profile"
+              aria-label="Profile"
               className="hidden md:flex p-2 text-[#8E8E93] hover:text-[#F2F0EC] transition-colors items-center gap-2 border border-transparent hover:border-white/10"
-              title="VIP Cinema Pass"
+              title="Profile"
             >
               <User className="w-4 h-4 sm:w-5 sm:h-5 text-[#E43D3D]" />
               <span className="hidden lg:inline text-[10px] font-mono tracking-widest text-[#F2F0EC] uppercase">
-                PASS
+                PROFILE
               </span>
             </button>
 
-            {/* Mobile-Only Minimal Menu Toggle (Refined Touch Target) */}
+            {/* Mobile-Only Menu Button */}
             <button
               onClick={() => setMobileMenuOpen(true)}
               className="md:hidden w-11 h-11 flex items-center justify-center text-[#F2F0EC] hover:text-[#E43D3D] active:text-[#E43D3D] border border-white/10 active:border-[#E43D3D] bg-[#111114] transition-colors"
-              aria-label="Open navigation menu"
+              aria-label="Open menu"
               aria-expanded={mobileMenuOpen}
             >
               <Menu className="w-5 h-5" />
@@ -180,7 +187,7 @@ export const Header: React.FC = () => {
         <div
           role="dialog"
           aria-modal="true"
-          aria-label="Mobile Navigation Menu"
+          aria-label="Navigation Menu"
           className="md:hidden fixed inset-0 z-50 bg-[#0B0B0D] text-[#F2F0EC] flex flex-col justify-between overflow-y-auto animate-menuSlideIn select-none"
           style={{
             paddingTop: 'max(1rem, env(safe-area-inset-top, 1rem))',
@@ -206,27 +213,19 @@ export const Header: React.FC = () => {
             <button
               onClick={() => setMobileMenuOpen(false)}
               className="w-11 h-11 flex items-center justify-center text-[#F2F0EC] hover:text-[#E43D3D] border border-white/10 hover:border-[#E43D3D] bg-[#111114] transition-colors active:scale-95"
-              aria-label="Close navigation menu"
+              aria-label="Close menu"
             >
               <X className="w-5 h-5" />
             </button>
           </div>
 
-          {/* Navigation Links Body with Staggered Delays */}
-          <div className="py-8 flex flex-col justify-center space-y-7 flex-grow">
+          {/* Navigation Links Body */}
+          <div className="py-8 flex flex-col justify-center space-y-6 flex-grow">
             
-            {/* Section Label */}
-            <div className="flex items-center gap-2">
-              <span className="w-1.5 h-1.5 bg-[#E43D3D] inline-block" />
-              <span className="text-[10px] font-mono font-bold tracking-[0.25em] text-[#8E8E93] uppercase">
-                AUDITORIUM PROGRAMME
-              </span>
-            </div>
-
             {/* Primary Navigation Items */}
             <nav className="flex flex-col space-y-1" aria-label="Mobile Primary Navigation">
               
-              {/* 1. MOVIES */}
+              {/* Movies */}
               <Link
                 to="/movie"
                 onClick={() => setMobileMenuOpen(false)}
@@ -240,12 +239,9 @@ export const Header: React.FC = () => {
                 <span className="font-display font-bold text-3xl sm:text-4xl tracking-tight uppercase">
                   MOVIES
                 </span>
-                <span className="text-xs font-mono text-[#8E8E93] tracking-widest uppercase">
-                  01
-                </span>
               </Link>
 
-              {/* 2. DISCOVER */}
+              {/* Discover */}
               <Link
                 to="/discover"
                 onClick={() => setMobileMenuOpen(false)}
@@ -259,12 +255,9 @@ export const Header: React.FC = () => {
                 <span className="font-display font-bold text-3xl sm:text-4xl tracking-tight uppercase">
                   DISCOVER
                 </span>
-                <span className="text-xs font-mono text-[#8E8E93] tracking-widest uppercase">
-                  02
-                </span>
               </Link>
 
-              {/* 3. GENRES */}
+              {/* Genres */}
               <Link
                 to="/discover?genre=All"
                 onClick={(e) => {
@@ -281,14 +274,11 @@ export const Header: React.FC = () => {
                 <span className="font-display font-bold text-3xl sm:text-4xl tracking-tight uppercase">
                   GENRES
                 </span>
-                <span className="text-xs font-mono text-[#8E8E93] tracking-widest uppercase">
-                  03
-                </span>
               </Link>
 
-              {/* 4. TRENDING */}
+              {/* Trending */}
               <Link
-                to="/movie"
+                to="/movie?sort=popularity.desc"
                 onClick={(e) => {
                   setMobileMenuOpen(false);
                   handleTrendingClick(e);
@@ -299,12 +289,9 @@ export const Header: React.FC = () => {
                 <span className="font-display font-bold text-3xl sm:text-4xl tracking-tight uppercase">
                   TRENDING
                 </span>
-                <span className="text-xs font-mono text-[#8E8E93] tracking-widest uppercase">
-                  04
-                </span>
               </Link>
 
-              {/* 5. WATCHLIST */}
+              {/* Watchlist */}
               <Link
                 to="/watchlist"
                 onClick={() => setMobileMenuOpen(false)}
@@ -325,20 +312,13 @@ export const Header: React.FC = () => {
                     </span>
                   )}
                 </div>
-                <span className="text-xs font-mono text-[#8E8E93] tracking-widest uppercase">
-                  05
-                </span>
               </Link>
 
             </nav>
 
-            {/* Subtle Divider */}
+            {/* Core Action Buttons: Search & Profile */}
             <div className="border-t border-white/10 pt-6 space-y-3">
-              <span className="text-[10px] font-mono font-bold tracking-[0.25em] text-[#8E8E93] uppercase block">
-                CINEMA SERVICES
-              </span>
-
-              {/* Search Action */}
+              {/* Search */}
               <button
                 type="button"
                 onClick={() => {
@@ -351,13 +331,13 @@ export const Header: React.FC = () => {
                 <div className="flex items-center gap-3">
                   <Search className="w-4 h-4 text-[#E43D3D]" />
                   <span className="text-xs font-mono font-bold tracking-widest uppercase">
-                    SEARCH CATALOG
+                    SEARCH
                   </span>
                 </div>
                 <ArrowRight className="w-4 h-4 text-[#8E8E93]" />
               </button>
 
-              {/* Profile / VIP Cinema Pass Action */}
+              {/* Profile */}
               <button
                 type="button"
                 onClick={() => {
@@ -370,19 +350,13 @@ export const Header: React.FC = () => {
                 <div className="flex items-center gap-3">
                   <User className="w-4 h-4 text-[#E43D3D]" />
                   <span className="text-xs font-mono font-bold tracking-widest uppercase">
-                    VIP CINEMA PASS
+                    PROFILE
                   </span>
                 </div>
                 <ArrowRight className="w-4 h-4 text-[#8E8E93]" />
               </button>
             </div>
 
-          </div>
-
-          {/* Footer Metadata */}
-          <div className="border-t border-white/10 pt-4 flex items-center justify-between text-[10px] font-mono text-[#8E8E93]">
-            <span>CINEMURA ARCHITECTURE</span>
-            <span className="text-[#E43D3D]">VIP PATRON</span>
           </div>
 
         </div>

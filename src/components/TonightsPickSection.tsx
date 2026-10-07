@@ -54,21 +54,15 @@ export const TonightsPickSection: React.FC<TonightsPickSectionProps> = ({ item }
         isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
       }`}
     >
-      {/* Section Header Label */}
-      <div className="flex items-center justify-between pb-4 border-b border-white/10 mb-6">
-        <div className="flex items-center gap-3">
-          <span className="w-2 h-2 bg-[#E43D3D] inline-block animate-pulse" />
-          <span className="text-[11px] font-mono font-bold tracking-[0.25em] text-[#E43D3D] uppercase">
-            TONIGHT'S CURATED PICK
-          </span>
-        </div>
-        <span className="text-[10px] font-mono text-[#8E8E93] tracking-widest uppercase">
-          AUDITORIUM FEATURE 01
-        </span>
+      {/* Section Header */}
+      <div className="pb-4 border-b border-white/10 mb-6">
+        <h2 className="font-display font-bold text-2xl sm:text-3xl text-white uppercase tracking-tight">
+          TONIGHT'S PICK
+        </h2>
       </div>
 
       {/* Dominant Showcase Card with Atmospheric Light Glow */}
-      <div className="relative bg-[#111114] border border-white/15 overflow-hidden group">
+      <div className="relative bg-[#111114] border border-white/10 overflow-hidden group">
         
         {/* Atmospheric Artwork-Derived Glow */}
         <div className="absolute inset-0 pointer-events-none overflow-hidden z-0">
@@ -112,24 +106,14 @@ export const TonightsPickSection: React.FC<TonightsPickSectionProps> = ({ item }
                 <Play className="w-6 h-6 fill-white pl-0.5" />
               </button>
             )}
-
-            {/* Type badge on artwork */}
-            <div className="absolute top-4 left-4 flex items-center gap-2">
-              <span className="text-[10px] font-mono font-bold tracking-widest px-2.5 py-1 bg-[#E43D3D] text-white uppercase shadow-md">
-                FEATURED
-              </span>
-              <span className="text-[10px] font-mono tracking-wider px-2 py-1 bg-black/60 backdrop-blur-md text-[#F2F0EC] border border-white/10 uppercase">
-                {item.type === 'movie' ? 'CINEMA EXCLUSIVE' : 'EPISODIC SERIES'}
-              </span>
-            </div>
           </div>
 
           {/* Movie Information Side */}
-          <div className="lg:col-span-5 p-6 sm:p-8 lg:p-10 flex flex-col justify-between space-y-6 bg-[#111114]/90 backdrop-blur-sm border-t lg:border-t-0 lg:border-l border-white/10">
+          <div className="lg:col-span-5 p-6 sm:p-8 lg:p-10 flex flex-col justify-between space-y-6 bg-[#111114]/90 border-t lg:border-t-0 lg:border-l border-white/10">
             
             <div className="space-y-4">
               
-              {/* Metadata Badges Row */}
+              {/* Metadata Row */}
               <div className="flex flex-wrap items-center gap-3 text-xs font-mono text-[#8E8E93]">
                 <span className="text-white font-bold">{item.year}</span>
                 {durationOrSeasons && (
@@ -151,9 +135,9 @@ export const TonightsPickSection: React.FC<TonightsPickSectionProps> = ({ item }
 
               {/* Title */}
               <Link to={detailPath} className="block group/title">
-                <h2 className="font-display font-bold text-3xl sm:text-4xl lg:text-5xl text-[#F2F0EC] group-hover/title:text-[#E43D3D] transition-colors leading-[1.05] uppercase tracking-tight">
+                <h3 className="font-display font-bold text-3xl sm:text-4xl lg:text-5xl text-[#F2F0EC] group-hover/title:text-[#E43D3D] transition-colors leading-[1.05] uppercase tracking-tight">
                   {item.title}
-                </h2>
+                </h3>
               </Link>
 
               {/* Genres */}
@@ -208,7 +192,7 @@ export const TonightsPickSection: React.FC<TonightsPickSectionProps> = ({ item }
                 to={detailPath}
                 className="btn-secondary px-5 py-3 text-xs font-mono font-bold tracking-wider uppercase inline-flex items-center gap-2"
               >
-                <span>EXPLORE TITLE</span>
+                <span>EXPLORE</span>
                 <ArrowRight className="w-3.5 h-3.5 text-[#E43D3D]" />
               </Link>
 

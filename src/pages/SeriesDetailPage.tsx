@@ -149,19 +149,15 @@ export const SeriesDetailPage: React.FC = () => {
           <div className="absolute inset-0 film-grain pointer-events-none opacity-40" />
         </div>
 
-        {/* Top Editorial Nav Row */}
+        {/* Top Nav Row */}
         <div className="relative z-10 w-full flex items-center justify-between border-b border-white/10 pb-4">
           <Link
             to="/tv"
             className="group flex items-center gap-2 text-xs font-mono tracking-wider text-[#8E8E93] hover:text-[#E43D3D] transition-colors"
           >
             <ArrowLeft className="w-3.5 h-3.5 transition-transform group-hover:-translate-x-1" />
-            <span>TV SERIES DIRECTORY</span>
+            <span>TV SHOWS</span>
           </Link>
-
-          <span className="text-[10px] font-mono tracking-[0.25em] text-[#8E8E93] uppercase">
-            SERIES GUIDE PROFILE
-          </span>
         </div>
 
         {/* Hero Content */}

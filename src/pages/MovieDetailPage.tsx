@@ -155,7 +155,7 @@ export const MovieDetailPage: React.FC = () => {
             className="group flex items-center gap-2 text-xs font-mono tracking-wider text-[#8E8E93] hover:text-[#E43D3D] transition-colors"
           >
             <ArrowLeft className="w-3.5 h-3.5 transition-transform group-hover:-translate-x-1" />
-            <span>FEATURE FILMS ARCHIVE</span>
+            <span>MOVIES</span>
           </Link>
 
           <div className="flex items-center gap-3">

@@ -22,22 +22,14 @@ export const WatchlistPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-[#0B0B0D] text-[#F2F0EC] pt-24 pb-20 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 selection:bg-[#E43D3D] selection:text-white space-y-10">
       
-      {/* Editorial Header */}
+      {/* Header */}
       <div className="border-b border-white/10 pb-6 flex flex-col md:flex-row md:items-end justify-between gap-6">
-        <div className="space-y-3">
-          <div className="flex items-center gap-2">
-            <Bookmark className="w-4 h-4 text-[#E43D3D]" />
-            <span className="text-[11px] font-mono font-bold tracking-[0.2em] text-[#E43D3D] uppercase">
-              PERSONAL CURATION ARCHIVE
-            </span>
-          </div>
-
-          <h1 className="font-display font-bold text-4xl sm:text-5xl lg:text-6xl text-white uppercase tracking-tight leading-none">
-            SAVED WATCHLIST
+        <div className="space-y-2">
+          <h1 className="font-display font-bold text-3xl sm:text-4xl lg:text-5xl text-white uppercase tracking-tight leading-none">
+            WATCHLIST
           </h1>
-
-          <p className="type-body text-sm sm:text-base text-[#8E8E93] max-w-xl">
-            Your personal digital cinema queue. Titles saved for your upcoming screening sessions.
+          <p className="type-body text-sm sm:text-base text-[#8E8E93]">
+            {watchlist.length} {watchlist.length === 1 ? 'title' : 'titles'} saved
           </p>
         </div>
 

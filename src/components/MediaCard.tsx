@@ -158,7 +158,7 @@ export const MediaCard: React.FC<MediaCardProps> = ({
           className={`absolute top-2 right-2 z-20 p-1.5 transition-all duration-300 ${
             isSaved
               ? 'bg-[#E43D3D] text-white opacity-100'
-              : 'bg-black/60 backdrop-blur-md text-[#8E8E93] hover:text-white opacity-0 group-hover:opacity-100 border border-white/10'
+              : 'bg-[#111114] text-[#8E8E93] hover:text-white opacity-0 group-hover:opacity-100 border border-white/10'
           }`}
           title={isSaved ? 'In Watchlist' : 'Save to Watchlist'}
         >

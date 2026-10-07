@@ -19,6 +19,7 @@ import { DiscoverPage } from './pages/DiscoverPage';
 import { WatchlistPage } from './pages/WatchlistPage';
 import { PeoplePage } from './pages/PeoplePage';
 import { PersonDetailPage } from './pages/PersonDetailPage';
+import { StyleGuidePage } from './pages/StyleGuidePage';
 import { NotFoundPage } from './pages/NotFoundPage';
 
 // Scroll to top on route change
@@ -67,6 +68,7 @@ export function App() {
               <Route path="/discover" element={<DiscoverPage />} />
               <Route path="/search" element={<DiscoverPage />} />
               <Route path="/watchlist" element={<WatchlistPage />} />
+              <Route path="/style-guide" element={<StyleGuidePage />} />
               
               <Route path="*" element={<NotFoundPage />} />
             </Routes>

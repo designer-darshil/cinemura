@@ -3,11 +3,12 @@ import { X, AlertCircle } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { getVidLinkMovieUrl, getVidLinkTvUrl } from '../utils/vidlink';
 
+type PlayerStatus = 'loading' | 'ready' | 'error';
+
 export const VidLinkModal: React.FC = () => {
   const { vidLinkSession, closeVidLink } = useApp();
 
-  const [isLoading, setIsLoading] = useState(true);
-  const [isError, setIsError] = useState(false);
+  const [playerStatus, setPlayerStatus] = useState<PlayerStatus>('loading');
   const closeButtonRef = useRef<HTMLButtonElement>(null);
   const triggerRef = useRef<HTMLElement | null>(null);
   const modalContainerRef = useRef<HTMLDivElement>(null);
@@ -30,12 +31,20 @@ export const VidLinkModal: React.FC = () => {
     }
   }, [Boolean(vidLinkSession)]);
 
-  // Reset loading & error state on session change
+  // Reset status on session change & arm timeout failsafe
   useEffect(() => {
-    if (vidLinkSession) {
-      setIsLoading(true);
-      setIsError(false);
-    }
+    if (!vidLinkSession) return;
+
+    setPlayerStatus('loading');
+
+    // 12-second failsafe: if player fails to confirm usability, transition to error
+    const timer = setTimeout(() => {
+      setPlayerStatus((current) => (current === 'loading' ? 'error' : current));
+    }, 12000);
+
+    return () => {
+      clearTimeout(timer);
+    };
   }, [vidLinkSession?.tmdbId, vidLinkSession?.season, vidLinkSession?.episode]);
 
   // Keyboard accessibility (Escape key and focus trap)
@@ -79,6 +88,14 @@ export const VidLinkModal: React.FC = () => {
           vidLinkSession.episode ?? 1
         );
 
+  const handleIframeLoad = () => {
+    setPlayerStatus('ready');
+  };
+
+  const handleIframeError = () => {
+    setPlayerStatus('error');
+  };
+
   return (
     <div
       ref={modalContainerRef}
@@ -88,6 +105,7 @@ export const VidLinkModal: React.FC = () => {
       tabIndex={-1}
       onClick={closeVidLink}
       className="fixed inset-0 z-[100] flex items-center justify-center bg-black/95 backdrop-blur-sm transition-opacity duration-200 select-none p-3 sm:p-6 md:p-10"
+      style={{ width: '100vw', height: '100vh' }}
     >
       {/* ==================================================
           MINIMAL CLOSE CONTROL (UPPER-RIGHT CORNER)
@@ -103,29 +121,52 @@ export const VidLinkModal: React.FC = () => {
       </button>
 
       {/* ==================================================
-          CONTAINED 16:9 VIDLINK PLAYER CONTAINER
-          Calculated based on BOTH available viewport width & height
-          so neither dimension ever exceeds the viewport.
+          CONTAINED 16:9 RESPONSIVE VIDLINK PLAYER CONTAINER
+          Structure:
+          player wrapper (width 100%, aspect-ratio 16/9, relative)
+          → iframe (absolute, inset 0, width 100%, height 100%, border 0)
          ================================================== */}
       <div
         onClick={(e) => e.stopPropagation()}
         style={{
           width: 'min(calc(100vw - 32px), calc((100dvh - 80px) * (16 / 9)))',
-          aspectRatio: '16 / 9',
+          maxWidth: 'min(calc(100vw - 32px), calc((100dvh - 80px) * (16 / 9)))',
           maxHeight: 'calc(100dvh - 80px)',
-          maxWidth: 'min(calc(100vw - 32px), calc((100dvh - 80px) * (16 / 9)))'
+          aspectRatio: '16 / 9',
+          position: 'relative'
         }}
-        className="relative bg-black flex items-center justify-center overflow-hidden border border-white/10 shadow-2xl"
+        className="relative w-full bg-black overflow-hidden border border-white/10 shadow-2xl"
       >
+        {/* Baseline required VidLink iframe */}
+        <iframe
+          key={embedUrl}
+          src={embedUrl}
+          title={vidLinkSession.title || 'VidLink Player'}
+          frameBorder="0"
+          allowFullScreen
+          allow="autoplay; fullscreen; encrypted-media; picture-in-picture"
+          onLoad={handleIframeLoad}
+          onError={handleIframeError}
+          className="absolute inset-0 w-full h-full border-0 block"
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            border: 0
+          }}
+        />
+
         {/* Local 16:9 Player Skeleton while loading */}
-        {isLoading && !isError && (
-          <div className="absolute inset-0 bg-[#0B0B0D] flex flex-col items-center justify-center z-10 pointer-events-none">
+        {playerStatus === 'loading' && (
+          <div className="absolute inset-0 bg-[#0B0B0D] flex flex-col items-center justify-center z-10 pointer-events-none transition-opacity duration-200">
             <div className="w-8 h-8 border-2 border-white/20 border-t-[#E43D3D] rounded-full animate-spin mb-2" />
           </div>
         )}
 
-        {/* Minimal Error State */}
-        {isError ? (
+        {/* Real Error State with VIDEO UNAVAILABLE and CLOSE */}
+        {playerStatus === 'error' && (
           <div className="absolute inset-0 bg-[#0B0B0D] flex flex-col items-center justify-center text-center p-6 z-20">
             <AlertCircle className="w-8 h-8 text-white/50 mb-3" />
             <span className="text-xs font-mono tracking-widest text-[#F2F0EC] uppercase font-bold">
@@ -139,20 +180,6 @@ export const VidLinkModal: React.FC = () => {
               CLOSE
             </button>
           </div>
-        ) : (
-          <iframe
-            key={embedUrl}
-            src={embedUrl}
-            title={vidLinkSession.title || 'VidLink Player'}
-            onLoad={() => setIsLoading(false)}
-            onError={() => {
-              setIsLoading(false);
-              setIsError(true);
-            }}
-            className="w-full h-full block border-0"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-            allowFullScreen
-          />
         )}
       </div>
     </div>

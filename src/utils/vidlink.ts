@@ -1,21 +1,31 @@
 /**
  * VidLink Playback URL Builder
  * 
- * Constructs official VidLink embed URLs configured to match
- * the website's dark cinematic theme and parameters:
- * - Primary: E43D3D
- * - Icon: F2F0EC
- * - title: false (context established by app)
- * - poster: true
- * - autoplay: false
+ * Movie playback MUST use:
+ * https://vidlink.pro/movie/{tmdbId}
+ * 
+ * TV playback MUST use:
+ * https://vidlink.pro/tv/{tmdbId}/{season}/{episode}
  */
 
 export function getVidLinkMovieUrl(tmdbId: string | number): string {
-  return `https://vidlink.pro/movie/${tmdbId}?primaryColor=E43D3D&iconColor=F2F0EC&title=false&poster=true&autoplay=false`;
+  const cleanId = String(tmdbId).trim();
+  const url = `https://vidlink.pro/movie/${cleanId}`;
+  if (import.meta.env.DEV) {
+    console.log('[VidLink] Generated Movie URL:', url);
+  }
+  return url;
 }
 
 export function getVidLinkTvUrl(tmdbId: string | number, season: number, episode: number): string {
-  return `https://vidlink.pro/tv/${tmdbId}/${season}/${episode}?primaryColor=E43D3D&iconColor=F2F0EC&title=false&poster=true&autoplay=false`;
+  const cleanId = String(tmdbId).trim();
+  const cleanSeason = Number(season);
+  const cleanEpisode = Number(episode);
+  const url = `https://vidlink.pro/tv/${cleanId}/${cleanSeason}/${cleanEpisode}`;
+  if (import.meta.env.DEV) {
+    console.log('[VidLink] Generated TV URL:', url);
+  }
+  return url;
 }
 
 /**

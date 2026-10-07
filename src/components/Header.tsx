@@ -48,31 +48,20 @@ export const Header: React.FC = () => {
   }, [mobileMenuOpen]);
 
   const navLinks = [
+    { name: 'HOME', path: '/' },
     { name: 'MOVIES', path: '/movie' },
-    { name: 'DISCOVER', path: '/discover' },
-    { name: 'GENRES', path: '/discover?genre=All' },
-    { name: 'TRENDING', path: '/movie?sort=popularity.desc' },
-    { name: 'WATCHLIST', path: '/watchlist', badge: watchlist.length },
+    { name: 'TV SHOWS', path: '/tv' },
+    { name: 'PEOPLE', path: '/person' },
+    { name: 'SEARCH', path: '/search' },
   ];
 
-  const handleGenreClick = (e: React.MouseEvent) => {
-    if (location.pathname === '/') {
-      const genreEl = document.getElementById('genre-discovery-section');
-      if (genreEl) {
-        e.preventDefault();
-        genreEl.scrollIntoView({ behavior: 'smooth' });
-      }
-    }
-  };
-
-  const handleTrendingClick = (e: React.MouseEvent) => {
-    if (location.pathname === '/') {
-      const trendingEl = document.getElementById('trending-rail');
-      if (trendingEl) {
-        e.preventDefault();
-        trendingEl.scrollIntoView({ behavior: 'smooth' });
-      }
-    }
+  const isLinkActive = (path: string) => {
+    if (path === '/') return location.pathname === '/';
+    if (path === '/movie') return location.pathname.startsWith('/movie');
+    if (path === '/tv') return location.pathname.startsWith('/tv') || location.pathname.startsWith('/series');
+    if (path === '/person') return location.pathname.startsWith('/person') || location.pathname.startsWith('/people');
+    if (path === '/search') return location.pathname.startsWith('/search');
+    return location.pathname === path;
   };
 
   return (
@@ -101,23 +90,15 @@ export const Header: React.FC = () => {
             <span className="w-1.5 h-1.5 bg-[#E43D3D] inline-block" />
           </Link>
 
-          {/* Center Navigation Links (Desktop Only) */}
+          {/* Center Navigation Links (Desktop Only: HOME, MOVIES, TV SHOWS, PEOPLE, SEARCH) */}
           <nav className="hidden md:flex items-center gap-6 lg:gap-8" aria-label="Main Navigation">
             {navLinks.map(link => {
-              const isActive = location.pathname === link.path;
-              const isGenreLink = link.name === 'GENRES';
-              const isTrendingLink = link.name === 'TRENDING';
-
-              const handleClick = (e: React.MouseEvent) => {
-                if (isGenreLink) handleGenreClick(e);
-                else if (isTrendingLink) handleTrendingClick(e);
-              };
+              const isActive = isLinkActive(link.path);
 
               return (
                 <Link
                   key={link.name}
                   to={link.path}
-                  onClick={isGenreLink || isTrendingLink ? handleClick : undefined}
                   className={`type-label transition-colors relative py-1 flex items-center gap-1.5 ${
                     isActive
                       ? 'text-[#E43D3D]'
@@ -125,11 +106,6 @@ export const Header: React.FC = () => {
                   }`}
                 >
                   <span>{link.name}</span>
-                  {link.badge !== undefined && link.badge > 0 && (
-                    <span className="text-[10px] font-mono px-1.5 py-0.2 bg-[#E43D3D] text-white font-bold leading-none">
-                      {link.badge}
-                    </span>
-                  )}
                   {isActive && (
                     <span className="absolute bottom-0 left-0 right-0 h-[2px] bg-[#E43D3D]" />
                   )}
@@ -152,6 +128,23 @@ export const Header: React.FC = () => {
                 SEARCH
               </span>
             </button>
+
+            {/* Desktop Watchlist Link */}
+            <Link
+              to="/watchlist"
+              className="hidden md:flex p-2 text-[#8E8E93] hover:text-[#F2F0EC] transition-colors items-center gap-1.5"
+              title="Watchlist"
+              aria-label="Watchlist"
+            >
+              <span className="hidden xl:inline text-[11px] font-mono tracking-widest uppercase">
+                WATCHLIST
+              </span>
+              {watchlist.length > 0 && (
+                <span className="text-[10px] font-mono px-1.5 py-0.2 bg-[#E43D3D] text-white font-bold leading-none">
+                  {watchlist.length}
+                </span>
+              )}
+            </Link>
 
             {/* Desktop Profile Button */}
             <button
@@ -234,69 +227,83 @@ export const Header: React.FC = () => {
             {/* Primary Navigation Items */}
             <nav className="flex flex-col space-y-1" aria-label="Mobile Primary Navigation">
               
-              {/* Movies */}
+              {/* Home */}
               <Link
-                to="/movie"
+                to="/"
                 onClick={() => setMobileMenuOpen(false)}
                 className={`py-3 flex items-center justify-between transition-colors animate-menuItemFade ${
-                  location.pathname === '/movie' || location.pathname === '/movies'
+                  location.pathname === '/'
                     ? 'text-[#E43D3D] pl-3 border-l-2 border-[#E43D3D]'
                     : 'text-[#F2F0EC] hover:text-[#E43D3D]'
                 }`}
                 style={{ animationDelay: '40ms' }}
               >
                 <span className="font-display font-bold text-3xl sm:text-4xl tracking-tight uppercase">
-                  MOVIES
+                  HOME
                 </span>
               </Link>
 
-              {/* Discover */}
+              {/* Movies */}
               <Link
-                to="/discover"
+                to="/movie"
                 onClick={() => setMobileMenuOpen(false)}
                 className={`py-3 flex items-center justify-between transition-colors animate-menuItemFade ${
-                  location.pathname === '/discover'
+                  location.pathname.startsWith('/movie')
                     ? 'text-[#E43D3D] pl-3 border-l-2 border-[#E43D3D]'
                     : 'text-[#F2F0EC] hover:text-[#E43D3D]'
                 }`}
                 style={{ animationDelay: '80ms' }}
               >
                 <span className="font-display font-bold text-3xl sm:text-4xl tracking-tight uppercase">
-                  DISCOVER
+                  MOVIES
                 </span>
               </Link>
 
-              {/* Genres */}
+              {/* TV Shows */}
               <Link
-                to="/discover?genre=All"
-                onClick={(e) => {
-                  setMobileMenuOpen(false);
-                  handleGenreClick(e);
-                }}
+                to="/tv"
+                onClick={() => setMobileMenuOpen(false)}
                 className={`py-3 flex items-center justify-between transition-colors animate-menuItemFade ${
-                  location.search.includes('genre=')
+                  location.pathname.startsWith('/tv') || location.pathname.startsWith('/series')
                     ? 'text-[#E43D3D] pl-3 border-l-2 border-[#E43D3D]'
                     : 'text-[#F2F0EC] hover:text-[#E43D3D]'
                 }`}
                 style={{ animationDelay: '120ms' }}
               >
                 <span className="font-display font-bold text-3xl sm:text-4xl tracking-tight uppercase">
-                  GENRES
+                  TV SHOWS
                 </span>
               </Link>
 
-              {/* Trending */}
+              {/* People */}
               <Link
-                to="/movie?sort=popularity.desc"
-                onClick={(e) => {
-                  setMobileMenuOpen(false);
-                  handleTrendingClick(e);
-                }}
-                className="py-3 flex items-center justify-between text-[#F2F0EC] hover:text-[#E43D3D] transition-colors animate-menuItemFade"
+                to="/person"
+                onClick={() => setMobileMenuOpen(false)}
+                className={`py-3 flex items-center justify-between transition-colors animate-menuItemFade ${
+                  location.pathname.startsWith('/person') || location.pathname.startsWith('/people')
+                    ? 'text-[#E43D3D] pl-3 border-l-2 border-[#E43D3D]'
+                    : 'text-[#F2F0EC] hover:text-[#E43D3D]'
+                }`}
                 style={{ animationDelay: '160ms' }}
               >
                 <span className="font-display font-bold text-3xl sm:text-4xl tracking-tight uppercase">
-                  TRENDING
+                  PEOPLE
+                </span>
+              </Link>
+
+              {/* Search */}
+              <Link
+                to="/search"
+                onClick={() => setMobileMenuOpen(false)}
+                className={`py-3 flex items-center justify-between transition-colors animate-menuItemFade ${
+                  location.pathname.startsWith('/search')
+                    ? 'text-[#E43D3D] pl-3 border-l-2 border-[#E43D3D]'
+                    : 'text-[#F2F0EC] hover:text-[#E43D3D]'
+                }`}
+                style={{ animationDelay: '200ms' }}
+              >
+                <span className="font-display font-bold text-3xl sm:text-4xl tracking-tight uppercase">
+                  SEARCH
                 </span>
               </Link>
 
@@ -309,7 +316,7 @@ export const Header: React.FC = () => {
                     ? 'text-[#E43D3D] pl-3 border-l-2 border-[#E43D3D]'
                     : 'text-[#F2F0EC] hover:text-[#E43D3D]'
                 }`}
-                style={{ animationDelay: '200ms' }}
+                style={{ animationDelay: '240ms' }}
               >
                 <div className="flex items-center gap-3">
                   <span className="font-display font-bold text-3xl sm:text-4xl tracking-tight uppercase">

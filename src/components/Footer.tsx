@@ -1,9 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { useApp } from '../context/AppContext';
-
 export const Footer: React.FC = () => {
-  const { openSearch } = useApp();
 
   return (
     <footer id="site-footer" className="bg-[#0B0B0D] border-t border-white/10 text-[#F2F0EC] py-8 sm:py-12">
@@ -19,12 +16,12 @@ export const Footer: React.FC = () => {
           </Link>
 
           {/* Primary Navigation Links */}
-          <nav className="flex flex-wrap items-center gap-x-5 gap-y-2.5 text-xs text-[#929298] font-mono">
+          <nav className="flex flex-wrap items-center gap-x-5 gap-y-2.5 text-xs text-[#929298] font-mono" aria-label="Footer Navigation">
+            <Link to="/" className="hover:text-white transition-colors py-1">HOME</Link>
             <Link to="/movie" className="hover:text-white transition-colors py-1">MOVIES</Link>
             <Link to="/tv" className="hover:text-white transition-colors py-1">TV SHOWS</Link>
-            <Link to="/discover" className="hover:text-white transition-colors py-1">GENRES</Link>
-            <Link to="/people" className="hover:text-white transition-colors py-1">PEOPLE</Link>
-            <button onClick={openSearch} className="hover:text-white transition-colors uppercase py-1">SEARCH</button>
+            <Link to="/person" className="hover:text-white transition-colors py-1">PEOPLE</Link>
+            <Link to="/search" className="hover:text-white transition-colors py-1">SEARCH</Link>
           </nav>
         </div>
 

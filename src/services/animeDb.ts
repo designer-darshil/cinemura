@@ -85,13 +85,16 @@ const normalizeAnimeItem = (raw: any): AnimeItem => {
   return {
     id: String(raw.id || raw._id || ''),
     title: raw.title || 'Untitled Anime',
+    alternativeTitles: Array.isArray(raw.alternativeTitles) ? raw.alternativeTitles : undefined,
     synopsis: raw.synopsis || raw.description || undefined,
-    rank: typeof raw.rank === 'number' ? raw.rank : typeof raw.ranking === 'number' ? raw.ranking : undefined,
+    rank: typeof raw.ranking === 'number' ? raw.ranking : typeof raw.rank === 'number' ? raw.rank : undefined,
     genres: Array.isArray(raw.genres) ? raw.genres : [],
     episodes: typeof raw.episodes === 'number' ? raw.episodes : undefined,
     image: raw.image || raw.thumb || undefined,
+    thumb: raw.thumb || undefined,
     type: raw.type || undefined,
-    status: raw.status || undefined
+    status: raw.status || undefined,
+    link: raw.link || undefined
   };
 };
 
@@ -130,8 +133,8 @@ export const getAnimeList = async (options: AnimeFilterOptions = {}): Promise<An
 };
 
 /**
- * Fetch detailed anime by ID
- * Endpoint: /api/anime/:id
+ * Fetch detailed anime by canonical ID
+ * Endpoint: /api/anime/by-id/:id
  */
 export const getAnimeById = async (id: string): Promise<AnimeItem> => {
   if (!id) {
@@ -141,7 +144,7 @@ export const getAnimeById = async (id: string): Promise<AnimeItem> => {
     } as AnimeApiError;
   }
 
-  const raw = await fetchAnimeDb<any>(`${API_BASE}/${encodeURIComponent(id)}`);
+  const raw = await fetchAnimeDb<any>(`${API_BASE}/by-id/${encodeURIComponent(id)}`);
   return normalizeAnimeItem(raw);
 };
 

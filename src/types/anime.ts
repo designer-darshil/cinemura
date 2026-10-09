@@ -1,13 +1,16 @@
 export interface AnimeItem {
   id: string;
   title: string;
+  alternativeTitles?: string[];
   synopsis?: string;
   rank?: number;
   genres?: string[];
   episodes?: number;
   image?: string;
+  thumb?: string;
   type?: string;
   status?: string;
+  link?: string;
 }
 
 export interface AnimeMeta {

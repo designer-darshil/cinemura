@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { ArrowLeft, Award } from 'lucide-react';
+import { ArrowLeft, Award, ExternalLink, Calendar, Film, Layers } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { AnimeItem, AnimeApiError } from '../types/anime';
 import { getAnimeById } from '../services/animeDb';
@@ -41,14 +41,14 @@ export const AnimeDetailPage: React.FC = () => {
         <div className="flex items-center justify-between border-b border-white/10 pb-4">
           <Link
             to="/anime"
-            className="group flex items-center gap-2 text-xs font-mono tracking-wider text-[#8E8E93] hover:text-[#E43D3D] transition-colors min-h-[44px] flex items-center"
+            className="group flex items-center gap-2 text-xs font-mono tracking-wider text-[#8E8E93] hover:text-[#E43D3D] transition-colors min-h-[44px]"
           >
             <ArrowLeft className="w-3.5 h-3.5 transition-transform group-hover:-translate-x-1" />
             <span>ANIME DIRECTORY</span>
           </Link>
 
           <span className="text-[10px] font-mono tracking-[0.25em] text-[#8E8E93] uppercase">
-            OVERVIEW
+            ANIME OVERVIEW
           </span>
         </div>
       </div>
@@ -79,7 +79,7 @@ export const AnimeDetailPage: React.FC = () => {
           <div className="bg-[#111114] border border-white/10 p-6 sm:p-10 grid grid-cols-1 lg:grid-cols-12 gap-8 animate-pulse">
             <div className="lg:col-span-4 aspect-[2/3] max-w-xs mx-auto lg:max-w-none w-full bg-[#18181D]" />
             <div className="lg:col-span-8 space-y-4">
-              <div className="h-4 w-24 bg-white/10" />
+              <div className="h-4 w-28 bg-white/10" />
               <div className="h-10 w-3/4 bg-white/10" />
               <div className="h-4 w-1/2 bg-white/10" />
               <div className="h-32 w-full bg-white/10 pt-4" />
@@ -90,26 +90,26 @@ export const AnimeDetailPage: React.FC = () => {
         {/* Real Anime Detail */}
         {!loading && !apiError && anime && (
           <article className="bg-[#111114] border border-white/10 p-6 sm:p-10 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 relative overflow-hidden shadow-2xl">
-            {/* Ambient Background Blur Glow (Subtle) */}
-            {anime.image && (
+            {/* Ambient Background Blur Glow */}
+            {(anime.image || anime.thumb) && (
               <div
                 className="absolute inset-0 opacity-10 bg-cover bg-center pointer-events-none filter blur-2xl"
-                style={{ backgroundImage: `url(${anime.image})` }}
+                style={{ backgroundImage: `url(${anime.image || anime.thumb})` }}
               />
             )}
 
             {/* LEFT: Cover Poster */}
             <div className="lg:col-span-4 max-w-[280px] sm:max-w-xs lg:max-w-none mx-auto w-full relative z-10">
               <div className="aspect-[2/3] bg-black border border-white/20 overflow-hidden shadow-2xl relative">
-                {anime.image ? (
+                {anime.image || anime.thumb ? (
                   <img
-                    src={anime.image}
+                    src={anime.image || anime.thumb}
                     alt={anime.title}
                     className="w-full h-full object-cover"
                   />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center text-[#8E8E93] text-xs font-mono">
-                    NO IMAGE
+                    NO POSTER AVAILABLE
                   </div>
                 )}
                 {typeof anime.rank === 'number' && anime.rank > 0 && (
@@ -125,7 +125,7 @@ export const AnimeDetailPage: React.FC = () => {
 
             {/* RIGHT: Metadata & Synopsis */}
             <div className="lg:col-span-8 space-y-6 relative z-10">
-              {/* Type & Status Badges */}
+              {/* Type, Status, & Episode Badges */}
               <div className="flex flex-wrap items-center gap-2">
                 {anime.type && (
                   <span className="text-[10px] font-mono font-extrabold tracking-[0.2em] px-2.5 py-1 uppercase bg-[#E43D3D] text-white">
@@ -148,6 +148,18 @@ export const AnimeDetailPage: React.FC = () => {
               <h1 className="text-3xl sm:text-5xl font-display font-bold text-[#F2F0EC] tracking-tight uppercase leading-none">
                 {anime.title}
               </h1>
+
+              {/* Alternative Titles */}
+              {anime.alternativeTitles && anime.alternativeTitles.length > 0 && (
+                <div className="space-y-1">
+                  <span className="text-[10px] font-mono tracking-widest text-[#8E8E93] uppercase font-bold">
+                    ALSO KNOWN AS:
+                  </span>
+                  <p className="text-xs font-sans text-[#8E8E93] leading-relaxed">
+                    {anime.alternativeTitles.slice(0, 4).join(' • ')}
+                  </p>
+                </div>
+              )}
 
               {/* Genres Tag Row */}
               {anime.genres && anime.genres.length > 0 && (
@@ -172,7 +184,7 @@ export const AnimeDetailPage: React.FC = () => {
               {anime.synopsis && (
                 <div className="space-y-2 pt-4 border-t border-white/10">
                   <span className="text-[10px] font-mono tracking-[0.2em] text-[#E43D3D] uppercase block font-bold">
-                    NARRATIVE SYNOPSIS
+                    SYNOPSIS
                   </span>
                   <p className="text-sm sm:text-base font-light text-[#F2F0EC]/90 leading-relaxed font-sans whitespace-pre-line">
                     {anime.synopsis}
@@ -180,9 +192,9 @@ export const AnimeDetailPage: React.FC = () => {
                 </div>
               )}
 
-              {/* Additional Real Specifications */}
+              {/* Additional Real Metadata Fields */}
               <div className="pt-6 border-t border-white/10">
-                <dl className="grid grid-cols-2 sm:grid-cols-3 gap-4 text-xs font-mono">
+                <dl className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-xs font-mono">
                   <div>
                     <dt className="text-[#8E8E93] uppercase">DATABASE ID</dt>
                     <dd className="text-[#F2F0EC] font-semibold mt-0.5">{anime.id}</dd>
@@ -193,6 +205,12 @@ export const AnimeDetailPage: React.FC = () => {
                       <dd className="text-[#E43D3D] font-bold mt-0.5">#{anime.rank}</dd>
                     </div>
                   )}
+                  {anime.type && (
+                    <div>
+                      <dt className="text-[#8E8E93] uppercase">FORMAT</dt>
+                      <dd className="text-[#F2F0EC] font-semibold mt-0.5 uppercase">{anime.type}</dd>
+                    </div>
+                  )}
                   {typeof anime.episodes === 'number' && (
                     <div>
                       <dt className="text-[#8E8E93] uppercase">TOTAL EPISODES</dt>
@@ -201,6 +219,21 @@ export const AnimeDetailPage: React.FC = () => {
                   )}
                 </dl>
               </div>
+
+              {/* External Source Link */}
+              {anime.link && (
+                <div className="pt-4 border-t border-white/10">
+                  <a
+                    href={anime.link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 text-xs font-mono text-[#8E8E93] hover:text-[#E43D3D] transition-colors"
+                  >
+                    <span>SOURCE ENTRY</span>
+                    <ExternalLink className="w-3.5 h-3.5" />
+                  </a>
+                </div>
+              )}
             </div>
           </article>
         )}

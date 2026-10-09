@@ -22,10 +22,13 @@ function animeApiPlugin(apiKey?: string, apiHost?: string): Plugin {
       const search = parsedUrl.search;
 
       let upstreamPath = '/anime';
-      if (pathname.startsWith('/api/anime/')) {
+      if (pathname.startsWith('/api/anime/by-id/')) {
+        const rest = pathname.substring('/api/anime/by-id/'.length).trim();
+        upstreamPath = `/anime/by-id/${rest}`;
+      } else if (pathname.startsWith('/api/anime/')) {
         const rest = pathname.substring('/api/anime/'.length).trim();
         if (rest) {
-          upstreamPath = `/anime/${rest}`;
+          upstreamPath = `/anime/by-id/${rest}`;
         }
       }
 

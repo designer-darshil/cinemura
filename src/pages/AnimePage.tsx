@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, Layers, RotateCcw } from 'lucide-react';
+import { Search, RotateCcw } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { AnimeItem, AnimeApiError } from '../types/anime';
 import { getAnimeList, getAnimeRankings, getAnimeGenres, getAnimeById } from '../services/animeDb';
@@ -212,7 +212,7 @@ export const AnimePage: React.FC = () => {
         heroBannerItem ? (
           <HeroBanner
             item={heroBannerItem}
-            badgeLabel={heroAnime?.rank ? `#${heroAnime.rank} RANKED ANIME` : 'ANIME SPOTLIGHT'}
+            badgeLabel={heroAnime?.rank ? `TOP RANKED #${heroAnime.rank}` : 'ANIME'}
           />
         ) : (
           heroLoading && !apiError && <IndexHeroSkeleton />
@@ -227,11 +227,6 @@ export const AnimePage: React.FC = () => {
             <h2 className="text-xl sm:text-2xl font-display font-bold uppercase tracking-tight text-white">
               {selectedGenre === 'All' ? 'ANIME DIRECTORY' : `${selectedGenre.toUpperCase()} TITLES`}
             </h2>
-            <p className="text-xs font-sans text-[#8E8E93]">
-              {selectedGenre === 'All'
-                ? 'Browse top-ranked anime series and features from the Anime DB catalog.'
-                : `Showing anime filtered by the ${selectedGenre} genre.`}
-            </p>
           </div>
 
           {/* Quick Search Input */}
@@ -257,32 +252,31 @@ export const AnimePage: React.FC = () => {
 
         {/* Genre Filter Control */}
         {!apiError && genres.length > 0 && (
-          <section className="bg-[#111114] border border-white/10 p-4 space-y-3">
+          <section className="space-y-2">
             <div className="flex items-center justify-between text-xs font-mono">
-              <span className="text-[#8E8E93] uppercase font-bold flex items-center gap-1.5">
-                <Layers className="w-3.5 h-3.5 text-[#E43D3D]" />
-                <span>GENRE FILTER</span>
+              <span className="text-[#8E8E93] uppercase font-bold text-[11px] tracking-wider">
+                GENRE
               </span>
               {selectedGenre !== 'All' && (
                 <button
                   type="button"
                   onClick={() => handleSelectGenre('All')}
-                  className="text-[#E43D3D] hover:underline flex items-center gap-1"
+                  className="text-[#E43D3D] hover:underline flex items-center gap-1 text-[11px]"
                 >
                   <RotateCcw className="w-3 h-3" />
-                  <span>RESET TO ALL</span>
+                  <span>RESET</span>
                 </button>
               )}
             </div>
 
-            <div className="flex flex-wrap gap-1.5 pt-1">
+            <div className="flex flex-wrap gap-1.5">
               <button
                 type="button"
                 onClick={() => handleSelectGenre('All')}
-                className={`text-xs px-3 py-1.5 sm:py-1 min-h-[36px] sm:min-h-0 flex items-center font-mono font-semibold uppercase transition-all border ${
+                className={`text-xs px-3 py-1.5 sm:py-1 min-h-[36px] sm:min-h-0 flex items-center font-mono font-semibold uppercase transition-all ${
                   selectedGenre === 'All'
-                    ? 'bg-[#E43D3D] border-[#E43D3D] text-white font-bold'
-                    : 'bg-[#0B0B0D] border-white/10 text-[#8E8E93] hover:text-white'
+                    ? 'bg-[#E43D3D] text-white font-bold'
+                    : 'bg-[#111114] border border-white/10 text-[#8E8E93] hover:text-white'
                 }`}
               >
                 ALL TITLES
@@ -293,10 +287,10 @@ export const AnimePage: React.FC = () => {
                   key={g}
                   type="button"
                   onClick={() => handleSelectGenre(g)}
-                  className={`text-xs px-3 py-1.5 sm:py-1 min-h-[36px] sm:min-h-0 flex items-center font-mono font-semibold uppercase transition-all border ${
+                  className={`text-xs px-3 py-1.5 sm:py-1 min-h-[36px] sm:min-h-0 flex items-center font-mono font-semibold uppercase transition-all ${
                     selectedGenre === g
-                      ? 'bg-[#E43D3D] border-[#E43D3D] text-white font-bold'
-                      : 'bg-[#0B0B0D] border-white/10 text-[#8E8E93] hover:text-white'
+                      ? 'bg-[#E43D3D] text-white font-bold'
+                      : 'bg-[#111114] border border-white/10 text-[#8E8E93] hover:text-white'
                   }`}
                 >
                   {g}

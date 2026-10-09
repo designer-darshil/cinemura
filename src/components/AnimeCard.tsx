@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Tv, ArrowUpRight, Award } from 'lucide-react';
+import { Tv, Award } from 'lucide-react';
 import { AnimeItem } from '../types/anime';
 
 interface AnimeCardProps {
@@ -18,7 +18,7 @@ export const AnimeCard = React.forwardRef<HTMLAnchorElement, AnimeCardProps>(({ 
       ref={ref}
       to={`/anime/${encodeURIComponent(item.id)}`}
       tabIndex={0}
-      className="group relative bg-[#111114] border border-white/10 hover:border-[#E43D3D] focus:outline-none focus:ring-1 focus:ring-[#E43D3D] transition-all duration-300 transform hover:scale-[1.02] hover:-translate-y-1 flex flex-col justify-between overflow-hidden shadow-lg"
+      className="group relative bg-[#111114] border border-white/5 hover:border-white/25 focus:outline-none focus-visible:ring-1 focus-visible:ring-[#E43D3D] transition-colors duration-300 flex flex-col justify-between overflow-hidden shadow-lg"
     >
       {/* 2:3 Poster Image Viewport */}
       <div className="relative w-full aspect-[2/3] overflow-hidden bg-[#141418]">
@@ -34,7 +34,7 @@ export const AnimeCard = React.forwardRef<HTMLAnchorElement, AnimeCardProps>(({ 
               setImgError(true);
               setLoaded(true);
             }}
-            className={`w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-105 ${
+            className={`w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-[1.03] ${
               loaded ? 'opacity-100' : 'opacity-0'
             }`}
           />
@@ -75,9 +75,8 @@ export const AnimeCard = React.forwardRef<HTMLAnchorElement, AnimeCardProps>(({ 
 
       {/* Content Area */}
       <div className="p-3 flex flex-col justify-between flex-grow space-y-1.5 bg-[#111114]">
-        <h3 className="font-display font-semibold text-[14px] sm:text-[15px] text-[#F2F0EC] group-hover:text-[#E43D3D] transition-colors leading-snug line-clamp-1 flex items-center justify-between gap-1">
+        <h3 className="font-display font-semibold text-[14px] sm:text-[15px] text-[#F2F0EC] group-hover:text-[#E43D3D] transition-colors leading-snug line-clamp-1">
           <span className="truncate">{item.title}</span>
-          <ArrowUpRight className="w-3.5 h-3.5 flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity text-[#E43D3D]" />
         </h3>
 
         {/* Genres or Status */}

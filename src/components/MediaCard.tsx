@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Play, Star, ArrowUpRight, Bookmark } from 'lucide-react';
+import { Play, Star, Bookmark } from 'lucide-react';
 import { MediaItem } from '../types';
 import { useApp } from '../context/AppContext';
 import { getImageWithFallback } from '../utils/image';
@@ -40,89 +40,15 @@ export const MediaCard = React.forwardRef<any, MediaCardProps>(({
     setImageLoaded(true);
   };
 
-  // Variant 3: Large Editorial Feature Card
-  if (variant === 'editorial') {
-    return (
-      <div ref={ref} className="hidden group relative bg-[#111114] border border-white/10 hover:border-[#E43D3D] transition-all duration-300 transform hover:-translate-y-1 grid grid-cols-1 lg:grid-cols-12 overflow-hidden">
-        <div className="lg:col-span-7 relative min-h-[300px] bg-[#141418] overflow-hidden">
-          {!imageLoaded && <div className="absolute inset-0 skeleton-pulse" />}
-          <img
-            src={imgSrc}
-            alt={item.title}
-            loading="lazy"
-            onLoad={() => setImageLoaded(true)}
-            onError={handleImageError}
-            className={`w-full h-full object-cover transition-all duration-500 ease-out group-hover:scale-105 ${
-              imageLoaded ? 'opacity-100' : 'opacity-0'
-            }`}
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-[#111114] via-transparent to-black/40 opacity-80" />
-          
-          <div className="absolute top-3 left-3">
-            <span className="text-[9px] font-sans font-extrabold tracking-[0.18em] px-2.5 py-1 uppercase bg-[#E43D3D] text-white">
-              FEATURED EDITORIAL
-            </span>
-          </div>
-
-          {item.trailerUrl && (
-            <button
-              onClick={handleTrailerClick}
-              className="absolute inset-0 m-auto w-12 h-12 bg-[#E43D3D] text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 z-20"
-              aria-label="Play Trailer"
-            >
-              <Play className="w-5 h-5 fill-white pl-0.5" />
-            </button>
-          )}
-        </div>
-
-        <div className="lg:col-span-5 p-6 flex flex-col justify-between space-y-4">
-          <div className="space-y-2">
-            <div className="flex items-center justify-between text-xs text-[#8E8E93] font-sans">
-              <span className="uppercase">{item.type === 'movie' ? 'FEATURE FILM' : 'SERIES'} • {item.year}</span>
-              <div className="flex items-center gap-1 text-[#E43D3D] font-bold">
-                <Star className="w-3.5 h-3.5 fill-[#E43D3D]" />
-                <span>{item.rating.toFixed(1)}</span>
-              </div>
-            </div>
-
-            <Link to={detailPath}>
-              <h3 className="font-display font-bold text-xl sm:text-2xl text-[#F2F0EC] group-hover:text-[#E43D3D] transition-colors leading-tight flex items-center justify-between">
-                <span>{item.title}</span>
-                <ArrowUpRight className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity text-[#E43D3D]" />
-              </h3>
-            </Link>
-
-            {item.genres.length > 0 && (
-              <p className="type-label text-[#8E8E93]">
-                {item.genres.join(' • ')}
-              </p>
-            )}
-
-            <p className="type-small line-clamp-3 font-light text-[#8E8E93]">
-              {item.synopsis}
-            </p>
-          </div>
-
-          <div className="pt-3 border-t border-white/10">
-            <Link to={detailPath} className="btn-link inline-flex items-center gap-2 text-white text-md fw-bold uppercase">
-              <span>EXPLORE TITLE →</span>
-            </Link>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  // Universal Standard Card (ENTIRE CARD IS A SINGLE FULLY CLICKABLE TARGET)
   return (
     <Link
       ref={ref}
       to={detailPath}
       tabIndex={0}
-      className="group relative bg-[#111114] border border-white/10 hover:border-[#E43D3D] focus:outline-none focus:ring-1 focus:ring-[#E43D3D] transition-all duration-400 ease-out transform hover:scale-[1.03] hover:-translate-y-1.5 hover:shadow-2xl hover:shadow-black/80 flex flex-col justify-between overflow-hidden"
+      className="group relative flex flex-col justify-between overflow-hidden bg-[#111114] border border-white/5 hover:border-white/25 focus:outline-none focus:ring-1 focus:ring-[#E43D3D] transition-all duration-300 ease-out"
     >
       {/* Aspect Image Container */}
-      <div className={`relative w-full overflow-hidden bg-[#141418] ${effectiveRatio === 'poster' ? 'aspect-[2/3]' : 'aspect-[16/9]'}`}>
+      <div className={`relative w-full overflow-hidden bg-[#121215] ${effectiveRatio === 'poster' ? 'aspect-[2/3]' : 'aspect-[16/9]'}`}>
         {!imageLoaded && <div className="absolute inset-0 skeleton-pulse" />}
         <img
           src={imgSrc}
@@ -130,22 +56,13 @@ export const MediaCard = React.forwardRef<any, MediaCardProps>(({
           loading="lazy"
           onLoad={() => setImageLoaded(true)}
           onError={handleImageError}
-          className={`w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-108 ${
+          className={`w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-[1.03] ${
             imageLoaded ? 'opacity-100' : 'opacity-0'
           }`}
         />
 
-        {/* Ambient Dark Gradient Vignette */}
-        <div className="absolute inset-0 bg-gradient-to-t from-[#111114] via-[#111114]/20 to-black/30 opacity-60 group-hover:opacity-85 transition-opacity duration-400" />
-
-        {/* Type Badge */}
-        <div className="absolute top-2 left-2 z-10">
-          <span className={`text-[9px] font-sans font-extrabold tracking-wider px-1.5 py-0.5 uppercase ${
-            item.type === 'movie' ? 'bg-[#E43D3D] text-white' : 'bg-white text-black'
-          }`}>
-            {item.type === 'movie' ? 'MOVIE' : 'TV'}
-          </span>
-        </div>
+        {/* Ambient Dark Gradient */}
+        <div className="absolute inset-0 bg-gradient-to-t from-[#0B0B0D] via-transparent to-transparent opacity-60 group-hover:opacity-40 transition-opacity duration-300" />
 
         {/* Watchlist Action Control */}
         <button
@@ -156,21 +73,21 @@ export const MediaCard = React.forwardRef<any, MediaCardProps>(({
             toggleWatchlist(item);
           }}
           aria-label={isSaved ? 'Remove from Watchlist' : 'Add to Watchlist'}
-          className={`absolute top-2 right-2 z-20 p-2 transition-all duration-300 min-w-[36px] min-h-[36px] flex items-center justify-center ${
+          className={`absolute top-2 right-2 z-20 w-8 h-8 flex items-center justify-center transition-all duration-200 ${
             isSaved
-              ? 'bg-[#E43D3D] text-white opacity-100 shadow-md'
-              : 'bg-[#111114]/90 text-[#8E8E93] hover:text-white opacity-100 md:opacity-0 md:group-hover:opacity-100 border border-white/10'
+              ? 'bg-[#E43D3D] text-white opacity-100'
+              : 'bg-black/60 text-[#8E8E93] hover:text-white opacity-0 group-hover:opacity-100'
           }`}
           title={isSaved ? 'In Watchlist' : 'Save to Watchlist'}
         >
           <Bookmark className="w-3.5 h-3.5 fill-current" />
         </button>
 
-        {/* Center Play Trailer Action Control (Desktop Only Hover Feature) */}
+        {/* Subtle Trailer Play Icon (Desktop Hover) */}
         {item.trailerUrl && (
           <button
             onClick={handleTrailerClick}
-            className="hidden md:flex absolute inset-0 m-auto w-11 h-11 bg-[#E43D3D] text-white items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 transform scale-75 group-hover:scale-100 z-20 shadow-xl cursor-pointer"
+            className="hidden md:flex absolute inset-0 m-auto w-10 h-10 bg-black/70 hover:bg-[#E43D3D] text-white items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-200 z-20"
             aria-label="Play Trailer"
           >
             <Play className="w-4 h-4 fill-white pl-0.5" />
@@ -178,26 +95,27 @@ export const MediaCard = React.forwardRef<any, MediaCardProps>(({
         )}
       </div>
 
-      {/* Content Area (TITLE -> GENRE -> METADATA) */}
-      <div className="p-3 flex flex-col justify-between flex-grow space-y-1 bg-[#111114]">
-        <h3 className="font-display font-semibold text-[15px] sm:text-[16px] text-[#F2F0EC] group-hover:text-[#E43D3D] transition-colors leading-snug line-clamp-1 flex items-center justify-between gap-1">
-          <span className="truncate">{item.title}</span>
-          <ArrowUpRight className="w-3.5 h-3.5 flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity text-[#E43D3D]" />
+      {/* Content Area */}
+      <div className="p-3 flex flex-col justify-between flex-grow space-y-1 bg-[#0F0F12]">
+        <h3 className="font-sans font-medium text-sm sm:text-[15px] text-[#F2F0EC] group-hover:text-white transition-colors leading-snug line-clamp-1">
+          {item.title}
         </h3>
 
-        {/* Genre Revelation on Hover / Micro-metadata */}
+        {/* Quiet Genre or Subtitle */}
         {item.genres && item.genres.length > 0 && (
-          <p className="text-[11px] font-mono text-[#8E8E93] truncate uppercase tracking-wider transition-colors group-hover:text-[#F2F0EC]/80">
-            {item.genres.slice(0, 2).join(' • ')}
+          <p className="text-[11px] font-mono text-[#8E8E93] truncate uppercase tracking-wider">
+            {item.genres.slice(0, 2).join(' / ')}
           </p>
         )}
 
-        <div className="flex items-center justify-between text-xs sm:text-[13px] text-[#8E8E93] font-sans pt-0.5">
-          <span>{item.year || 'N/A'}</span>
-          <div className="flex items-center gap-1 text-[#E43D3D] font-bold">
-            <Star className="w-3 h-3 fill-[#E43D3D]" />
-            <span>{item.rating ? item.rating.toFixed(1) : 'NR'}</span>
-          </div>
+        <div className="flex items-center justify-between text-xs text-[#8E8E93] font-mono pt-0.5">
+          <span>{item.year || '—'}</span>
+          {item.rating > 0 && (
+            <div className="flex items-center gap-1 text-[#8E8E93] group-hover:text-[#F2F0EC] transition-colors">
+              <Star className="w-3 h-3 fill-[#E43D3D] text-[#E43D3D]" />
+              <span>{item.rating.toFixed(1)}</span>
+            </div>
+          )}
         </div>
       </div>
     </Link>
@@ -206,7 +124,7 @@ export const MediaCard = React.forwardRef<any, MediaCardProps>(({
 
 MediaCard.displayName = 'MediaCard';
 
-/* Unified Cast Card Component (ENTIRE CARD CLICKABLE) */
+/* Cast Card Component */
 export interface CastCardProps {
   id: string;
   name: string;
@@ -228,9 +146,9 @@ export const CastCard: React.FC<CastCardProps> = ({ name, character, image, slug
     <Link
       to={`/person/${slug}`}
       tabIndex={0}
-      className="group relative bg-[#111114] border border-white/10 hover:border-[#E43D3D] focus:outline-none focus:ring-1 focus:ring-[#E43D3D] transition-all duration-300 transform hover:-translate-y-1 flex flex-col justify-between overflow-hidden"
+      className="group relative flex flex-col justify-between overflow-hidden bg-[#111114] border border-white/5 hover:border-white/25 focus:outline-none focus:ring-1 focus:ring-[#E43D3D] transition-all duration-300 ease-out"
     >
-      <div className="relative w-full aspect-[2/3] overflow-hidden bg-[#141418]">
+      <div className="relative w-full aspect-[2/3] overflow-hidden bg-[#121215]">
         {!loaded && <div className="absolute inset-0 skeleton-pulse" />}
         <img
           src={src}
@@ -238,21 +156,20 @@ export const CastCard: React.FC<CastCardProps> = ({ name, character, image, slug
           loading="lazy"
           onLoad={() => setLoaded(true)}
           onError={handleError}
-          className={`w-full h-full object-cover transition-all duration-500 ease-out group-hover:scale-105 ${
+          className={`w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-[1.03] ${
             loaded ? 'opacity-100' : 'opacity-0'
           }`}
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#111114] via-transparent to-black/20 opacity-60 group-hover:opacity-80 transition-opacity" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#0B0B0D] via-transparent to-transparent opacity-60" />
       </div>
 
-      <div className="p-3 flex flex-col justify-between flex-grow space-y-1">
-        <h3 className="font-display font-semibold text-[15px] sm:text-[16px] text-[#F2F0EC] group-hover:text-[#E43D3D] transition-colors leading-snug line-clamp-1 flex items-center justify-between gap-1">
-          <span className="truncate">{name}</span>
-          <ArrowUpRight className="w-3.5 h-3.5 flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity text-[#E43D3D]" />
+      <div className="p-3 flex flex-col justify-between flex-grow space-y-0.5 bg-[#0F0F12]">
+        <h3 className="font-sans font-medium text-sm sm:text-[15px] text-[#F2F0EC] group-hover:text-white transition-colors leading-snug line-clamp-1">
+          {name}
         </h3>
         {character && (
-          <p className="text-xs sm:text-[13px] text-[#8E8E93] font-sans line-clamp-1">
-            as {character}
+          <p className="text-xs text-[#8E8E93] font-light line-clamp-1">
+            {character}
           </p>
         )}
       </div>
@@ -260,7 +177,7 @@ export const CastCard: React.FC<CastCardProps> = ({ name, character, image, slug
   );
 };
 
-/* Unified Person / Director Card Component (ENTIRE CARD CLICKABLE) */
+/* Person / Creator Card Component */
 export interface PersonCardProps {
   id: string;
   name: string;
@@ -284,9 +201,9 @@ export const PersonCard = React.forwardRef<HTMLAnchorElement, PersonCardProps>((
       ref={ref}
       to={`/person/${slug}`}
       tabIndex={0}
-      className="group relative bg-[#111114] border border-white/10 hover:border-[#E43D3D] focus:outline-none focus:ring-1 focus:ring-[#E43D3D] transition-all duration-300 transform hover:-translate-y-1 flex flex-col justify-between overflow-hidden"
+      className="group relative flex flex-col justify-between overflow-hidden bg-[#111114] border border-white/5 hover:border-white/25 focus:outline-none focus:ring-1 focus:ring-[#E43D3D] transition-all duration-300 ease-out"
     >
-      <div className="relative w-full aspect-[2/3] overflow-hidden bg-[#141418]">
+      <div className="relative w-full aspect-[2/3] overflow-hidden bg-[#121215]">
         {!loaded && <div className="absolute inset-0 skeleton-pulse" />}
         <img
           src={src}
@@ -294,28 +211,25 @@ export const PersonCard = React.forwardRef<HTMLAnchorElement, PersonCardProps>((
           loading="lazy"
           onLoad={() => setLoaded(true)}
           onError={handleError}
-          className={`w-full h-full object-cover transition-all duration-500 ease-out group-hover:scale-105 ${
+          className={`w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-[1.03] ${
             loaded ? 'opacity-100' : 'opacity-0'
           }`}
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#111114] via-transparent to-black/20 opacity-60 group-hover:opacity-80 transition-opacity" />
-        {role && (
-          <div className="absolute top-2 left-2 z-10">
-            <span className="text-[9px] font-sans font-extrabold tracking-wider px-1.5 py-0.5 uppercase bg-[#E43D3D] text-white">
-              {role}
-            </span>
-          </div>
-        )}
+        <div className="absolute inset-0 bg-gradient-to-t from-[#0B0B0D] via-transparent to-transparent opacity-60" />
       </div>
 
-      <div className="p-3 flex flex-col justify-between flex-grow space-y-1">
-        <h3 className="font-display font-semibold text-[15px] sm:text-[16px] text-[#F2F0EC] group-hover:text-[#E43D3D] transition-colors leading-snug line-clamp-1 flex items-center justify-between gap-1">
-          <span className="truncate">{name}</span>
-          <ArrowUpRight className="w-3.5 h-3.5 flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity text-[#E43D3D]" />
+      <div className="p-3 flex flex-col justify-between flex-grow space-y-0.5 bg-[#0F0F12]">
+        <h3 className="font-sans font-medium text-sm sm:text-[15px] text-[#F2F0EC] group-hover:text-white transition-colors leading-snug line-clamp-1">
+          {name}
         </h3>
-        {knownFor && knownFor.length > 0 && (
-          <p className="text-xs sm:text-[13px] text-[#8E8E93] font-sans line-clamp-1">
-            {knownFor.join(' • ')}
+        {role && (
+          <p className="text-xs text-[#8E8E93] font-mono uppercase tracking-wider line-clamp-1">
+            {role}
+          </p>
+        )}
+        {knownFor && knownFor.length > 0 && !role && (
+          <p className="text-xs text-[#8E8E93] font-light line-clamp-1">
+            {knownFor.join(', ')}
           </p>
         )}
       </div>

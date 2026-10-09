@@ -53,7 +53,6 @@ export const Header: React.FC = () => {
     { name: 'TV SHOWS', path: '/tv' },
     { name: 'ANIME', path: '/anime' },
     { name: 'PEOPLE', path: '/person' },
-    { name: 'SEARCH', path: '/search' },
   ];
 
   const isLinkActive = (path: string) => {
@@ -92,7 +91,7 @@ export const Header: React.FC = () => {
             <span className="w-1.5 h-1.5 bg-[#E43D3D] inline-block" />
           </Link>
 
-          {/* Center Navigation Links (Desktop Only: HOME, MOVIES, TV SHOWS, PEOPLE, SEARCH) */}
+          {/* Center Navigation Links (Desktop Only: HOME, MOVIES, TV SHOWS, ANIME, PEOPLE) */}
           <nav className="hidden md:flex items-center gap-6 lg:gap-8" aria-label="Main Navigation">
             {navLinks.map(link => {
               const isActive = isLinkActive(link.path);
@@ -118,17 +117,14 @@ export const Header: React.FC = () => {
 
           {/* Right Action Controls */}
           <div className="flex items-center gap-2 sm:gap-3">
-            {/* Desktop Search Trigger */}
+            {/* Desktop Search Trigger (Icon-only) */}
             <button
               id="header-search-trigger"
               onClick={openSearch}
-              aria-label="Search"
-              className="hidden md:flex p-2 text-[#8E8E93] hover:text-[#E43D3D] focus-visible:text-[#E43D3D] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#E43D3D] transition-colors items-center gap-2"
+              aria-label="Open search"
+              className="hidden md:flex p-2 text-[#8E8E93] hover:text-[#E43D3D] focus-visible:text-[#E43D3D] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#E43D3D] transition-colors items-center justify-center"
             >
               <Search className="w-4 h-4 sm:w-5 sm:h-5" />
-              <span className="hidden xl:inline text-[11px] font-mono text-[#8E8E93] tracking-widest uppercase">
-                SEARCH
-              </span>
             </button>
 
             {/* Desktop Watchlist Link */}
@@ -164,7 +160,7 @@ export const Header: React.FC = () => {
             {/* Mobile-Only Search Trigger (Touch Target >= 44px) */}
             <button
               onClick={openSearch}
-              className="md:hidden w-11 h-11 flex items-center justify-center text-[#F2F0EC] hover:text-[#E43D3D] active:text-[#E43D3D] border border-white/10 active:border-[#E43D3D] bg-[#111114] transition-colors"
+              className="md:hidden w-11 h-11 flex items-center justify-center text-[#F2F0EC] hover:text-[#E43D3D] active:text-[#E43D3D] border border-white/10 active:border-[#E43D3D] bg-[#111114] transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#E43D3D]"
               aria-label="Open search"
             >
               <Search className="w-5 h-5" />
@@ -306,22 +302,6 @@ export const Header: React.FC = () => {
               >
                 <span className="font-display font-bold text-3xl sm:text-4xl tracking-tight uppercase">
                   PEOPLE
-                </span>
-              </Link>
-
-              {/* Search */}
-              <Link
-                to="/search"
-                onClick={() => setMobileMenuOpen(false)}
-                className={`py-3 flex items-center justify-between transition-colors animate-menuItemFade ${
-                  location.pathname.startsWith('/search')
-                    ? 'text-[#E43D3D] pl-3 border-l-2 border-[#E43D3D]'
-                    : 'text-[#F2F0EC] hover:text-[#E43D3D]'
-                }`}
-                style={{ animationDelay: '200ms' }}
-              >
-                <span className="font-display font-bold text-3xl sm:text-4xl tracking-tight uppercase">
-                  SEARCH
                 </span>
               </Link>
 

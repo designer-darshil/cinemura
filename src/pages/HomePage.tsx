@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Play, Star, Compass } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Play, Compass } from 'lucide-react';
 import {
   getTrendingMovies,
   getTrendingTv,
@@ -8,6 +8,7 @@ import {
   getMovieCategory,
 } from '../services/tmdb';
 import { MediaItem, Movie, Series } from '../types';
+import { HeroBanner } from '../components/HeroBanner';
 import { HorizontalRail } from '../components/HorizontalRail';
 import { SectionHeader } from '../components/SectionHeader';
 import { GenreDiscovery } from '../components/GenreDiscovery';
@@ -20,7 +21,6 @@ const LAST_HERO_SESSION_KEY = 'cinemura_last_hero_id';
 
 export const HomePage: React.FC = () => {
   const { openVideoPlayer, markAppReady } = useApp();
-  const containerRef = useRef<HTMLDivElement>(null);
 
   const [heroItem, setHeroItem] = useState<Movie | Series | null>(null);
   const [trendingMovies, setTrendingMovies] = useState<Movie[]>([]);
@@ -31,17 +31,6 @@ export const HomePage: React.FC = () => {
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
-
-  // Signature Cinemura Interactive Spotlight
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (containerRef.current) {
-      const rect = containerRef.current.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-      containerRef.current.style.setProperty('--mouse-x', `${x}px`);
-      containerRef.current.style.setProperty('--mouse-y', `${y}px`);
-    }
-  };
 
   const loadLiveData = async () => {
     setLoading(true);
@@ -173,11 +162,7 @@ export const HomePage: React.FC = () => {
   const heroTrailerLabel = getVideoButtonLabel(heroPrimaryVideo);
   const heroPlayableVideos = sortVideosWithPrimaryFirst(heroItem.videos, heroItem.language);
 
-  // Runtime or seasons display
-  const heroDurationOrSeasons = heroItem.type === 'movie'
-    ? (heroItem.runtime && heroItem.runtime !== 'N/A' ? heroItem.runtime : null)
-    : ((heroItem as Series).seasonsCount ? `${(heroItem as Series).seasonsCount} ${(heroItem as Series).seasonsCount === 1 ? 'SEASON' : 'SEASONS'}` : null);
-
+// Runtime or seasons display
   const scrollToDiscovery = () => {
     const el = document.getElementById('browse-discovery-section');
     if (el) {
@@ -186,107 +171,39 @@ export const HomePage: React.FC = () => {
   };
 
   return (
-    <div
-      ref={containerRef}
-      onMouseMove={handleMouseMove}
-      className="relative min-h-screen bg-[#0B0B0D] text-[#F2F0EC] space-y-16 lg:space-y-24 pb-24 selection:bg-[#E43D3D] selection:text-white overflow-hidden"
-    >
-      {/* Signature Cinemura Projection Spotlight */}
-      <div className="pointer-events-none fixed inset-0 z-10 cinema-spotlight-radial opacity-60 transition-opacity duration-300" />
+    <div className="relative min-h-screen bg-[#0B0B0D] text-[#F2F0EC] space-y-12 sm:space-y-16 lg:space-y-20 pb-24 selection:bg-[#E43D3D] selection:text-white overflow-hidden">
+      {/* SECTION 01 — HERO */}
+      <HeroBanner
+        item={heroItem}
+        badgeLabel={heroItem.type === 'movie' ? 'FEATURE FILM' : 'TELEVISION'}
+        actions={
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 pt-2">
+            <button
+              type="button"
+              onClick={scrollToDiscovery}
+              className="btn-primary min-h-[40px] px-6 text-xs font-mono font-semibold tracking-wider uppercase flex items-center justify-center gap-2 w-full sm:w-auto"
+            >
+              <Compass className="w-3.5 h-3.5" />
+              <span>EXPLORE MOVIES</span>
+            </button>
 
-      {/* ==================================================
-          SECTION 01 — HERO (MOBILE-OPTIMIZED)
-         ================================================== */}
-      <section className="relative min-h-[58vh] sm:min-h-[66vh] lg:min-h-[72vh] flex flex-col justify-end pt-20 pb-8 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 w-full overflow-hidden border-b border-white/10">
-        
-        {/* Full-width Movie Artwork with Ambient Movement */}
-        <div className="absolute inset-0 z-0 overflow-hidden">
-          <img
-            src={heroItem.backdrop}
-            alt={heroItem.title}
-            className="w-full h-full object-cover opacity-50 filter brightness-90 contrast-110 animate-cinemaDrift"
-          />
-          
-          {/* Dark Gradient Overlays for Readability */}
-          <div className="absolute inset-0 bg-gradient-to-t md:bg-gradient-to-r from-[#0B0B0D] via-[#0B0B0D]/85 to-transparent" />
-          
-          <div className="absolute top-1/4 -left-20 w-96 h-96 bg-[#E43D3D]/10 rounded-full blur-3xl pointer-events-none animate-cinemaGlow" />
-          <div className="absolute inset-0 film-grain pointer-events-none opacity-30" />
-        </div>
-
-        {/* Hero Content Canvas */}
-        <div className="relative z-20 w-full grid grid-cols-1 lg:grid-cols-12 gap-8 items-end">
-          <div className="lg:col-span-9 space-y-4 sm:space-y-5">
-            
-            {/* Headline */}
-            <h1 className="font-display font-bold text-3xl sm:text-5xl lg:text-7xl xl:text-8xl text-white tracking-tight uppercase leading-[0.96]">
-              {heroItem.title}
-            </h1>
-
-            {/* Metadata Row */}
-            <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 text-xs sm:text-sm font-mono text-[#8E8E93]">
-              <span className="text-white font-semibold">{heroItem.year}</span>
-              {heroDurationOrSeasons && (
-                <>
-                  <span className="text-white/30">•</span>
-                  <span className="text-[#F2F0EC]">{heroDurationOrSeasons}</span>
-                </>
-              )}
-              {heroItem.genres.length > 0 && (
-                <>
-                  <span className="text-white/30">•</span>
-                  <span className="text-[#F2F0EC] uppercase tracking-wider">{heroItem.genres.slice(0, 2).join(' / ')}</span>
-                </>
-              )}
-              {heroItem.rating > 0 && (
-                <>
-                  <span className="text-white/30">•</span>
-                  <span className="flex items-center gap-1.5 text-[#E43D3D] font-bold">
-                    <Star className="w-3.5 h-3.5 fill-[#E43D3D]" />
-                    {heroItem.rating.toFixed(1)}
-                  </span>
-                </>
-              )}
-            </div>
-
-            {/* Short Synopsis */}
-            {heroItem.synopsis && (
-              <p className="type-body text-sm sm:text-base text-[#F2F0EC]/85 max-w-2xl font-light leading-relaxed line-clamp-3">
-                {heroItem.synopsis}
-              </p>
-            )}
-
-            {/* Primary & Secondary CTAs (Touch-friendly >= 44px) */}
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4 pt-2">
+            {heroPrimaryVideo && (
               <button
                 type="button"
-                onClick={scrollToDiscovery}
-                className="btn-primary min-h-[44px] px-6 sm:px-8 py-3 text-xs font-mono font-bold tracking-widest uppercase flex items-center justify-center gap-2.5 shadow-2xl w-full sm:w-auto"
+                onClick={() => openVideoPlayer(
+                  heroPlayableVideos.length > 0 ? heroPlayableVideos : [heroPrimaryVideo],
+                  0,
+                  heroItem.title
+                )}
+                className="btn-secondary min-h-[40px] px-5 text-xs font-mono font-semibold tracking-wider uppercase flex items-center justify-center gap-2 w-full sm:w-auto"
               >
-                <Compass className="w-4 h-4" />
-                <span>EXPLORE MOVIES</span>
+                <Play className="w-3.5 h-3.5 fill-[#E43D3D] text-[#E43D3D]" />
+                <span>{heroTrailerLabel || 'WATCH TRAILER'}</span>
               </button>
-
-              {heroPrimaryVideo && (
-                <button
-                  type="button"
-                  onClick={() => openVideoPlayer(
-                    heroPlayableVideos.length > 0 ? heroPlayableVideos : [heroPrimaryVideo],
-                    0,
-                    heroItem.title
-                  )}
-                  className="btn-secondary min-h-[44px] px-5 sm:px-6 py-3 text-xs font-mono font-bold tracking-widest uppercase flex items-center justify-center gap-2.5 w-full sm:w-auto"
-                >
-                  <Play className="w-3.5 h-3.5 fill-[#E43D3D] text-[#E43D3D]" />
-                  <span>{heroTrailerLabel || 'WATCH TRAILER'}</span>
-                </button>
-              )}
-            </div>
-
+            )}
           </div>
-        </div>
-
-      </section>
+        }
+      />
 
       {/* Anchor for Smooth Exploration */}
       <div id="browse-discovery-section" className="scroll-mt-20" />

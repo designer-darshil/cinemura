@@ -42,9 +42,7 @@ export const GenreDiscovery: React.FC = () => {
     return (
       <div className="space-y-6">
         <SectionHeader
-          label="CATEGORIES"
           title="GENRE DISCOVERY"
-          description="Explore feature films and prestige television grouped by narrative style and cinematic tone."
         />
         <div
           className="grid grid-cols-1 min-[440px]:grid-cols-2 lg:grid-cols-3 border-t border-l border-[rgba(255,255,255,0.12)]"
@@ -85,9 +83,7 @@ export const GenreDiscovery: React.FC = () => {
   return (
     <div className="space-y-6">
       <SectionHeader
-        label="CATEGORIES"
         title="GENRE DISCOVERY"
-        description="Explore feature films and prestige television grouped by narrative style and cinematic tone."
       />
 
       {/* Editorial Connected Grid with shared 1px separators */}
@@ -100,22 +96,22 @@ export const GenreDiscovery: React.FC = () => {
               key={genre.id}
               to={`/genre/${genre.id}/movie`}
               aria-label={`Explore ${genre.name} movies`}
-              className="group relative flex flex-col justify-between p-6 sm:p-7 lg:p-8 min-h-[170px] sm:min-h-[190px] lg:min-h-[210px] bg-[#0B0B0D] hover:bg-[#E43D3D] transition-colors duration-250 ease-out border-r border-b border-[rgba(255,255,255,0.12)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#E43D3D] focus-visible:ring-inset cursor-pointer"
+              className="group relative flex flex-col justify-between p-6 sm:p-7 lg:p-8 min-h-[170px] sm:min-h-[190px] lg:min-h-[210px] bg-[#0B0B0D] hover:bg-[#141418] transition-colors duration-200 border-r border-b border-[rgba(255,255,255,0.12)] focus:outline-none focus-visible:ring-1 focus-visible:ring-[#E43D3D] focus-visible:ring-inset cursor-pointer"
             >
               {/* Top row: sequential number and directional arrow */}
               <div className="flex items-center justify-between w-full">
-                <span className="font-mono text-xs sm:text-sm tracking-widest text-[#8E8E93] group-hover:text-white/90 transition-colors duration-250">
+                <span className="font-mono text-xs sm:text-sm tracking-widest text-[#8E8E93] group-hover:text-white transition-colors duration-200">
                   {formattedNumber}
                 </span>
                 <ArrowUpRight
-                  className="w-4 h-4 sm:w-5 sm:h-5 text-[#8E8E93] group-hover:text-white transform group-hover:translate-x-1 group-hover:-translate-y-1 transition-all duration-250 ease-out"
+                  className="w-4 h-4 sm:w-5 sm:h-5 text-[#8E8E93] group-hover:text-[#E43D3D] transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all duration-200"
                   aria-hidden="true"
                 />
               </div>
 
               {/* Bottom row: Large bold condensed uppercase genre name */}
               <div className="mt-8 sm:mt-10 lg:mt-12">
-                <h3 className="font-display font-black text-2xl sm:text-3xl lg:text-4xl leading-[1.02] tracking-tight uppercase text-[#F2F0EC] group-hover:text-white transition-colors duration-250">
+                <h3 className="font-display font-black text-2xl sm:text-3xl lg:text-4xl leading-[1.02] tracking-tight uppercase text-[#F2F0EC] group-hover:text-[#E43D3D] transition-colors duration-200">
                   {genre.name}
                 </h3>
               </div>

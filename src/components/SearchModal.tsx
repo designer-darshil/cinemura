@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { X, TrendingUp, Sparkles } from 'lucide-react';
+import { X, TrendingUp } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { searchTmdb, getTrendingMovies } from '../services/tmdb';
 import { Movie, Series, Person } from '../types';
@@ -224,12 +224,9 @@ export const SearchModal: React.FC = () => {
             {suggestions.length > 0 && (
               <div className="space-y-4 pt-4 border-t border-white/10">
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <Sparkles className="w-3.5 h-3.5 text-[#E43D3D]" />
-                    <span className="text-[11px] font-mono font-bold tracking-[0.2em] text-[#F2F0EC] uppercase">
-                      CURATED CINEMA SUGGESTIONS
-                    </span>
-                  </div>
+                  <span className="text-[11px] font-mono font-bold tracking-[0.2em] text-[#8E8E93] uppercase">
+                    SUGGESTIONS
+                  </span>
                 </div>
 
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3 sm:gap-4">
@@ -248,7 +245,7 @@ export const SearchModal: React.FC = () => {
         {searching && (
           <div className="space-y-4 pt-4">
             <div className="text-xs font-mono text-[#8E8E93] uppercase animate-pulse">
-              SEARCHING LIVE CATALOG...
+              SEARCHING...
             </div>
             <CardGridSkeleton count={12} />
           </div>
@@ -260,7 +257,7 @@ export const SearchModal: React.FC = () => {
             
             {/* Zero Results State */}
             {totalResults === 0 && (
-              <div className="py-16 text-center space-y-2 border border-white/10 bg-[#111114] p-8">
+              <div className="py-16 text-center space-y-2">
                 <h3 className="font-display font-bold text-xl text-[#F2F0EC] uppercase">
                   NO RESULTS
                 </h3>

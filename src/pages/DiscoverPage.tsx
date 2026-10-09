@@ -248,14 +248,12 @@ export const DiscoverPage: React.FC = () => {
     <div className="min-h-screen bg-[#0B0B0D] text-[#F2F0EC] pt-28 pb-20 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 w-full space-y-8">
       
       <SectionHeader
-        label={queryParam ? 'SEARCH RESULTS' : 'DISCOVERY'}
-        title={queryParam ? `SEARCH FOR "${queryParam.toUpperCase()}"` : 'DISCOVER TITLES'}
-        description={queryParam ? 'Live catalog search results.' : 'Explore genres and curated media across the CINEMURA catalog.'}
+        title={queryParam ? `SEARCH FOR "${queryParam.toUpperCase()}"` : 'DISCOVER'}
       />
 
       {/* Discovery Genre Controls (When Not Searching) */}
       {!queryParam && (
-        <div className="bg-[#111114] border border-white/10 p-4 space-y-4">
+        <div className="space-y-4">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <span className="text-xs font-mono text-[#8E8E93]">MEDIA TYPE:</span>
             <div className="flex flex-wrap items-center gap-2">
@@ -280,7 +278,7 @@ export const DiscoverPage: React.FC = () => {
                 className={`text-xs px-3 py-1.5 sm:py-1 min-h-[36px] sm:min-h-0 flex items-center font-mono font-semibold uppercase transition-all ${
                   genreParam === 'All'
                     ? 'bg-[#E43D3D] text-white'
-                    : 'bg-[#0B0B0D] text-[#8E8E93] hover:text-white border border-white/10'
+                    : 'bg-[#111114] text-[#8E8E93] hover:text-white border border-white/10'
                 }`}
               >
                 ALL GENRES
@@ -292,7 +290,7 @@ export const DiscoverPage: React.FC = () => {
                   className={`text-xs px-3 py-1.5 sm:py-1 min-h-[36px] sm:min-h-0 flex items-center font-mono font-semibold uppercase transition-all ${
                     genreParam === g.id.toString()
                       ? 'bg-[#E43D3D] text-white'
-                      : 'bg-[#0B0B0D] text-[#8E8E93] hover:text-white border border-white/10'
+                      : 'bg-[#111114] text-[#8E8E93] hover:text-white border border-white/10'
                   }`}
                 >
                   {g.name}
@@ -324,8 +322,8 @@ export const DiscoverPage: React.FC = () => {
         <CardGridSkeleton count={12} />
       ) : error ? (
         <ErrorState
-          title="SEARCH ENGINE OFFLINE"
-          message="Could not connect to live database catalog."
+          title="SEARCH UNAVAILABLE"
+          message="Could not connect to the database catalog."
           onRetry={() => queryParam ? searchTmdb(queryParam) : fetchDiscoveryData(1, false)}
         />
       ) : searchResults ? (

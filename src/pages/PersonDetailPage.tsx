@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { Calendar, MapPin, ArrowLeft, ArrowUpRight, TrendingUp, ExternalLink } from 'lucide-react';
+import { Calendar, MapPin, ArrowLeft, ArrowUpRight, ExternalLink } from 'lucide-react';
 import { getPersonDetail } from '../services/tmdb';
 import { Person } from '../types';
 import { SectionHeader } from '../components/SectionHeader';
@@ -85,7 +85,7 @@ export const PersonDetailPage: React.FC = () => {
     return (
       <div className="min-h-screen bg-[#0B0B0D] text-[#F2F0EC] pt-28 pb-20 px-4 sm:px-8 mx-auto">
         <ErrorState
-          title="PERSONALITY PROFILE UNRESOLVED"
+          title="PERSON NOT FOUND"
           message="Could not load the requested artist or creator record from the database."
           onRetry={fetchPersonDetail}
         />
@@ -106,12 +106,8 @@ export const PersonDetailPage: React.FC = () => {
             className="group flex items-center gap-2 text-xs font-mono tracking-wider text-[#8E8E93] hover:text-[#E43D3D] transition-colors"
           >
             <ArrowLeft className="w-3.5 h-3.5 transition-transform group-hover:-translate-x-1" />
-            <span>CAST & CREW DIRECTORY</span>
+            <span>PEOPLE DIRECTORY</span>
           </Link>
-
-          <span className="text-[10px] font-mono tracking-[0.25em] text-[#8E8E93] uppercase">
-            CAREER PROFILE
-          </span>
         </div>
       </div>
 
@@ -120,62 +116,50 @@ export const PersonDetailPage: React.FC = () => {
          ================================================== */}
       <section className="mt-8 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 w-full">
         
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center bg-[#111114] border border-white/10 p-6 sm:p-10 md:p-12 relative overflow-hidden">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-14 items-center">
           
-          {/* Subtle Ambient Film Grain */}
-          <div className="absolute inset-0 film-grain pointer-events-none opacity-20" />
-
           {/* LEFT: Dominant Portrait Visual Anchor */}
           <div className="lg:col-span-4 max-w-[220px] sm:max-w-xs lg:max-w-none mx-auto w-full">
-            <div className="relative aspect-[3/4] bg-black border border-white/20 overflow-hidden shadow-2xl group/portrait">
+            <div className="relative aspect-[3/4] bg-black border border-white/10 overflow-hidden shadow-2xl">
               <img
                 src={person.portrait}
                 alt={person.name}
-                className="w-full h-full object-cover group-hover/portrait:scale-105 transition-transform duration-700"
+                className="w-full h-full object-cover transition-transform duration-700 hover:scale-105"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
-              <div className="absolute bottom-3 left-3">
-                <span className="text-[10px] font-mono font-extrabold tracking-[0.2em] px-2.5 py-1 uppercase bg-[#E43D3D] text-white">
-                  {person.role || 'ARTIST'}
-                </span>
-              </div>
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none" />
+              {person.role && (
+                <div className="absolute bottom-3 left-3">
+                  <span className="text-[10px] font-mono font-bold tracking-wider px-2 py-0.5 uppercase bg-white/10 backdrop-blur-sm text-white border border-white/10">
+                    {person.role}
+                  </span>
+                </div>
+              )}
             </div>
           </div>
 
           {/* RIGHT: Name & Essential Identity Metadata */}
           <div className="lg:col-span-8 space-y-5 sm:space-y-6 text-center lg:text-left">
             
-            <div className="space-y-2">
-              <span className="text-[10px] font-mono tracking-[0.25em] text-[#E43D3D] uppercase block">
-                EDITORIAL PROFILE
-              </span>
-              <h1 className="text-3xl sm:text-5xl lg:text-7xl font-display font-bold text-[#F2F0EC] tracking-tight uppercase leading-none">
+            <div className="space-y-1">
+              <h1 className="text-3xl sm:text-5xl lg:text-6xl font-display font-bold text-[#F2F0EC] tracking-tight uppercase leading-none">
                 {person.name}
               </h1>
             </div>
 
             {/* Short Identity Metadata Row */}
-            <div className="flex flex-wrap items-center justify-center lg:justify-start gap-x-6 gap-y-3 text-xs sm:text-sm font-mono text-[#8E8E93] border-y border-white/10 py-4">
+            <div className="flex flex-wrap items-center justify-center lg:justify-start gap-x-6 gap-y-3 text-xs sm:text-sm font-mono text-[#8E8E93] border-y border-white/10 py-3.5">
               {person.birthDate && (
                 <div className="flex items-center gap-2">
-                  <Calendar className="w-4 h-4 text-[#E43D3D]" />
-                  <span className="text-[#8E8E93]">BORN:</span>
-                  <span className="text-[#F2F0EC] font-semibold">{person.birthDate}</span>
+                  <Calendar className="w-3.5 h-3.5 text-[#E43D3D]" />
+                  <span>BORN:</span>
+                  <span className="text-[#F2F0EC] font-medium">{person.birthDate}</span>
                 </div>
               )}
 
               {person.birthPlace && (
                 <div className="flex items-center gap-2">
-                  <MapPin className="w-4 h-4 text-[#E43D3D]" />
-                  <span className="text-[#F2F0EC] font-semibold">{person.birthPlace}</span>
-                </div>
-              )}
-
-              {person.popularity && (
-                <div className="flex items-center gap-2">
-                  <TrendingUp className="w-4 h-4 text-[#E43D3D]" />
-                  <span className="text-[#8E8E93]">POPULARITY INDEX:</span>
-                  <span className="text-[#F2F0EC] font-bold">{person.popularity}</span>
+                  <MapPin className="w-3.5 h-3.5 text-[#E43D3D]" />
+                  <span className="text-[#F2F0EC] font-medium">{person.birthPlace}</span>
                 </div>
               )}
             </div>
@@ -195,10 +179,10 @@ export const PersonDetailPage: React.FC = () => {
                   href={`https://www.imdb.com/name/${person.imdbId}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 text-xs font-mono tracking-widest text-[#F2F0EC] hover:text-[#E43D3D] border border-white/20 hover:border-[#E43D3D] px-4 py-2 transition-colors"
+                  className="inline-flex items-center gap-2 text-xs font-mono tracking-wider text-[#8E8E93] hover:text-[#E43D3D] transition-colors"
                 >
                   <ExternalLink className="w-3.5 h-3.5 text-[#E43D3D]" />
-                  <span>IMDB PROFILE</span>
+                  <span>IMDb PROFILE</span>
                 </a>
               </div>
             )}
@@ -216,9 +200,7 @@ export const PersonDetailPage: React.FC = () => {
         
         <div className="border-t border-white/10 pt-8 sm:pt-12">
           <SectionHeader
-            label="BIOGRAPHY"
-            title="ABOUT"
-            description="Background and career trajectory of the artist."
+            title="BIOGRAPHY"
           />
 
           <div className="mt-6 max-w-4xl text-base sm:text-lg font-light text-[#F2F0EC]/90 leading-relaxed space-y-4 font-serif">
@@ -243,9 +225,7 @@ export const PersonDetailPage: React.FC = () => {
         <section className="mt-10 sm:mt-16 lg:mt-24 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 w-full space-y-6">
           
           <SectionHeader
-            label="ACCLAIMED WORKS"
             title="KNOWN FOR"
-            description="Notable films and series associated with this profile."
           />
 
           {/* Render Known For titles using credit items matching the titles */}
@@ -254,7 +234,7 @@ export const PersonDetailPage: React.FC = () => {
               <Link
                 key={`known-${credit.id}`}
                 to={credit.type === 'movie' ? `/movie/${credit.id}` : `/tv/${credit.id}`}
-                className="group bg-[#111114] border border-white/10 hover:border-[#E43D3D] transition-all duration-300 overflow-hidden flex flex-col justify-between"
+                className="group bg-[#111114] border border-white/10 hover:border-white/30 transition-all duration-300 overflow-hidden flex flex-col justify-between"
               >
                 <div className="aspect-[2/3] bg-black overflow-hidden relative">
                   <img
@@ -262,16 +242,12 @@ export const PersonDetailPage: React.FC = () => {
                     alt={credit.title}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#111114] via-transparent to-transparent opacity-60" />
-                  <span className="absolute top-2 left-2 text-[8px] font-mono font-extrabold uppercase px-1.5 py-0.5 bg-[#E43D3D] text-white">
-                    {credit.type === 'movie' ? 'MOVIE' : 'TV'}
-                  </span>
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#111114] via-transparent to-transparent opacity-60 pointer-events-none" />
                 </div>
 
                 <div className="p-3 space-y-1">
-                  <h4 className="font-serif font-bold text-sm text-[#F2F0EC] group-hover:text-[#E43D3D] transition-colors truncate flex items-center justify-between">
-                    <span className="truncate">{credit.title}</span>
-                    <ArrowUpRight className="w-3.5 h-3.5 text-[#E43D3D] opacity-0 group-hover:opacity-100 transition-opacity" />
+                  <h4 className="font-serif font-bold text-sm text-[#F2F0EC] group-hover:text-[#E43D3D] transition-colors truncate">
+                    {credit.title}
                   </h4>
                   <p className="text-[11px] font-mono text-[#8E8E93]">
                     {credit.year} • {credit.role || 'Credit'}
@@ -288,7 +264,7 @@ export const PersonDetailPage: React.FC = () => {
           AWARDS — REAL AUTHORIZED DATA ONLY (HIDDEN IF UNAVAILABLE)
          ================================================== */}
       <div className="w-full mt-10 sm:mt-16 lg:mt-24 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16">
-        <AwardsSection awards={awards} loading={awardsLoading} title="AWARDS & NOMINATIONS" label="CAREER HONORS" />
+        <AwardsSection awards={awards} loading={awardsLoading} title="AWARDS & NOMINATIONS" />
       </div>
 
       {/* ==================================================
@@ -298,7 +274,6 @@ export const PersonDetailPage: React.FC = () => {
         <section className="mt-12 sm:mt-16 lg:mt-24 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 w-full space-y-8">
           
           <SectionHeader
-            label="FULL CREDIT RECORD"
             title="FILMOGRAPHY"
             rightElement={
               <div className="flex items-center gap-1 bg-[#111114] border border-white/10 p-1">
@@ -351,8 +326,8 @@ export const PersonDetailPage: React.FC = () => {
                     <div className="flex items-center gap-2 text-xs font-mono text-[#8E8E93]">
                       <span className="text-[#F2F0EC] font-bold">{credit.year}</span>
                       <span>•</span>
-                      <span className="uppercase text-[#E43D3D] font-bold">
-                        {credit.type === 'movie' ? 'FEATURE FILM' : 'TV SERIES'}
+                      <span className="uppercase text-[#8E8E93]">
+                        {credit.type === 'movie' ? 'Feature Film' : 'TV Series'}
                       </span>
                       {credit.rating && credit.rating > 0 && (
                         <>
@@ -375,8 +350,7 @@ export const PersonDetailPage: React.FC = () => {
 
                 {/* Arrow Icon Affordance */}
                 <div className="flex items-center gap-2 text-xs font-mono text-[#8E8E93] group-hover:text-[#E43D3D] transition-colors flex-shrink-0">
-                  <span className="hidden sm:inline uppercase tracking-wider text-[10px]">VIEW PROFILE</span>
-                  <ArrowUpRight className="w-4 h-4 text-[#E43D3D] opacity-0 group-hover:opacity-100 transition-all transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                  <ArrowUpRight className="w-4 h-4 text-[#8E8E93] group-hover:text-[#E43D3D] transition-colors" />
                 </div>
 
               </Link>

@@ -495,7 +495,20 @@ export const SeriesDetailPageSkeleton: React.FC = () => {
   );
 };
 
-/* 15. PERSON DETAIL SKELETON */
+/* 15. FULL ANIME DETAIL PAGE SKELETON */
+export const AnimeDetailPageSkeleton: React.FC = () => {
+  return (
+    <div className="min-h-screen bg-[#0B0B0D] text-[#F2F0EC] pb-24 space-y-16 animate-fadeIn">
+      <DetailHeroSkeleton />
+      <DetailOverviewSkeleton />
+      <div className="w-full px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16">
+        <CardGridSkeleton count={6} />
+      </div>
+    </div>
+  );
+};
+
+/* 16. PERSON DETAIL SKELETON */
 export const PersonDetailSkeleton: React.FC = () => {
   return (
     <div className="min-h-screen bg-[#0B0B0D] text-[#F2F0EC] pb-24 space-y-12 animate-fadeIn">

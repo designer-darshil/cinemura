@@ -1,41 +1,20 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
 import { Play, Star, Bookmark, ArrowRight } from 'lucide-react';
 import { MediaItem, Movie, Series } from '../types';
 import { useApp } from '../context/AppContext';
 import { selectPrimaryVideo, sortVideosWithPrimaryFirst, getVideoButtonLabel } from '../utils/trailer';
-import { isMoviePlayable } from '../utils/vidlink';
+import { isMoviePlayable } from '../utils/cinesrc';
 
 interface TonightsPickSectionProps {
   item: MediaItem;
 }
 
 export const TonightsPickSection: React.FC<TonightsPickSectionProps> = ({ item }) => {
-  const { openVideoPlayer, openVidLinkMovie, toggleWatchlist, isInWatchlist } = useApp();
-  const [isVisible, setIsVisible] = useState(false);
-  const sectionRef = useRef<HTMLDivElement>(null);
+  const { openVideoPlayer, openCineSrcMovie, toggleWatchlist, isInWatchlist } = useApp();
 
   const detailPath = item.type === 'movie' ? `/movie/${item.id}` : `/tv/${item.id}`;
   const isSaved = isInWatchlist(item.id);
-
-  // IntersectionObserver for smooth entrance transition
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsVisible(true);
-          observer.disconnect();
-        }
-      },
-      { threshold: 0.15 }
-    );
-
-    if (sectionRef.current) {
-      observer.observe(sectionRef.current);
-    }
-
-    return () => observer.disconnect();
-  }, []);
 
   const primaryVideo = selectPrimaryVideo(item.videos, item.language) || item.primaryVideo || null;
   const playableVideos = sortVideosWithPrimaryFirst(item.videos, item.language);
@@ -48,48 +27,33 @@ export const TonightsPickSection: React.FC<TonightsPickSectionProps> = ({ item }
   const artworkImage = item.backdrop || item.poster;
 
   return (
-    <section
-      ref={sectionRef}
-      className={`relative w-full transition-all duration-700 ease-out ${
-        isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
-      }`}
-    >
+    <div className="w-full space-y-4">
       {/* Section Header */}
-      <div className="pb-4 border-b border-white/10 mb-6">
-        <h2 className="font-display font-bold text-2xl sm:text-3xl text-white uppercase tracking-tight">
-          TONIGHT'S PICK
-        </h2>
+      <div className="flex items-baseline justify-between gap-4">
+        <div>
+          <span className="text-[11px] font-mono tracking-widest text-[#E43D3D] uppercase block">
+            CURATED SPOTLIGHT
+          </span>
+          <h2 className="text-base sm:text-lg lg:text-xl font-bold tracking-tight text-[#F2F0EC] uppercase">
+            TONIGHT'S SELECTION
+          </h2>
+        </div>
       </div>
 
-      {/* Dominant Showcase Card with Atmospheric Light Glow */}
-      <div className="relative bg-[#111114] border border-white/10 overflow-hidden group">
-        
-        {/* Atmospheric Artwork-Derived Glow */}
-        <div className="absolute inset-0 pointer-events-none overflow-hidden z-0">
-          <img
-            src={artworkImage}
-            alt=""
-            aria-hidden="true"
-            className="w-full h-full object-cover filter blur-3xl opacity-20 scale-125 transform group-hover:scale-130 transition-transform duration-1000"
-          />
-          <div className="absolute inset-0 bg-[#0B0B0D]/75" />
-          <div className="absolute inset-0 film-grain opacity-25" />
-        </div>
-
-        {/* Content Grid: Artwork (Left) + Information (Right) */}
-        <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 items-stretch">
+      {/* Presentation Card */}
+      <div className="relative bg-[#111114] border border-white/5 overflow-hidden group">
+        <div className="grid grid-cols-1 lg:grid-cols-12 items-stretch">
           
-          {/* Large Artwork Side */}
-          <div className="lg:col-span-7 relative min-h-[320px] sm:min-h-[420px] lg:min-h-[480px] overflow-hidden bg-[#141418]">
+          {/* Artwork Side */}
+          <div className="lg:col-span-7 relative min-h-[260px] sm:min-h-[360px] lg:min-h-[420px] overflow-hidden bg-[#121215]">
             <img
               src={artworkImage}
               alt={item.title}
               loading="lazy"
-              className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105 filter brightness-95 contrast-105"
+              className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.02] filter brightness-95 contrast-105"
             />
-            {/* Cinematic Vignette */}
-            <div className="absolute inset-0 bg-gradient-to-t from-[#111114] via-transparent to-black/30 lg:bg-gradient-to-r lg:from-transparent lg:via-[#111114]/40 lg:to-[#111114]" />
-            <div className="absolute inset-0 film-grain opacity-30 pointer-events-none" />
+            {/* Vignette */}
+            <div className="absolute inset-0 bg-gradient-to-t from-[#111114] via-transparent to-transparent lg:bg-gradient-to-r lg:from-transparent lg:via-[#111114]/30 lg:to-[#111114]" />
 
             {/* Quick Play Trigger Overlay */}
             {primaryVideo && (
@@ -101,32 +65,30 @@ export const TonightsPickSection: React.FC<TonightsPickSectionProps> = ({ item }
                   item.title
                 )}
                 aria-label={`Play trailer for ${item.title}`}
-                className="absolute inset-0 m-auto w-14 h-14 bg-[#E43D3D] text-white flex items-center justify-center opacity-90 sm:opacity-0 group-hover:opacity-100 transition-all duration-300 transform group-hover:scale-110 shadow-2xl cursor-pointer"
+                className="absolute inset-0 m-auto w-12 h-12 bg-black/70 hover:bg-[#E43D3D] text-white flex items-center justify-center transition-all duration-200 cursor-pointer"
               >
-                <Play className="w-6 h-6 fill-white pl-0.5" />
+                <Play className="w-5 h-5 fill-white pl-0.5" />
               </button>
             )}
           </div>
 
-          {/* Movie Information Side */}
-          <div className="lg:col-span-5 p-6 sm:p-8 lg:p-10 flex flex-col justify-between space-y-6 bg-[#111114]/90 border-t lg:border-t-0 lg:border-l border-white/10">
-            
-            <div className="space-y-4">
-              
+          {/* Information Side */}
+          <div className="lg:col-span-5 p-6 sm:p-8 flex flex-col justify-between space-y-5 bg-[#111114]">
+            <div className="space-y-3">
               {/* Metadata Row */}
-              <div className="flex flex-wrap items-center gap-3 text-xs font-mono text-[#8E8E93]">
-                <span className="text-white font-bold">{item.year}</span>
+              <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs font-mono text-[#8E8E93]">
+                <span className="text-[#F2F0EC]">{item.year}</span>
                 {durationOrSeasons && (
                   <>
-                    <span>•</span>
-                    <span className="text-[#F2F0EC]">{durationOrSeasons}</span>
+                    <span className="text-white/20">•</span>
+                    <span>{durationOrSeasons}</span>
                   </>
                 )}
                 {item.rating > 0 && (
                   <>
-                    <span>•</span>
-                    <span className="flex items-center gap-1 text-[#E43D3D] font-bold">
-                      <Star className="w-3.5 h-3.5 fill-[#E43D3D]" />
+                    <span className="text-white/20">•</span>
+                    <span className="flex items-center gap-1 text-[#F2F0EC]">
+                      <Star className="w-3.5 h-3.5 fill-[#E43D3D] text-[#E43D3D]" />
                       {item.rating.toFixed(1)}
                     </span>
                   </>
@@ -135,40 +97,33 @@ export const TonightsPickSection: React.FC<TonightsPickSectionProps> = ({ item }
 
               {/* Title */}
               <Link to={detailPath} className="block group/title">
-                <h3 className="font-display font-bold text-3xl sm:text-4xl lg:text-5xl text-[#F2F0EC] group-hover/title:text-[#E43D3D] transition-colors leading-[1.05] uppercase tracking-tight">
+                <h3 className="font-display font-bold text-2xl sm:text-3xl lg:text-4xl text-[#F2F0EC] group-hover/title:text-white transition-colors leading-tight uppercase tracking-tight">
                   {item.title}
                 </h3>
               </Link>
 
               {/* Genres */}
               {item.genres.length > 0 && (
-                <div className="flex flex-wrap gap-1.5 pt-1">
-                  {item.genres.slice(0, 3).map((genre) => (
-                    <span
-                      key={genre}
-                      className="text-[10px] font-mono text-[#8E8E93] uppercase tracking-wider px-2 py-0.5 bg-white/5 border border-white/10"
-                    >
-                      {genre}
-                    </span>
-                  ))}
-                </div>
+                <p className="text-xs font-mono text-[#8E8E93] uppercase tracking-wider">
+                  {item.genres.slice(0, 3).join(' / ')}
+                </p>
               )}
 
               {/* Synopsis */}
               {item.synopsis && (
-                <p className="type-body text-sm sm:text-base text-[#F2F0EC]/80 font-light leading-relaxed line-clamp-4 pt-1">
+                <p className="text-sm text-[#8E8E93] font-light leading-relaxed line-clamp-4 pt-1">
                   {item.synopsis}
                 </p>
               )}
             </div>
 
             {/* Action Buttons */}
-            <div className="pt-4 border-t border-white/10 flex flex-wrap items-center gap-3">
+            <div className="pt-4 border-t border-white/5 flex flex-wrap items-center gap-3">
               {item.type === 'movie' && isMoviePlayable(item as Movie) ? (
                 <button
                   type="button"
-                  onClick={() => openVidLinkMovie(item.id, item.title)}
-                  className="bg-[#E43D3D] hover:bg-[#c02e2e] text-white px-6 py-3 text-xs font-mono font-bold tracking-widest uppercase flex items-center gap-2.5 transition-all transform hover:-translate-y-0.5 shadow-lg"
+                  onClick={() => openCineSrcMovie(item.id, item.title)}
+                  className="btn-primary min-h-[40px] px-5 text-xs font-mono font-semibold tracking-wider uppercase flex items-center gap-2"
                 >
                   <Play className="w-3.5 h-3.5 fill-white" />
                   <span>WATCH MOVIE</span>
@@ -181,7 +136,7 @@ export const TonightsPickSection: React.FC<TonightsPickSectionProps> = ({ item }
                     0,
                     item.title
                   )}
-                  className="bg-[#E43D3D] hover:bg-[#c02e2e] text-white px-6 py-3 text-xs font-mono font-bold tracking-widest uppercase flex items-center gap-2.5 transition-all transform hover:-translate-y-0.5 shadow-lg"
+                  className="btn-primary min-h-[40px] px-5 text-xs font-mono font-semibold tracking-wider uppercase flex items-center gap-2"
                 >
                   <Play className="w-3.5 h-3.5 fill-white" />
                   <span>{trailerLabel}</span>
@@ -190,22 +145,22 @@ export const TonightsPickSection: React.FC<TonightsPickSectionProps> = ({ item }
 
               <Link
                 to={detailPath}
-                className="btn-secondary px-5 py-3 text-xs font-mono font-bold tracking-wider uppercase inline-flex items-center gap-2"
+                className="btn-secondary min-h-[40px] px-5 text-xs font-mono font-semibold tracking-wider uppercase inline-flex items-center gap-2"
               >
                 <span>EXPLORE</span>
-                <ArrowRight className="w-3.5 h-3.5 text-[#E43D3D]" />
+                <ArrowRight className="w-3.5 h-3.5 text-[#8E8E93]" />
               </Link>
 
               <button
                 type="button"
                 onClick={() => toggleWatchlist(item)}
                 aria-label={isSaved ? 'Remove from Watchlist' : 'Add to Watchlist'}
-                className={`p-3 border transition-colors ${
+                className={`p-2.5 border transition-colors ${
                   isSaved
                     ? 'bg-[#E43D3D] text-white border-[#E43D3D]'
-                    : 'bg-transparent text-[#8E8E93] hover:text-white border-white/15 hover:border-white/40'
+                    : 'bg-transparent text-[#8E8E93] hover:text-white border-white/15'
                 }`}
-                title={isSaved ? 'In Watchlist' : 'Add to Watchlist'}
+                title={isSaved ? 'In Watchlist' : 'Save to Watchlist'}
               >
                 <Bookmark className="w-4 h-4" />
               </button>
@@ -214,9 +169,8 @@ export const TonightsPickSection: React.FC<TonightsPickSectionProps> = ({ item }
           </div>
 
         </div>
-
       </div>
-    </section>
+    </div>
   );
 };
 

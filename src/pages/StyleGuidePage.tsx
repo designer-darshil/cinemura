@@ -99,7 +99,7 @@ const FALLBACK_PERSON: Person = {
 };
 
 export const StyleGuidePage: React.FC = () => {
-  const { markAppReady, openSearch, openVideoPlayer, openVidLinkMovie } = useApp();
+  const { markAppReady, openSearch, openVideoPlayer, openCineSrcMovie } = useApp();
   const [showLoaderDemo, setShowLoaderDemo] = useState(false);
 
   const [realMovie, setRealMovie] = useState<Movie>(FALLBACK_MOVIE);
@@ -895,11 +895,11 @@ export const StyleGuidePage: React.FC = () => {
 
             <button
               type="button"
-              onClick={() => openVidLinkMovie(realMovie.id, realMovie.title)}
+              onClick={() => openCineSrcMovie(realMovie.id, realMovie.title)}
               className="btn-secondary min-h-[44px] px-6 text-xs uppercase"
             >
               <Film className="w-4 h-4 text-[#E43D3D]" />
-              <span>OPEN VIDLINK PLAYER MODAL</span>
+              <span>OPEN CINESRC PLAYER MODAL</span>
             </button>
           </div>
         </section>

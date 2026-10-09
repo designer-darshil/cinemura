@@ -5,7 +5,7 @@ import { getMovieDetail, formatCurrency } from '../services/tmdb';
 import { Movie } from '../types';
 import { useApp } from '../context/AppContext';
 import { selectPrimaryVideo, sortVideosWithPrimaryFirst, getVideoButtonLabel } from '../utils/trailer';
-import { isMoviePlayable } from '../utils/vidlink';
+import { isMoviePlayable } from '../utils/cinesrc';
 import { MediaCard } from '../components/MediaCard';
 import { SectionHeader } from '../components/SectionHeader';
 import { MovieDetailPageSkeleton, ErrorState } from '../components/StateViews';
@@ -21,7 +21,7 @@ import { EntityAwardsData } from '../types';
 export const MovieDetailPage: React.FC = () => {
   const { id, slug } = useParams<{ id?: string; slug?: string }>();
   const movieId = id || slug;
-  const { openVideoPlayer, markAppReady, toggleWatchlist, isInWatchlist } = useApp();
+  const { openVideoPlayer, openCineSrcMovie, markAppReady, toggleWatchlist, isInWatchlist } = useApp();
 
   const [movie, setMovie] = useState<Movie | null>(null);
   const [awards, setAwards] = useState<EntityAwardsData | null>(null);
@@ -144,7 +144,7 @@ export const MovieDetailPage: React.FC = () => {
             className="w-full h-full object-cover filter brightness-60 contrast-110 scale-105 transition-transform duration-1000 ease-out"
           />
           {/* Gradient Vignette & Tint */}
-          <div className="absolute inset-0 bg-gradient-to-t md:bg-gradient-to-r from-[#0B0B0D] via-[#0B0B0D]/50 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t md:bg-gradient-to-r from-[#0B0B0D]/50 via-[#0B0B0D]/50 to-transparent" />
           <div className="absolute inset-0 film-grain pointer-events-none opacity-40" />
         </div>
 
@@ -217,6 +217,17 @@ export const MovieDetailPage: React.FC = () => {
 
             {/* Actions (Touch targets min 44px) */}
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4 pt-2">
+              {isMoviePlayable(movie) && (
+                <button
+                  type="button"
+                  onClick={() => openCineSrcMovie(movie.id, movie.title)}
+                  className="bg-[#E43D3D] hover:bg-[#c02e2e] text-white min-h-[44px] px-7 py-3 text-xs font-mono font-bold tracking-widest uppercase flex items-center justify-center gap-3 transition-all shadow-lg w-full sm:w-auto"
+                >
+                  <Play className="w-4 h-4 fill-white" />
+                  <span>WATCH MOVIE</span>
+                </button>
+              )}
+
               {primaryVideo && (
                 <button
                   type="button"
@@ -247,17 +258,13 @@ export const MovieDetailPage: React.FC = () => {
 
           {/* Secondary Visual Anchor: Docked Poster Card */}
           <div className="lg:col-span-3 hidden lg:block">
-            <div className="relative group/anchor aspect-[2/3] max-w-[260px] ml-auto border border-white/20 bg-[#111114] shadow-2xl overflow-hidden transform rotate-1 hover:rotate-0 transition-transform duration-500">
+            <div className="relative aspect-[2/3] max-w-[260px] ml-auto border border-white/10 bg-[#111114] overflow-hidden">
               <img
                 src={movie.poster}
                 alt={movie.title}
-                className="w-full h-full object-cover group-hover/anchor:scale-105 transition-transform duration-500"
+                className="w-full h-full object-cover"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-60" />
-              <div className="absolute bottom-3 left-3 right-3 text-[10px] font-mono text-[#8E8E93] uppercase tracking-wider flex justify-between">
-                <span>POSTER ANCHOR</span>
-                <span className="text-[#E43D3D] font-bold">{movie.language}</span>
-              </div>
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-50" />
             </div>
           </div>
 
@@ -271,57 +278,42 @@ export const MovieDetailPage: React.FC = () => {
       <DetailMediaNav sections={navSections} />
 
       {/* ==================================================
-          2. MOVIE INFORMATION — EDITORIAL OVERVIEW
+          2. MOVIE INFORMATION — OVERVIEW
          ================================================== */}
-      <section id="overview-section" className="w-full mt-12 sm:mt-16 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 scroll-mt-28">
+      <section id="overview-section" className="w-full mt-10 sm:mt-12 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 scroll-mt-24">
         
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start border-t border-white/10 pt-10">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start border-t border-white/5 pt-8">
           
           {/* LEFT: ABOUT THE MOVIE */}
-          <div className="lg:col-span-7 space-y-6">
-            <div className="space-y-1">
-              <span className="text-[10px] font-mono tracking-[0.2em] text-[#E43D3D] uppercase block">
-                NARRATIVE OVERVIEW
-              </span>
-              <h2 className="text-2xl sm:text-3xl font-serif font-bold text-[#F2F0EC] uppercase">
-                ABOUT THE MOVIE
-              </h2>
-            </div>
+          <div className="lg:col-span-7 space-y-5">
+            <h2 className="text-lg sm:text-xl font-bold text-[#F2F0EC] uppercase tracking-wide">
+              ABOUT THE MOVIE
+            </h2>
 
-            <p className="font-sans text-base sm:text-lg leading-relaxed text-[#F2F0EC]/90 font-light">
-              {movie.synopsis || 'Full editorial narrative overview pending release archive update.'}
+            <p className="font-sans text-base leading-relaxed text-[#F2F0EC]/90 font-light">
+              {movie.synopsis || 'Full narrative overview pending archive update.'}
             </p>
 
             {/* Keywords */}
             {movie.keywords && movie.keywords.length > 0 && (
-              <div className="space-y-2 pt-2">
-                <span className="text-[10px] font-mono tracking-widest text-[#8E8E93] uppercase block">
-                  THEMATIC INDEX
-                </span>
-                <div className="flex flex-wrap gap-2">
-                  {movie.keywords.map((kw, i) => (
-                    <span
-                      key={i}
-                      className="px-2.5 py-1 text-xs font-mono bg-white/5 border border-white/10 text-[#8E8E93] hover:text-white transition-colors"
-                    >
-                      #{kw}
-                    </span>
-                  ))}
-                </div>
+              <div className="flex flex-wrap gap-1.5 pt-1">
+                {movie.keywords.map((kw, i) => (
+                  <span
+                    key={i}
+                    className="px-2 py-0.5 text-xs font-mono bg-white/5 text-[#8E8E93]"
+                  >
+                    #{kw}
+                  </span>
+                ))}
               </div>
             )}
           </div>
 
           {/* RIGHT: COMPACT KEY PRODUCTION FACTS */}
-          <div className="lg:col-span-5 bg-[#111114] border border-white/10 p-6 sm:p-8 space-y-6 shadow-xl">
-            <div className="border-b border-white/10 pb-3">
-              <span className="text-[10px] font-mono tracking-[0.2em] text-[#E43D3D] uppercase block">
-                FACTSHEET
-              </span>
-              <h3 className="text-lg font-serif font-bold text-[#F2F0EC] uppercase">
-                PRODUCTION DOSSIER
-              </h3>
-            </div>
+          <div className="lg:col-span-5 bg-[#111114] border border-white/5 p-5 sm:p-6 space-y-4">
+            <h3 className="text-xs font-mono tracking-widest text-[#8E8E93] uppercase font-semibold">
+              SPECIFICATIONS
+            </h3>
 
             <dl className="grid grid-cols-2 gap-y-4 gap-x-6 text-xs font-mono">
               <div>
@@ -376,8 +368,8 @@ export const MovieDetailPage: React.FC = () => {
                     rel="noopener noreferrer"
                     className="inline-flex items-center gap-1.5 text-xs font-mono text-[#8E8E93] hover:text-[#E43D3D] transition-colors"
                   >
-                    <span className="font-bold bg-[#E43D3D] text-white px-1 py-0.2 rounded-xs text-[10px]">IMDb</span>
-                    <span>DOSSIER</span>
+                    <span className="font-bold bg-[#E43D3D] text-white px-1.5 py-0.5 text-[10px]">IMDb</span>
+                    <span>VIEW ON IMDB</span>
                   </a>
                 )}
               </div>
@@ -392,7 +384,7 @@ export const MovieDetailPage: React.FC = () => {
           3. CAST — HORIZONTAL CONTENT CAROUSEL
          ================================================== */}
       {movie.cast && movie.cast.length > 0 && (
-        <section id="cast-section" className="w-full mt-12 sm:mt-16 lg:mt-24 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 scroll-mt-28">
+        <section id="cast-section" className="w-full mt-12 sm:mt-16 lg:mt-20 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 scroll-mt-24">
           <CastCarousel cast={movie.cast} title="CAST" />
         </section>
       )}
@@ -401,7 +393,7 @@ export const MovieDetailPage: React.FC = () => {
           4. VIDEOS — REAL TMDB MEDIA GRID + TYPE FILTER
          ================================================== */}
       {playableVideos.length > 0 && (
-        <div className="w-full mt-12 sm:mt-16 lg:mt-24 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16">
+        <div className="w-full mt-12 sm:mt-16 lg:mt-20 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16">
           <MediaVideosSection id="videos-section" videos={playableVideos} parentTitle={movie.title} />
         </div>
       )}
@@ -410,7 +402,7 @@ export const MovieDetailPage: React.FC = () => {
           5. PHOTOS — BACKDROPS & POSTERS GALLERIES
          ================================================== */}
       {totalPhotosCount > 0 && (
-        <div className="w-full mt-12 sm:mt-16 lg:mt-24 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16">
+        <div className="w-full mt-12 sm:mt-16 lg:mt-20 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16">
           <MediaPhotosSection
             id="photos-section"
             backdrops={backdropImages}
@@ -424,14 +416,13 @@ export const MovieDetailPage: React.FC = () => {
           6. MOVIE COLLECTION / FRANCHISE
          ================================================== */}
       {movie.collection && (
-        <section className="w-full mt-12 sm:mt-16 lg:mt-24 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 space-y-6">
+        <section className="w-full mt-12 sm:mt-16 lg:mt-20 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 space-y-4">
           
           <SectionHeader
-            label="FRANCHISE ARCHIVE"
             title="COLLECTION"
           />
 
-          <div className="relative bg-[#111114] border border-white/10 p-6 sm:p-8 flex flex-col md:flex-row items-center gap-6 overflow-hidden">
+          <div className="relative bg-[#111114] border border-white/5 p-6 sm:p-8 flex flex-col md:flex-row items-center gap-6 overflow-hidden">
             {movie.collection.backdrop && (
               <img
                 src={movie.collection.backdrop}
@@ -439,7 +430,7 @@ export const MovieDetailPage: React.FC = () => {
                 className="absolute inset-0 w-full h-full object-cover opacity-20 filter brightness-50"
               />
             )}
-            <div className="relative z-10 w-24 h-36 flex-shrink-0 bg-black border border-white/20">
+            <div className="relative z-10 w-24 h-36 flex-shrink-0 bg-black border border-white/10">
               <img
                 src={movie.collection.poster || movie.poster}
                 alt={movie.collection.name}
@@ -447,10 +438,7 @@ export const MovieDetailPage: React.FC = () => {
               />
             </div>
             <div className="relative z-10 space-y-2 text-center md:text-left">
-              <span className="text-[10px] font-mono tracking-[0.2em] text-[#E43D3D] uppercase block font-bold">
-                OFFICIAL TMDb COLLECTION
-              </span>
-              <h3 className="text-xl sm:text-2xl font-serif font-bold text-[#F2F0EC]">
+              <h3 className="text-lg sm:text-xl font-bold text-[#F2F0EC] uppercase">
                 {movie.collection.name}
               </h3>
               {movie.collection.overview && (

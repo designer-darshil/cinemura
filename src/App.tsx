@@ -4,7 +4,7 @@ import { AppProvider } from './context/AppContext';
 import { Header } from './components/Header';
 import { Footer } from './components/Footer';
 import { TrailerModal } from './components/TrailerModal';
-import { VidLinkModal } from './components/VidLinkModal';
+import { CineSrcModal } from './components/CineSrcModal';
 import { SearchModal } from './components/SearchModal';
 import { ProfileModal } from './components/ProfileModal';
 
@@ -86,7 +86,7 @@ export function App() {
 
           {/* Interactive Modals */}
           <TrailerModal />
-          <VidLinkModal />
+          <CineSrcModal />
           <SearchModal />
           <ProfileModal />
         </div>

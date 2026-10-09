@@ -335,10 +335,10 @@ export const EpisodesSectionSkeleton: React.FC<{ count?: number }> = ({ count = 
   );
 };
 
-/* 10. HOMEPAGE HERO SKELETON */
+/* 10. HOMEPAGE & INDEX HERO SKELETON (Home, Movies, TV, Anime) */
 export const HomepageHeroSkeleton: React.FC = () => {
   return (
-    <section className="relative min-h-[70vh] lg:min-h-[75vh] flex flex-col justify-end pt-20 pb-8 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 w-full overflow-hidden border-b border-white/10 bg-[#0B0B0D]">
+    <section className="relative min-h-[58vh] sm:min-h-[66vh] lg:min-h-[72vh] flex flex-col justify-end pt-20 pb-8 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 w-full overflow-hidden border-b border-white/10 bg-[#0B0B0D]">
       <div className="w-full grid grid-cols-1 lg:grid-cols-12 gap-8 items-end pb-4">
         <div className="lg:col-span-8 space-y-5">
           {/* Badge line */}
@@ -370,6 +370,8 @@ export const HomepageHeroSkeleton: React.FC = () => {
     </section>
   );
 };
+
+export const IndexHeroSkeleton = HomepageHeroSkeleton;
 
 /* 11. DETAIL HERO SKELETON (Movie / TV) */
 export const DetailHeroSkeleton: React.FC = () => {

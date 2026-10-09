@@ -5,7 +5,8 @@ import {
   getTvCategory,
   getTvDetail,
   getTvList,
-  getTvGenres
+  getTvGenres,
+  getTrendingTv
 } from '../services/tmdb';
 import { Series } from '../types';
 import { MediaCard } from '../components/MediaCard';
@@ -18,7 +19,8 @@ import {
   EmptyState,
   InfiniteLoadingSkeleton,
   InfiniteErrorState,
-  EndOfContentState
+  EndOfContentState,
+  IndexHeroSkeleton
 } from '../components/StateViews';
 import { useInfiniteScroll } from '../hooks/useInfiniteScroll';
 import { useApp } from '../context/AppContext';
@@ -75,40 +77,79 @@ export const SeriesPage: React.FC = () => {
     setIndexError(false);
 
     Promise.all([
+      getTrendingTv('day'),
       getTvCategory('popular', 1),
       getTvCategory('top_rated', 1),
       getTvCategory('on_the_air', 1),
       getTvCategory('airing_today', 1)
     ])
-      .then(async ([pop, top, onAir, airing]) => {
+      .then(async ([trending, pop, top, onAir, airing]) => {
         if (!mounted) return;
 
-        if (!pop && !top && !onAir && !airing) {
+        if (!trending && !pop && !top && !onAir && !airing) {
           setIndexError(true);
           setIndexLoading(false);
           return;
         }
 
+        const validTrending = trending || [];
         const validPopular = pop || [];
         setPopularSeries(validPopular);
         setTopRatedSeries(top || []);
         setOnTheAirSeries(onAir || []);
         setAiringTodaySeries(airing || []);
 
-        // Pick top popular TV series with full details for Hero
-        if (validPopular.length > 0) {
+        // Filter eligible candidates with backdrop, title, and synopsis
+        const candidateSource = validTrending.length > 0 ? validTrending : validPopular;
+        const eligibleCandidates = candidateSource.filter(c =>
+          c &&
+          c.id &&
+          c.backdrop &&
+          !c.backdrop.includes('placeholder') &&
+          c.title &&
+          c.synopsis
+        );
+
+        // Avoid selecting the immediately previous title from session on reload
+        const LAST_TV_HERO_KEY = 'cinemura_prev_hero_tv';
+        const prevHeroId = sessionStorage.getItem(LAST_TV_HERO_KEY);
+        let pool = eligibleCandidates.filter(c => c.id !== prevHeroId);
+        if (pool.length === 0) {
+          pool = eligibleCandidates.length > 0 ? eligibleCandidates : candidateSource;
+        }
+
+        const selected = pool.length > 0
+          ? pool[Math.floor(Math.random() * pool.length)]
+          : null;
+
+        if (selected) {
           try {
-            const fullHero = await getTvDetail(validPopular[0].id);
+            const fullHero = await getTvDetail(selected.id);
+            const resolvedHero = fullHero || selected;
+
+            // Preload hero backdrop before revealing
+            if (resolvedHero?.backdrop) {
+              await new Promise<void>((resolve) => {
+                const img = new Image();
+                img.src = resolvedHero.backdrop;
+                img.onload = () => resolve();
+                img.onerror = () => resolve();
+              });
+            }
+
             if (mounted) {
-              setHeroSeries(fullHero || validPopular[0]);
+              setHeroSeries(resolvedHero);
+              sessionStorage.setItem(LAST_TV_HERO_KEY, resolvedHero.id);
             }
           } catch {
-            if (mounted) setHeroSeries(validPopular[0]);
+            if (mounted) setHeroSeries(selected);
           }
         }
 
-        setIndexLoading(false);
-        markAppReady();
+        if (mounted) {
+          setIndexLoading(false);
+          markAppReady();
+        }
       })
       .catch((err) => {
         console.error('Failed to load TV categories:', err);
@@ -122,7 +163,7 @@ export const SeriesPage: React.FC = () => {
     return () => {
       mounted = false;
     };
-  }, [isCategoryView]);
+  }, [isCategoryView, markAppReady]);
 
   /* ====================================================
      EFFECT: LOAD FULL CATEGORY LIST (PAGINATED)
@@ -310,7 +351,11 @@ export const SeriesPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-[#0B0B0D] text-[#F2F0EC] space-y-12 sm:space-y-16 lg:space-y-20 pb-20 selection:bg-[#E43D3D] selection:text-white">
       {/* 1. HERO BANNER */}
-      {heroSeries && <HeroBanner item={heroSeries} badgeLabel="TELEVISION" />}
+      {heroSeries ? (
+        <HeroBanner item={heroSeries} badgeLabel="TELEVISION" />
+      ) : (
+        indexLoading && <IndexHeroSkeleton />
+      )}
 
       {/* Loading Skeletons when initial data is arriving */}
       {indexLoading && (

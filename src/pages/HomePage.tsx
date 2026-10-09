@@ -197,7 +197,7 @@ export const HomePage: React.FC = () => {
       {/* ==================================================
           SECTION 01 — HERO (MOBILE-OPTIMIZED)
          ================================================== */}
-      <section className="relative min-h-[62vh] sm:min-h-[72vh] lg:min-h-[85vh] flex flex-col justify-end pt-20 sm:pt-24 pb-8 sm:pb-12 md:pb-16 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 w-full overflow-hidden border-b border-white/10">
+      <section className="relative min-h-[58vh] sm:min-h-[66vh] lg:min-h-[72vh] flex flex-col justify-end pt-20 pb-8 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 w-full overflow-hidden border-b border-white/10">
         
         {/* Full-width Movie Artwork with Ambient Movement */}
         <div className="absolute inset-0 z-0 overflow-hidden">

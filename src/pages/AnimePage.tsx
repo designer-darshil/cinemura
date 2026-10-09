@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { Search, Layers, RotateCcw, Award, ArrowRight } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Search, Layers, RotateCcw } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { AnimeItem, AnimeApiError } from '../types/anime';
-import { getAnimeList, getAnimeRankings, getAnimeGenres } from '../services/animeDb';
+import { getAnimeList, getAnimeRankings, getAnimeGenres, getAnimeById } from '../services/animeDb';
 import { AnimeCard, AnimeCardSkeleton } from '../components/AnimeCard';
-import { SectionHeader } from '../components/SectionHeader';
+import { HeroBanner, GenericHeroItem } from '../components/HeroBanner';
+import { IndexHeroSkeleton } from '../components/StateViews';
 import { useInfiniteScroll } from '../hooks/useInfiniteScroll';
 import { EndOfContentState } from '../components/StateViews';
 
@@ -22,11 +23,15 @@ export const AnimePage: React.FC = () => {
   const [loadingMore, setLoadingMore] = useState<boolean>(false);
   const [apiError, setApiError] = useState<AnimeApiError | null>(null);
 
+  const [heroAnime, setHeroAnime] = useState<AnimeItem | null>(null);
+  const [heroLoading, setHeroLoading] = useState<boolean>(true);
+
   const [searchQuery, setSearchQuery] = useState('');
 
-  // Fetch initial data: genres and top ranked anime
+  // Fetch initial data: genres, top ranked anime catalog, and dynamic random hero
   const loadInitialData = useCallback(async () => {
     setLoading(true);
+    setHeroLoading(true);
     setApiError(null);
 
     try {
@@ -39,14 +44,63 @@ export const AnimePage: React.FC = () => {
 
       // 2. Fetch initial top ranked anime catalog
       const res = await getAnimeRankings(1, 18);
-      setAnimeItems(res.data);
+      const catalog = res.data || [];
+      setAnimeItems(catalog);
       setPage(1);
-      setHasMore(res.data.length >= 18);
+      setHasMore(catalog.length >= 18);
+
+      // 3. Randomly select one eligible anime for the dynamic Hero
+      const eligibleCandidates = catalog.filter(c =>
+        c &&
+        c.id &&
+        (c.image || c.thumb) &&
+        c.title &&
+        c.synopsis
+      );
+
+      // Avoid selecting the immediately previous title from session on reload
+      const LAST_ANIME_HERO_KEY = 'cinemura_prev_hero_anime';
+      const prevHeroId = sessionStorage.getItem(LAST_ANIME_HERO_KEY);
+      let pool = eligibleCandidates.filter(c => c.id !== prevHeroId);
+      if (pool.length === 0) {
+        pool = eligibleCandidates.length > 0 ? eligibleCandidates : catalog;
+      }
+
+      const selected = pool.length > 0
+        ? pool[Math.floor(Math.random() * pool.length)]
+        : null;
+
+      if (selected) {
+        let fullHero: AnimeItem | null = null;
+        try {
+          fullHero = await getAnimeById(selected.id);
+        } catch (detailErr) {
+          console.warn('Could not fetch detail for anime hero candidate:', detailErr);
+        }
+        if (!fullHero) {
+          fullHero = selected;
+        }
+
+        // Preload hero artwork before revealing
+        const heroImgUrl = fullHero.image || fullHero.thumb;
+        if (heroImgUrl) {
+          await new Promise<void>((resolve) => {
+            const img = new Image();
+            img.src = heroImgUrl;
+            img.onload = () => resolve();
+            img.onerror = () => resolve();
+          });
+        }
+
+        setHeroAnime(fullHero);
+        sessionStorage.setItem(LAST_ANIME_HERO_KEY, fullHero.id);
+      }
     } catch (err: any) {
       console.error('Failed to load anime from Anime DB:', err);
       setApiError(err as AnimeApiError);
     } finally {
       setLoading(false);
+      setHeroLoading(false);
       markAppReady();
     }
   }, [markAppReady]);
@@ -137,71 +191,32 @@ export const AnimePage: React.FC = () => {
     }
   };
 
-  const featuredHero = animeItems.length > 0 && selectedGenre === 'All' ? animeItems[0] : null;
+  const heroBannerItem: GenericHeroItem | null = heroAnime
+    ? {
+        id: heroAnime.id,
+        title: heroAnime.title,
+        type: 'anime',
+        backdrop: heroAnime.image || heroAnime.thumb || '',
+        synopsis: heroAnime.synopsis,
+        genres: heroAnime.genres,
+        detailUrl: `/anime/${encodeURIComponent(heroAnime.id)}`,
+        episodesCount: heroAnime.episodes,
+        certification: heroAnime.type,
+      }
+    : null;
 
   return (
     <div className="min-h-screen bg-[#0B0B0D] text-[#F2F0EC] pb-24 selection:bg-[#E43D3D] selection:text-white">
-      {/* Featured Anime Hero Banner (Top Ranked) */}
-      {!loading && !apiError && featuredHero && (
-        <section className="relative w-full min-h-[55vh] sm:min-h-[65vh] flex items-end pt-24 pb-12 sm:pb-16 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 overflow-hidden border-b border-white/10 bg-[#111114]">
-          {/* Background Ambient Poster Art */}
-          {(featuredHero.image || featuredHero.thumb) && (
-            <div
-              className="absolute inset-0 bg-cover bg-center filter blur-md opacity-25 scale-105 pointer-events-none"
-              style={{ backgroundImage: `url(${featuredHero.image || featuredHero.thumb})` }}
-            />
-          )}
-
-          {/* Cinematic Vignette Overlay */}
-          <div className="absolute inset-0 bg-gradient-to-t from-[#0B0B0D] via-[#0B0B0D]/70 to-transparent" />
-          <div className="absolute inset-0 bg-gradient-to-r from-[#0B0B0D] via-[#0B0B0D]/80 to-transparent" />
-
-          {/* Hero Content Area */}
-          <div className="relative z-10 max-w-3xl space-y-4">
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="flex items-center gap-1.5 px-2.5 py-1 text-[10px] font-mono font-bold tracking-wider uppercase bg-[#E43D3D] text-white">
-                <Award className="w-3.5 h-3.5" />
-                <span>#1 RANKED ANIME</span>
-              </span>
-              {featuredHero.type && (
-                <span className="px-2.5 py-1 text-[10px] font-mono tracking-widest uppercase bg-black/60 border border-white/15 text-[#F2F0EC]">
-                  {featuredHero.type}
-                </span>
-              )}
-              {typeof featuredHero.episodes === 'number' && (
-                <span className="px-2.5 py-1 text-[10px] font-mono tracking-widest uppercase bg-black/60 border border-white/15 text-[#8E8E93]">
-                  {featuredHero.episodes} EPS
-                </span>
-              )}
-            </div>
-
-            <h1 className="text-3xl sm:text-5xl lg:text-6xl font-display font-bold uppercase tracking-tight text-[#F2F0EC] leading-tight">
-              {featuredHero.title}
-            </h1>
-
-            {featuredHero.genres && featuredHero.genres.length > 0 && (
-              <p className="text-xs font-mono text-[#E43D3D] uppercase tracking-wider font-semibold">
-                {featuredHero.genres.join(' • ')}
-              </p>
-            )}
-
-            {featuredHero.synopsis && (
-              <p className="text-xs sm:text-sm font-sans text-[#8E8E93] line-clamp-3 leading-relaxed max-w-2xl font-light">
-                {featuredHero.synopsis}
-              </p>
-            )}
-
-            <div className="pt-2">
-              <Link
-                to={`/anime/${encodeURIComponent(featuredHero.id)}`}
-                className="btn-primary min-h-[44px] px-8 text-xs font-mono font-bold tracking-widest uppercase inline-flex items-center gap-2"
-              >
-                <span>EXPLORE TITLE</span>
-                <ArrowRight className="w-4 h-4" />
-              </Link>
-            </div>
-          </div>
-        </section>
+      {/* Dynamic Anime Hero Banner matching Home/Movies/TV dimensions */}
+      {selectedGenre === 'All' && (
+        heroBannerItem ? (
+          <HeroBanner
+            item={heroBannerItem}
+            badgeLabel={heroAnime?.rank ? `#${heroAnime.rank} RANKED ANIME` : 'ANIME SPOTLIGHT'}
+          />
+        ) : (
+          heroLoading && !apiError && <IndexHeroSkeleton />
+        )
       )}
 
       {/* Main Catalog Viewport */}

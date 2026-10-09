@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { ArrowLeft, Award, ExternalLink, Calendar, Film, Layers } from 'lucide-react';
+import { ArrowLeft, Award, ExternalLink } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { AnimeItem, AnimeApiError } from '../types/anime';
 import { getAnimeById } from '../services/animeDb';

@@ -51,6 +51,7 @@ export const Header: React.FC = () => {
     { name: 'HOME', path: '/' },
     { name: 'MOVIES', path: '/movie' },
     { name: 'TV SHOWS', path: '/tv' },
+    { name: 'ANIME', path: '/anime' },
     { name: 'PEOPLE', path: '/person' },
     { name: 'SEARCH', path: '/search' },
   ];
@@ -59,6 +60,7 @@ export const Header: React.FC = () => {
     if (path === '/') return location.pathname === '/';
     if (path === '/movie') return location.pathname.startsWith('/movie');
     if (path === '/tv') return location.pathname.startsWith('/tv') || location.pathname.startsWith('/series');
+    if (path === '/anime') return location.pathname.startsWith('/anime');
     if (path === '/person') return location.pathname.startsWith('/person') || location.pathname.startsWith('/people');
     if (path === '/search') return location.pathname.startsWith('/search');
     return location.pathname === path;
@@ -272,6 +274,22 @@ export const Header: React.FC = () => {
               >
                 <span className="font-display font-bold text-3xl sm:text-4xl tracking-tight uppercase">
                   TV SHOWS
+                </span>
+              </Link>
+
+              {/* Anime */}
+              <Link
+                to="/anime"
+                onClick={() => setMobileMenuOpen(false)}
+                className={`py-3 flex items-center justify-between transition-colors animate-menuItemFade ${
+                  location.pathname.startsWith('/anime')
+                    ? 'text-[#E43D3D] pl-3 border-l-2 border-[#E43D3D]'
+                    : 'text-[#F2F0EC] hover:text-[#E43D3D]'
+                }`}
+                style={{ animationDelay: '140ms' }}
+              >
+                <span className="font-display font-bold text-3xl sm:text-4xl tracking-tight uppercase">
+                  ANIME
                 </span>
               </Link>
 

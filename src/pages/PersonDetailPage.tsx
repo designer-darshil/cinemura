@@ -9,6 +9,7 @@ import { AwardsSection } from '../components/AwardsSection';
 import { getPersonAwards } from '../services/awardsService';
 import { EntityAwardsData } from '../types';
 import { useApp } from '../context/AppContext';
+import { Seo } from '../seo/Seo';
 
 export const PersonDetailPage: React.FC = () => {
   const { markAppReady } = useApp();
@@ -97,6 +98,20 @@ export const PersonDetailPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-[#0B0B0D] text-[#F2F0EC] pb-24 selection:bg-[#E43D3D] selection:text-white">
+      <Seo
+        title={person.name}
+        description={person.biography ? person.biography.slice(0, 160) : `Filmography and career profile for ${person.name}.`}
+        image={person.portrait}
+        type="profile"
+        structuredData={{
+          '@context': 'https://schema.org',
+          '@type': 'Person',
+          name: person.name,
+          image: person.portrait,
+          description: person.biography,
+          jobTitle: person.role,
+        }}
+      />
       
       {/* Top Navigation Bar */}
       <div className="pt-24 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 w-full">

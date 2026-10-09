@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { Play, Star, ArrowLeft, Globe, Film } from 'lucide-react';
+import { Play, Star, ArrowLeft, Globe, Film, Bookmark } from 'lucide-react';
 import { getMovieDetail, formatCurrency } from '../services/tmdb';
 import { Movie } from '../types';
 import { useApp } from '../context/AppContext';
+import { useWatchlist } from '../context/WatchlistContext';
+import { Seo } from '../seo/Seo';
 import { selectPrimaryVideo, sortVideosWithPrimaryFirst, getVideoButtonLabel } from '../utils/trailer';
 import { isMoviePlayable } from '../utils/vidlink';
 import { MediaCard } from '../components/MediaCard';
@@ -22,6 +24,7 @@ export const MovieDetailPage: React.FC = () => {
   const { id, slug } = useParams<{ id?: string; slug?: string }>();
   const movieId = id || slug;
   const { openVideoPlayer, openVidLinkMovie, markAppReady } = useApp();
+  const { isInWatchlist, toggleWatchlist } = useWatchlist();
 
   const [movie, setMovie] = useState<Movie | null>(null);
   const [awards, setAwards] = useState<EntityAwardsData | null>(null);
@@ -129,6 +132,28 @@ export const MovieDetailPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-[#0B0B0D] text-[#F2F0EC] pb-24 selection:bg-[#E43D3D] selection:text-white">
       
+      <Seo
+        title={movie.title}
+        description={movie.synopsis || `Explore ${movie.title} (${movie.year}) on Cinemura.`}
+        image={movie.backdrop || movie.poster}
+        type="video.movie"
+        structuredData={{
+          '@context': 'https://schema.org',
+          '@type': 'Movie',
+          name: movie.title,
+          image: movie.poster || movie.backdrop,
+          datePublished: movie.releaseDate,
+          director: movie.director ? { '@type': 'Person', name: movie.director } : undefined,
+          aggregateRating: movie.rating > 0 ? {
+            '@type': 'AggregateRating',
+            ratingValue: movie.rating,
+            bestRating: '10',
+            ratingCount: movie.voteCount || 1,
+          } : undefined,
+          description: movie.synopsis,
+        }}
+      />
+
       {/* ==================================================
           1. HERO CONCEPT — IMMERSIVE MAGAZINE COVER
          ================================================== */}
@@ -234,6 +259,20 @@ export const MovieDetailPage: React.FC = () => {
                   <span>{primaryVideoLabel}</span>
                 </button>
               )}
+
+              {/* Watchlist Toggle */}
+              <button
+                type="button"
+                onClick={() => toggleWatchlist(movie)}
+                className={`px-6 py-3.5 text-xs font-mono font-bold tracking-widest uppercase flex items-center gap-2.5 transition-all border ${
+                  isInWatchlist(String(movie.id))
+                    ? 'bg-[#E43D3D] text-white border-[#E43D3D]'
+                    : 'bg-transparent hover:bg-white/5 border-white/20 text-[#F2F0EC]'
+                }`}
+              >
+                <Bookmark className={`w-4 h-4 ${isInWatchlist(String(movie.id)) ? 'fill-white' : ''}`} />
+                <span>{isInWatchlist(String(movie.id)) ? 'IN WATCHLIST' : 'WATCHLIST'}</span>
+              </button>
 
               {movie.cast && movie.cast.length > 0 && (
                 <button

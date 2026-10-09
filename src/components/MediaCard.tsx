@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Play, Star, ArrowUpRight } from 'lucide-react';
+import { Play, Star, ArrowUpRight, Bookmark } from 'lucide-react';
 import { MediaItem } from '../types';
 import { useApp } from '../context/AppContext';
+import { useWatchlist } from '../context/WatchlistContext';
 import { getImageWithFallback } from '../utils/image';
 
 interface MediaCardProps {
@@ -17,6 +18,8 @@ export const MediaCard: React.FC<MediaCardProps> = ({
   aspectRatio
 }) => {
   const { openTrailer } = useApp();
+  const { isInWatchlist, toggleWatchlist } = useWatchlist();
+  const isSaved = isInWatchlist(String(item.id));
   const detailPath = item.type === 'movie' ? `/movie/${item.id}` : `/tv/${item.id}`;
   const effectiveRatio = aspectRatio || (variant === 'horizontal' ? 'backdrop' : 'poster');
 
@@ -31,6 +34,12 @@ export const MediaCard: React.FC<MediaCardProps> = ({
     if (item.trailerUrl) {
       openTrailer(item.trailerUrl, item.title);
     }
+  };
+
+  const handleWatchlistClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    toggleWatchlist(item);
   };
 
   const handleImageError = () => {
@@ -143,6 +152,21 @@ export const MediaCard: React.FC<MediaCardProps> = ({
             {item.type === 'movie' ? 'MOVIE' : 'TV'}
           </span>
         </div>
+
+        {/* Watchlist Toggle Action */}
+        <button
+          type="button"
+          onClick={handleWatchlistClick}
+          className={`absolute top-2 right-2 z-20 p-1.5 border border-white/10 transition-all ${
+            isSaved
+              ? 'bg-[#E43D3D] text-white opacity-100'
+              : 'bg-[#0B0B0D]/80 text-[#8E8E93] hover:text-white hover:bg-black opacity-0 group-hover:opacity-100 focus:opacity-100'
+          }`}
+          aria-label={isSaved ? `Remove ${item.title} from watchlist` : `Add ${item.title} to watchlist`}
+          title={isSaved ? 'In Watchlist' : 'Add to Watchlist'}
+        >
+          <Bookmark className={`w-3.5 h-3.5 ${isSaved ? 'fill-white' : ''}`} />
+        </button>
 
         {/* Optional Play Button Overlay */}
         {item.trailerUrl && (

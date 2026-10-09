@@ -18,9 +18,14 @@ export default {
           secondary: '#8E8E93',
           muted: '#626269',
         },
+        canvas: '#0B0B0D',
+        ink: '#F2F0EC',
+        muted: '#8E8E93',
+        line: 'rgba(255, 255, 255, 0.10)',
         accent: {
           DEFAULT: '#E43D3D',
           hover: '#F04545',
+          strong: '#F04545',
         },
         cinema: {
           black: '#0B0B0D',
@@ -35,12 +40,13 @@ export default {
         }
       },
       fontFamily: {
-        display: ['"DM Sans"', 'sans-serif'],
-        heading: ['"DM Sans"', 'sans-serif'],
-        serif: ['"DM Sans"', 'sans-serif'],
+        display: ['"Barlow Condensed"', '"DM Sans"', 'sans-serif'],
+        heading: ['"Barlow Condensed"', '"DM Sans"', 'sans-serif'],
+        condensed: ['"Barlow Condensed"', 'sans-serif'],
+        serif: ['"Barlow Condensed"', '"DM Sans"', 'sans-serif'],
         body: ['"Manrope"', 'sans-serif'],
         sans: ['"Manrope"', 'sans-serif'],
-        mono: ['"Manrope"', 'sans-serif'],
+        mono: ['"Manrope"', 'monospace'],
       },
       letterSpacing: {
         tighter: '-0.03em',

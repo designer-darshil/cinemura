@@ -135,7 +135,7 @@ export const WatchProvidersSection: React.FC<WatchProvidersSectionProps> = ({
 
       {/* Mandatory JustWatch Attribution per TMDb API terms */}
       <div className="pt-2 flex items-center justify-between text-[10px] font-mono text-[#8E8E93]/70">
-        <span>Streaming data powered by JustWatch</span>
+        <span>Watch availability data provided by JustWatch</span>
         {link && (
           <a
             href={link}

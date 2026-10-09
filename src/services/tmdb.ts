@@ -4,7 +4,7 @@ import { selectPrimaryVideo, getVideoEmbedUrl } from '../utils/trailer';
 
 const TMDB_BASE_URL = 'https://api.themoviedb.org/3';
 const API_KEY = import.meta.env.VITE_TMDB_API_KEY || '4e44d9029b1270a757cddc766a1bcb63';
-const ACCESS_TOKEN = import.meta.env.VITE_TMDB_ACCESS_TOKEN || '';
+const ACCESS_TOKEN = import.meta.env.VITE_TMDB_READ_ACCESS_TOKEN || import.meta.env.VITE_TMDB_ACCESS_TOKEN || '';
 
 export interface GenreItem {
   id: number;

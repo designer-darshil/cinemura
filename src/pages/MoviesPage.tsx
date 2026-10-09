@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
+import { Seo } from '../seo/Seo';
 import {
   getMovieCategory,
   getMovieDetail,
@@ -229,6 +230,10 @@ export const MoviesPage: React.FC = () => {
 
     return (
       <div className="min-h-screen bg-[#0B0B0D] text-[#F2F0EC] pt-24 pb-20 w-full px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 space-y-10">
+        <Seo
+          title={pageTitle}
+          description={`Browse ${pageTitle} on Cinemura. Powered by canonical TMDB data.`}
+        />
         {/* Top Back Nav & Heading */}
         <header className="border-b border-white/10 pb-6 space-y-4">
           <Link
@@ -306,6 +311,10 @@ export const MoviesPage: React.FC = () => {
      ==================================================== */
   return (
     <div className="min-h-screen bg-[#0B0B0D] text-[#F2F0EC] space-y-16 lg:space-y-20 pb-20 selection:bg-[#E43D3D] selection:text-white">
+      <Seo
+        title="Feature Films Discovery"
+        description="Explore popular, top-rated, upcoming, and now-playing movies from the global cinematic catalog."
+      />
       {/* 1. HERO BANNER */}
       {heroMovie && <HeroBanner item={heroMovie} badgeLabel="FEATURE FILM" />}
 

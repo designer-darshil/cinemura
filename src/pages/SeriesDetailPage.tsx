@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { Play, Star, ArrowLeft, Building2, Globe } from 'lucide-react';
+import { Play, Star, ArrowLeft, Building2, Globe, Bookmark } from 'lucide-react';
 import { getTvDetail } from '../services/tmdb';
 import { Series } from '../types';
 import { useApp } from '../context/AppContext';
+import { useWatchlist } from '../context/WatchlistContext';
+import { Seo } from '../seo/Seo';
 import { selectPrimaryVideo, sortVideosWithPrimaryFirst, getVideoButtonLabel } from '../utils/trailer';
 import { MediaCard, PersonCard } from '../components/MediaCard';
 import { SectionHeader } from '../components/SectionHeader';
@@ -22,6 +24,7 @@ export const SeriesDetailPage: React.FC = () => {
   const { id, slug } = useParams<{ id?: string; slug?: string }>();
   const seriesId = id || slug;
   const { openVideoPlayer, markAppReady } = useApp();
+  const { isInWatchlist, toggleWatchlist } = useWatchlist();
 
   const [series, setSeries] = useState<Series | null>(null);
   const [awards, setAwards] = useState<EntityAwardsData | null>(null);
@@ -131,6 +134,27 @@ export const SeriesDetailPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-[#0B0B0D] text-[#F2F0EC] pb-24 selection:bg-[#E43D3D] selection:text-white">
       
+      <Seo
+        title={series.title}
+        description={series.synopsis || `Explore ${series.title} on Cinemura.`}
+        image={series.backdrop || series.poster}
+        type="video.tv_show"
+        structuredData={{
+          '@context': 'https://schema.org',
+          '@type': 'TVSeries',
+          name: series.title,
+          image: series.poster || series.backdrop,
+          startDate: series.firstAirDate,
+          aggregateRating: series.rating > 0 ? {
+            '@type': 'AggregateRating',
+            ratingValue: series.rating,
+            bestRating: '10',
+            ratingCount: series.voteCount || 1,
+          } : undefined,
+          description: series.synopsis,
+        }}
+      />
+
       {/* ==================================================
           1. TV SERIES HERO — INFORMATION-DENSE IMMERSIVE COVER
          ================================================== */}
@@ -243,6 +267,20 @@ export const SeriesDetailPage: React.FC = () => {
                   <span>{primaryVideoLabel}</span>
                 </button>
               )}
+
+              {/* Watchlist Toggle */}
+              <button
+                type="button"
+                onClick={() => toggleWatchlist(series)}
+                className={`px-6 py-3.5 text-xs font-mono font-bold tracking-widest uppercase flex items-center gap-2.5 transition-all border ${
+                  isInWatchlist(String(series.id))
+                    ? 'bg-[#E43D3D] text-white border-[#E43D3D]'
+                    : 'bg-transparent hover:bg-white/5 border-white/20 text-[#F2F0EC]'
+                }`}
+              >
+                <Bookmark className={`w-4 h-4 ${isInWatchlist(String(series.id)) ? 'fill-white' : ''}`} />
+                <span>{isInWatchlist(String(series.id)) ? 'IN WATCHLIST' : 'WATCHLIST'}</span>
+              </button>
 
               {series.seasons && series.seasons.length > 0 && (
                 <button

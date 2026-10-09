@@ -12,6 +12,7 @@ import {
 } from '../components/StateViews';
 import { useInfiniteScroll } from '../hooks/useInfiniteScroll';
 import { useApp } from '../context/AppContext';
+import { Seo } from '../seo/Seo';
 
 export const PeoplePage: React.FC = () => {
   const { markAppReady } = useApp();
@@ -102,6 +103,10 @@ export const PeoplePage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-[#0B0B0D] text-[#F2F0EC] pt-24 pb-20 w-full px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 space-y-10 selection:bg-[#E43D3D] selection:text-white">
+      <Seo
+        title="Cast & Directors Directory"
+        description="Explore popular actors, directors, screenwriters, and creators from the global TMDB database."
+      />
       {/* 1. EDITORIAL HEADER */}
       <header className="border-b border-white/10 pb-6 space-y-3">
         <div className="flex flex-wrap items-baseline justify-between gap-4">

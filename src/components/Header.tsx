@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Search, User, Menu, X, ArrowRight } from 'lucide-react';
+import { Search, Menu, X, ArrowRight } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 
 export const Header: React.FC = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const { openSearch, openProfile, watchlist } = useApp();
+  const { openSearch, watchlist } = useApp();
   const location = useLocation();
 
   useEffect(() => {

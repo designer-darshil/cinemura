@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { Play, Star, ArrowLeft, Globe, Bookmark } from 'lucide-react';
+import { Play, ArrowLeft, ArrowRight, Globe, Bookmark } from 'lucide-react';
 import { getMovieDetail, formatCurrency } from '../services/tmdb';
 import { Movie } from '../types';
 import { useApp } from '../context/AppContext';
@@ -132,143 +132,214 @@ export const MovieDetailPage: React.FC = () => {
     <div className="min-h-screen bg-[#0B0B0D] text-[#F2F0EC] pb-24 selection:bg-[#E43D3D] selection:text-white">
       
       {/* ==================================================
-          1. HERO CONCEPT — IMMERSIVE MAGAZINE COVER (MOBILE-OPTIMIZED)
+          1. REDESIGNED EDITORIAL CINEMATIC HERO
          ================================================== */}
-      <section className="relative min-h-[56vh] sm:min-h-[68vh] lg:min-h-[90vh] flex flex-col justify-between pt-20 sm:pt-24 pb-8 sm:pb-12 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 w-full overflow-hidden">
-        
-        {/* Dominant Backdrop Visual Field */}
-        <div className="absolute inset-0 z-0">
-          <img
-            src={movie.backdrop}
-            alt={movie.title}
-            className="w-full h-full object-cover filter brightness-60 contrast-110 scale-105 transition-transform duration-1000 ease-out"
-          />
-          {/* Gradient Vignette & Tint */}
-          <div className="absolute inset-0 bg-gradient-to-t md:bg-gradient-to-r from-[#0B0B0D]/50 via-[#0B0B0D]/50 to-transparent" />
-          <div className="absolute inset-0 film-grain pointer-events-none opacity-40" />
+      <section className="relative w-full min-h-[82vh] lg:min-h-[90vh] flex flex-col justify-between pt-6 sm:pt-8 pb-10 sm:pb-14 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 overflow-hidden bg-[#0B0B0D]">
+        {/* Large Cinematic Backdrop Canvas */}
+        <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
+          {movie.backdrop ? (
+            <img
+              src={movie.backdrop}
+              alt={movie.title}
+              className="w-full h-full object-cover object-[60%_35%] filter grayscale contrast-125 opacity-35 sm:opacity-50 lg:opacity-70 scale-100 transition-transform duration-1000 ease-out"
+            />
+          ) : (
+            <div className="w-full h-full bg-[#111114]" />
+          )}
+          {/* Filmic Multi-Directional Gradients */}
+          <div className="absolute inset-0 bg-gradient-to-r from-[#0B0B0D] via-[#0B0B0D]/85 via-45% to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#0B0B0D] via-[#0B0B0D]/60 via-20% to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-b from-[#0B0B0D]/90 via-transparent to-transparent h-24" />
+          <div className="absolute inset-0 film-grain pointer-events-none opacity-30" />
         </div>
 
-        {/* Top Header / Breadcrumb Row */}
-        <div className="relative z-10 flex items-center justify-between border-b border-white/10 pb-4">
-          <Link
-            to="/movie"
-            className="group flex items-center gap-2 text-xs font-mono tracking-wider text-[#8E8E93] hover:text-[#E43D3D] transition-colors"
-          >
-            <ArrowLeft className="w-3.5 h-3.5 transition-transform group-hover:-translate-x-1" />
-            <span>MOVIES</span>
-          </Link>
+        {/* Thin Structural Grid Lines (Asymmetric Architectural Grid) */}
+        <div className="absolute top-[46%] left-0 right-0 h-[1px] bg-white/[0.08] pointer-events-none hidden lg:block" />
+        <div className="absolute top-0 bottom-0 right-[22%] xl:right-[18%] w-[1px] bg-white/[0.08] pointer-events-none hidden lg:block" />
 
+        {/* Top Kicker Row with Red Line Accent */}
+        <div className="relative z-10 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            {movie.certification && (
-              <span className="text-[10px] font-mono tracking-widest px-2 py-0.5 border border-white/20 text-[#F2F0EC] uppercase">
-                {movie.certification}
-              </span>
-            )}
-            <span className="text-[10px] font-mono tracking-[0.2em] text-[#8E8E93] uppercase">
-              {movie.status || 'RELEASED'}
+            <span className="w-6 h-[2px] bg-[#E43D3D] inline-block" />
+            <span className="text-[10px] sm:text-xs font-mono font-medium tracking-[0.25em] text-[#8E8E93] uppercase">
+              THE ART OF CINEMA
             </span>
+          </div>
+
+          <Link
+            to="/movies"
+            className="group flex items-center gap-1.5 text-[10px] sm:text-xs font-mono tracking-wider text-[#8E8E93] hover:text-[#E43D3D] transition-colors uppercase"
+          >
+            <span>MOVIES DIRECTORY</span>
+            <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-1" />
+          </Link>
+        </div>
+
+        {/* Mid Row: Minimal Editorial Micro-Columns + Asymmetric Metric Block */}
+        <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 my-auto pt-8 pb-4 items-start">
+          {/* Left Columns */}
+          <div className="lg:col-span-8 xl:col-span-9 flex flex-wrap gap-8 sm:gap-14">
+            {/* Column 1: DIRECTED BY */}
+            {movie.director && movie.director !== 'N/A' && (
+              <div className="space-y-1.5 min-w-[140px] max-w-[200px]">
+                <div className="text-[10px] font-mono tracking-[0.2em] uppercase text-[#8E8E93]">
+                  DIRECTED BY
+                </div>
+                <p className="text-xs sm:text-sm font-sans text-[#F2F0EC] truncate">
+                  {movie.director}
+                </p>
+                {movie.runtime && movie.runtime !== 'N/A' && (
+                  <p className="text-[11px] font-mono text-[#8E8E93]">{movie.runtime}</p>
+                )}
+                <div className="w-5 h-[2px] bg-[#E43D3D] mt-2.5" />
+              </div>
+            )}
+
+            {/* Column 2: RELEASE */}
+            <div className="space-y-1.5 min-w-[140px]">
+              <div className="text-[10px] font-mono tracking-[0.2em] uppercase text-[#8E8E93]">
+                RELEASE
+              </div>
+              <p className="text-xs sm:text-sm font-sans text-[#F2F0EC]">
+                {movie.year || 'Unknown'}
+              </p>
+              {movie.certification && (
+                <p className="text-[11px] font-mono text-[#8E8E93] uppercase">
+                  CERT. {movie.certification}
+                </p>
+              )}
+              <div className="w-5 h-[2px] bg-[#E43D3D] mt-2.5" />
+            </div>
+
+            {/* Column 3: GENRES */}
+            {movie.genres && movie.genres.length > 0 && (
+              <div className="space-y-1.5 min-w-[140px] max-w-[220px] hidden sm:block">
+                <div className="text-[10px] font-mono tracking-[0.2em] uppercase text-[#8E8E93]">
+                  GENRES
+                </div>
+                <p className="text-xs sm:text-sm font-sans text-[#F2F0EC] truncate">
+                  {movie.genres.slice(0, 2).join(' • ')}
+                </p>
+                {movie.tagline && (
+                  <p className="text-[11px] font-serif italic text-[#8E8E93] truncate">
+                    "{movie.tagline}"
+                  </p>
+                )}
+                <div className="w-5 h-[2px] bg-[#E43D3D] mt-2.5" />
+              </div>
+            )}
+          </div>
+
+          {/* Right Asymmetric Metric Block */}
+          <div className="lg:col-span-4 xl:col-span-3 lg:pl-8 space-y-1.5">
+            <div className="text-[10px] font-mono tracking-[0.2em] uppercase text-[#8E8E93]">
+              SCORE
+            </div>
+            <div className="flex items-baseline gap-2">
+              <span className="text-4xl sm:text-5xl font-display font-light text-white tracking-tight">
+                {typeof movie.rating === 'number' && movie.rating > 0 ? movie.rating.toFixed(1) : '—'}
+              </span>
+              {movie.voteCount > 0 && (
+                <span className="text-xs font-mono text-[#8E8E93]">
+                  ({movie.voteCount.toLocaleString()} votes)
+                </span>
+              )}
+            </div>
+            <div className="w-6 h-[2px] bg-[#E43D3D] mt-2.5" />
           </div>
         </div>
 
-        {/* Hero Bottom Canvas: Title & High-Level Metadata */}
-        <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 items-end pt-12 sm:pt-20">
-          
-          <div className="lg:col-span-9 space-y-4 sm:space-y-5">
-            
-            {/* Tagline or Editorial Kicker */}
-            {movie.tagline && (
-              <p className="text-xs sm:text-sm font-mono tracking-[0.25em] text-[#E43D3D] uppercase font-bold">
-                "{movie.tagline}"
-              </p>
-            )}
-
-            {/* Movie Title */}
-            <h1 className="text-3xl sm:text-5xl lg:text-7xl font-display font-bold text-[#F2F0EC] tracking-tight uppercase leading-none">
+        {/* Bottom Row: Oversized Title, Actions & Thumbnail Card */}
+        <div className="relative z-10 flex flex-col lg:flex-row lg:items-end justify-between gap-6 pt-4">
+          {/* Oversized Title & Navigation Actions */}
+          <div className="space-y-4 max-w-4xl">
+            <h1 className="text-5xl sm:text-7xl md:text-8xl lg:text-9xl font-display font-bold text-[#F2F0EC] tracking-tight leading-[0.88] uppercase">
               {movie.title}
             </h1>
 
-            {/* Fast-Scannable Spec Row */}
-            <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 text-xs sm:text-sm font-mono text-[#8E8E93]">
-              <span className="flex items-center gap-1.5 text-white font-bold">
-                <Star className="w-4 h-4 fill-[#E43D3D] text-[#E43D3D]" />
-                {movie.rating.toFixed(1)}
-                <span className="text-[#8E8E93] font-normal text-[11px]">({movie.voteCount.toLocaleString()} votes)</span>
-              </span>
-              <span>•</span>
-              <span className="text-[#F2F0EC]">{movie.year}</span>
-              <span>•</span>
-              <span className="text-[#F2F0EC]">{movie.runtime}</span>
-              <span>•</span>
-              <span className="text-[#F2F0EC] uppercase">{movie.genres.slice(0, 3).join(' / ')}</span>
-              {movie.director !== 'N/A' && (
-                <>
-                  <span>•</span>
-                  <span className="text-[#8E8E93]">DIR. <strong className="text-[#F2F0EC] font-normal">{movie.director}</strong></span>
-                </>
-              )}
-            </div>
-
-            {/* Short Overview Excerpt */}
-            {movie.synopsis && (
-              <p className="text-sm sm:text-base font-light text-[#F2F0EC]/85 max-w-3xl line-clamp-3 leading-relaxed">
-                {movie.synopsis}
-              </p>
-            )}
-
-            {/* Actions (Touch targets min 44px) */}
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4 pt-2">
+            {/* Restrained Navigation / Playback Controls */}
+            <div className="flex flex-wrap items-center gap-3 pt-2">
+              {/* Primary Watch Action */}
               {isMoviePlayable(movie) && (
                 <Link
                   to={`/watch/movie/${movie.id}`}
-                  className="bg-[#E43D3D] hover:bg-[#c02e2e] text-white min-h-[44px] px-7 py-3 text-xs font-mono font-bold tracking-widest uppercase flex items-center justify-center gap-3 transition-all shadow-lg w-full sm:w-auto"
+                  className="bg-[#E43D3D] hover:bg-[#c93535] text-white min-h-[44px] px-6 py-2.5 text-xs font-mono font-bold tracking-widest uppercase flex items-center justify-center gap-2.5 transition-all shadow-lg shadow-[#E43D3D]/30"
                 >
-                  <Play className="w-4 h-4 fill-white" />
+                  <Play className="w-3.5 h-3.5 fill-white" />
                   <span>WATCH MOVIE</span>
                 </Link>
               )}
 
+              {/* Watch Trailer CTA */}
               {primaryVideo && (
                 <button
                   type="button"
                   onClick={() => openVideoPlayer(playableVideos, 0, movie.title)}
-                  className={`${isMoviePlayable(movie) ? 'bg-transparent hover:bg-white/5 border border-white/20 text-[#F2F0EC]' : 'bg-[#E43D3D] hover:bg-[#c02e2e] text-white shadow-lg'} min-h-[44px] px-7 py-3 text-xs font-mono font-bold tracking-widest uppercase flex items-center justify-center gap-3 transition-all w-full sm:w-auto`}
+                  className="bg-[#0B0B0D]/50 hover:bg-white/10 border border-white/20 text-[#F2F0EC] min-h-[44px] px-5 py-2.5 text-xs font-mono font-bold tracking-widest uppercase flex items-center justify-center gap-2 transition-all backdrop-blur-sm"
                 >
-                  <Play className={`w-4 h-4 ${isMoviePlayable(movie) ? 'text-[#E43D3D]' : 'fill-white'}`} />
+                  <Play className="w-3.5 h-3.5 text-[#E43D3D]" />
                   <span>{primaryVideoLabel}</span>
                 </button>
               )}
 
-              {/* Watchlist Toggle CTA */}
+              {/* Watchlist Toggle */}
               <button
                 type="button"
                 onClick={() => toggleWatchlist(movie)}
-                className={`min-h-[44px] px-6 py-3 text-xs font-mono font-bold tracking-widest uppercase flex items-center justify-center gap-2.5 transition-all border w-full sm:w-auto ${
+                aria-label={isSaved ? 'Remove from Watchlist' : 'Add to Watchlist'}
+                className={`w-11 h-11 rounded-full border flex items-center justify-center transition-all ${
                   isSaved
-                    ? 'bg-[#E43D3D] text-white border-[#E43D3D]'
-                    : 'bg-transparent hover:bg-white/5 border-white/20 text-[#F2F0EC]'
+                    ? 'bg-[#E43D3D] border-[#E43D3D] text-white'
+                    : 'border-white/20 hover:border-white/50 text-[#8E8E93] hover:text-white bg-[#0B0B0D]/50 backdrop-blur-sm'
                 }`}
               >
-                <Bookmark className={`w-3.5 h-3.5 ${isSaved ? 'fill-white' : ''}`} />
-                <span>{isSaved ? 'SAVED TO WATCHLIST' : 'ADD TO WATCHLIST'}</span>
+                <Bookmark className={`w-4 h-4 ${isSaved ? 'fill-white' : ''}`} />
               </button>
             </div>
-
           </div>
 
-          {/* Secondary Visual Anchor: Docked Poster Card */}
-          <div className="lg:col-span-3 hidden lg:block">
-            <div className="relative aspect-[2/3] max-w-[260px] ml-auto border border-white/10 bg-[#111114] overflow-hidden">
-              <img
-                src={movie.poster}
-                alt={movie.title}
-                className="w-full h-full object-cover"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-50" />
+          {/* Right Bottom Anchor: Poster Artwork Thumbnail & Numeric Index */}
+          <div className="flex items-end gap-5 lg:ml-auto">
+            {/* Small Artwork Thumbnail */}
+            <div className="relative w-20 h-28 sm:w-24 sm:h-32 border border-white/15 bg-[#111114] shadow-2xl overflow-hidden flex-shrink-0 group">
+              {movie.poster ? (
+                <img
+                  src={movie.poster}
+                  alt={movie.title}
+                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center text-[10px] font-mono text-[#8E8E93]">
+                  POSTER
+                </div>
+              )}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none" />
+            </div>
+
+            {/* Pagination / Year / Navigation Arrows */}
+            <div className="space-y-2">
+              <div className="text-[11px] font-mono tracking-widest text-[#8E8E93]">
+                {movie.year ? `FILM / ${movie.year}` : '01 / 01'}
+              </div>
+              <div className="flex items-center gap-2">
+                <Link
+                  to="/movies"
+                  title="Back to Movies"
+                  className="w-8 h-8 rounded-full border border-white/20 hover:border-white/50 flex items-center justify-center text-[#8E8E93] hover:text-white transition-all bg-[#0B0B0D]/50"
+                >
+                  <ArrowLeft className="w-3.5 h-3.5" />
+                </Link>
+                <a
+                  href="#overview-section"
+                  title="Overview"
+                  className="w-8 h-8 rounded-full border border-white/20 hover:border-white/50 flex items-center justify-center text-[#8E8E93] hover:text-white transition-all bg-[#0B0B0D]/50"
+                >
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </a>
+              </div>
             </div>
           </div>
-
         </div>
-
       </section>
 
       {/* ==================================================

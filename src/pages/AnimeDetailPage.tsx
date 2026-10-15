@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { ArrowLeft, Star, Bookmark, Award, ExternalLink } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Bookmark, ExternalLink } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { AnimeItem } from '../types/anime';
 import { getAnimeById, getAnimeList } from '../services/animeDb';
@@ -128,114 +128,132 @@ export const AnimeDetailPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-[#0B0B0D] text-[#F2F0EC] pb-24 selection:bg-[#E43D3D] selection:text-white">
       {/* ==================================================
-          1. HERO SECTION — MATCHING MOVIE & TV DETAIL DESIGN
+          1. HERO SECTION — ARCHITECTURAL EDITORIAL ANIME
          ================================================== */}
-      <section className="relative w-full min-h-[70vh] sm:min-h-[78vh] lg:min-h-[85vh] flex flex-col justify-between pt-24 pb-12 sm:pb-16 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 overflow-hidden">
-        {/* Ambient Backdrop Canvas */}
-        <div className="absolute inset-0 z-0">
+      <section className="relative w-full min-h-[82vh] lg:min-h-[90vh] flex flex-col justify-between pt-6 sm:pt-8 pb-10 sm:pb-14 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 overflow-hidden bg-[#0B0B0D]">
+        {/* Large Dominant Artwork Canvas */}
+        <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
           {heroArtwork ? (
             <img
               src={heroArtwork}
               alt={anime.title}
-              className="w-full h-full object-cover filter brightness-50 contrast-110 scale-105 transition-transform duration-1000 ease-out"
+              className="w-full h-full object-cover object-[60%_30%] filter grayscale contrast-125 opacity-35 sm:opacity-50 lg:opacity-70 scale-100 transition-transform duration-1000 ease-out"
             />
           ) : (
             <div className="w-full h-full bg-[#111114]" />
           )}
-          {/* Gradient Vignette & Tint matching Movie/TV heroes */}
-          <div className="absolute inset-0 bg-gradient-to-t md:bg-gradient-to-r from-[#0B0B0D] via-[#0B0B0D]/85 to-transparent" />
-          <div className="absolute inset-0 film-grain pointer-events-none opacity-40" />
+          {/* Filmic Multi-Directional Gradients */}
+          <div className="absolute inset-0 bg-gradient-to-r from-[#0B0B0D] via-[#0B0B0D]/85 via-45% to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#0B0B0D] via-[#0B0B0D]/60 via-20% to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-b from-[#0B0B0D]/90 via-transparent to-transparent h-24" />
+          <div className="absolute inset-0 film-grain pointer-events-none opacity-30" />
         </div>
 
-        {/* Top Header / Breadcrumb Row */}
-        <div className="relative z-10 flex items-center justify-between border-b border-white/10 pb-4">
+        {/* Thin Structural Grid Lines (Asymmetric Architectural Grid) */}
+        <div className="absolute top-[46%] left-0 right-0 h-[1px] bg-white/[0.08] pointer-events-none hidden lg:block" />
+        <div className="absolute top-0 bottom-0 right-[22%] xl:right-[18%] w-[1px] bg-white/[0.08] pointer-events-none hidden lg:block" />
+
+        {/* Top Kicker Row with Red Line Accent */}
+        <div className="relative z-10 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <span className="w-6 h-[2px] bg-[#E43D3D] inline-block" />
+            <span className="text-[10px] sm:text-xs font-mono font-medium tracking-[0.25em] text-[#8E8E93] uppercase">
+              JAPANESE ANIMATION
+            </span>
+          </div>
+
           <Link
             to="/anime"
-            className="group flex items-center gap-2 text-xs font-mono tracking-wider text-[#8E8E93] hover:text-[#E43D3D] transition-colors"
+            className="group flex items-center gap-1.5 text-[10px] sm:text-xs font-mono tracking-wider text-[#8E8E93] hover:text-[#E43D3D] transition-colors uppercase"
           >
-            <ArrowLeft className="w-3.5 h-3.5 transition-transform group-hover:-translate-x-1" />
             <span>ANIME DIRECTORY</span>
+            <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-1" />
           </Link>
+        </div>
 
-          <div className="flex items-center gap-3">
-            {anime.type && (
-              <span className="text-[10px] font-mono tracking-widest px-2 py-0.5 border border-white/20 text-[#F2F0EC] uppercase">
-                {anime.type}
-              </span>
+        {/* Mid Row: Minimal Editorial Micro-Columns + Asymmetric Metric Block */}
+        <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 my-auto pt-8 pb-4 items-start">
+          {/* Left Columns */}
+          <div className="lg:col-span-8 xl:col-span-9 flex flex-wrap gap-8 sm:gap-14">
+            {/* Column 1: FORMAT */}
+            <div className="space-y-1.5 min-w-[140px] max-w-[200px]">
+              <div className="text-[10px] font-mono tracking-[0.2em] uppercase text-[#8E8E93]">
+                FORMAT
+              </div>
+              <p className="text-xs sm:text-sm font-sans text-[#F2F0EC] uppercase">
+                {anime.type || 'TV Series'}
+              </p>
+              {typeof anime.episodes === 'number' && anime.episodes > 0 && (
+                <p className="text-[11px] font-mono text-[#8E8E93]">{anime.episodes} Episodes</p>
+              )}
+              <div className="w-5 h-[2px] bg-[#E43D3D] mt-2.5" />
+            </div>
+
+            {/* Column 2: STATUS */}
+            <div className="space-y-1.5 min-w-[140px]">
+              <div className="text-[10px] font-mono tracking-[0.2em] uppercase text-[#8E8E93]">
+                STATUS
+              </div>
+              <p className="text-xs sm:text-sm font-sans text-[#F2F0EC] uppercase">
+                {anime.status || 'Finished'}
+              </p>
+              {typeof anime.rank === 'number' && anime.rank > 0 && (
+                <p className="text-[11px] font-mono text-[#8E8E93]">Rank #{anime.rank}</p>
+              )}
+              <div className="w-5 h-[2px] bg-[#E43D3D] mt-2.5" />
+            </div>
+
+            {/* Column 3: GENRES */}
+            {anime.genres && anime.genres.length > 0 && (
+              <div className="space-y-1.5 min-w-[140px] max-w-[220px] hidden sm:block">
+                <div className="text-[10px] font-mono tracking-[0.2em] uppercase text-[#8E8E93]">
+                  GENRES
+                </div>
+                <p className="text-xs sm:text-sm font-sans text-[#F2F0EC] truncate uppercase">
+                  {anime.genres.slice(0, 2).join(' • ')}
+                </p>
+                {anime.synopsis && (
+                  <p className="text-[11px] font-sans text-[#8E8E93] line-clamp-1">
+                    {anime.synopsis}
+                  </p>
+                )}
+                <div className="w-5 h-[2px] bg-[#E43D3D] mt-2.5" />
+              </div>
             )}
-            {anime.status && (
-              <span className="text-[10px] font-mono tracking-[0.2em] text-[#8E8E93] uppercase">
-                {anime.status}
+          </div>
+
+          {/* Right Asymmetric Metric Block */}
+          <div className="lg:col-span-4 xl:col-span-3 lg:pl-8 space-y-1.5">
+            <div className="text-[10px] font-mono tracking-[0.2em] uppercase text-[#8E8E93]">
+              TOP RANK
+            </div>
+            <div className="flex items-baseline gap-2">
+              <span className="text-4xl sm:text-5xl font-display font-light text-white tracking-tight">
+                {typeof anime.rank === 'number' && anime.rank > 0 ? `#${anime.rank}` : '—'}
               </span>
-            )}
+            </div>
+            <div className="w-6 h-[2px] bg-[#E43D3D] mt-2.5" />
           </div>
         </div>
 
-        {/* Hero Bottom Canvas: Title & High-Level Metadata */}
-        <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 items-end pt-12 sm:pt-20">
-          <div className="lg:col-span-9 space-y-4 sm:space-y-5">
-            {/* Rank Kicker if available */}
-            {typeof anime.rank === 'number' && anime.rank > 0 && (
-              <div className="flex items-center gap-2">
-                <Award className="w-3.5 h-3.5 text-[#E43D3D]" />
-                <span className="text-xs sm:text-sm font-mono tracking-[0.25em] text-[#E43D3D] uppercase font-bold">
-                  TOP RANKED #{anime.rank}
-                </span>
-              </div>
-            )}
-
-            {/* Anime Title */}
-            <h1 className="text-3xl sm:text-5xl lg:text-7xl font-display font-bold text-[#F2F0EC] tracking-tight uppercase leading-none">
+        {/* Bottom Row: Oversized Title, Actions & Thumbnail Card */}
+        <div className="relative z-10 flex flex-col lg:flex-row lg:items-end justify-between gap-6 pt-4">
+          {/* Oversized Title & Navigation Actions */}
+          <div className="space-y-4 max-w-4xl">
+            <h1 className="text-5xl sm:text-7xl md:text-8xl lg:text-9xl font-display font-bold text-[#F2F0EC] tracking-tight leading-[0.88] uppercase">
               {anime.title}
             </h1>
 
-            {/* Fast-Scannable Spec Row */}
-            <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 text-xs sm:text-sm font-mono text-[#8E8E93]">
-              {typeof anime.rank === 'number' && anime.rank > 0 && (
-                <>
-                  <span className="flex items-center gap-1.5 text-white font-bold">
-                    <Star className="w-4 h-4 fill-[#E43D3D] text-[#E43D3D]" />
-                    <span>#{anime.rank}</span>
-                  </span>
-                  <span>•</span>
-                </>
-              )}
-              {anime.type && (
-                <>
-                  <span className="text-[#F2F0EC] uppercase">{anime.type}</span>
-                  <span>•</span>
-                </>
-              )}
-              {typeof anime.episodes === 'number' && anime.episodes > 0 && (
-                <>
-                  <span className="text-[#F2F0EC]">{anime.episodes} EPISODES</span>
-                  <span>•</span>
-                </>
-              )}
-              {anime.genres && anime.genres.length > 0 && (
-                <span className="text-[#F2F0EC] uppercase">
-                  {anime.genres.slice(0, 3).join(' / ')}
-                </span>
-              )}
-            </div>
-
-            {/* Short Overview Excerpt */}
-            {anime.synopsis && (
-              <p className="text-sm sm:text-base font-light text-[#F2F0EC]/85 max-w-3xl line-clamp-3 leading-relaxed">
-                {anime.synopsis}
-              </p>
-            )}
-
-            {/* Actions (Touch targets min 44px) */}
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4 pt-2">
+            {/* Restrained Navigation / Playback Controls */}
+            <div className="flex flex-wrap items-center gap-3 pt-2">
               {/* Watchlist Toggle CTA */}
               <button
                 type="button"
                 onClick={handleToggleWatchlist}
-                className={`min-h-[44px] px-6 py-3 text-xs font-mono font-bold tracking-widest uppercase flex items-center justify-center gap-2.5 transition-all border w-full sm:w-auto ${
+                className={`min-h-[44px] px-6 py-2.5 text-xs font-mono font-bold tracking-widest uppercase flex items-center justify-center gap-2.5 transition-all shadow-lg ${
                   isSaved
-                    ? 'bg-[#E43D3D] text-white border-[#E43D3D]'
-                    : 'bg-transparent hover:bg-white/5 border-white/20 text-[#F2F0EC]'
+                    ? 'bg-[#E43D3D] text-white shadow-[#E43D3D]/30'
+                    : 'bg-[#0B0B0D]/50 hover:bg-white/10 border border-white/20 text-[#F2F0EC] backdrop-blur-sm'
                 }`}
               >
                 <Bookmark className={`w-3.5 h-3.5 ${isSaved ? 'fill-white' : ''}`} />
@@ -248,7 +266,7 @@ export const AnimeDetailPage: React.FC = () => {
                   href={anime.link}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="bg-transparent hover:bg-white/5 border border-white/20 text-[#F2F0EC] min-h-[44px] px-6 py-3 text-xs font-mono font-bold tracking-widest uppercase flex items-center justify-center gap-2 transition-all w-full sm:w-auto"
+                  className="bg-[#0B0B0D]/50 hover:bg-white/10 border border-white/20 text-[#F2F0EC] min-h-[44px] px-5 py-2.5 text-xs font-mono font-bold tracking-widest uppercase flex items-center justify-center gap-2 transition-all backdrop-blur-sm"
                 >
                   <ExternalLink className="w-3.5 h-3.5 text-[#E43D3D]" />
                   <span>VIEW SOURCE</span>
@@ -257,21 +275,45 @@ export const AnimeDetailPage: React.FC = () => {
             </div>
           </div>
 
-          {/* Secondary Visual Anchor: Docked Poster Card (matching MovieDetailPage) */}
-          <div className="lg:col-span-3 hidden lg:block">
-            <div className="relative aspect-[2/3] max-w-[260px] ml-auto border border-white/10 bg-[#111114] overflow-hidden">
+          {/* Right Bottom Anchor: Artwork Thumbnail & Numeric Index */}
+          <div className="flex items-end gap-5 lg:ml-auto">
+            {/* Small Artwork Thumbnail */}
+            <div className="relative w-20 h-28 sm:w-24 sm:h-32 border border-white/15 bg-[#111114] shadow-2xl overflow-hidden flex-shrink-0 group">
               {heroArtwork ? (
                 <img
                   src={heroArtwork}
                   alt={anime.title}
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                 />
               ) : (
-                <div className="w-full h-full flex items-center justify-center text-xs font-mono text-[#8E8E93]">
-                  NO POSTER
+                <div className="w-full h-full flex items-center justify-center text-[10px] font-mono text-[#8E8E93]">
+                  POSTER
                 </div>
               )}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-50 pointer-events-none" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none" />
+            </div>
+
+            {/* Pagination / Index / Navigation Arrows */}
+            <div className="space-y-2">
+              <div className="text-[11px] font-mono tracking-widest text-[#8E8E93]">
+                {anime.episodes ? `EP / ${anime.episodes}` : '01 / 01'}
+              </div>
+              <div className="flex items-center gap-2">
+                <Link
+                  to="/anime"
+                  title="Back to Anime"
+                  className="w-8 h-8 rounded-full border border-white/20 hover:border-white/50 flex items-center justify-center text-[#8E8E93] hover:text-white transition-all bg-[#0B0B0D]/50"
+                >
+                  <ArrowLeft className="w-3.5 h-3.5" />
+                </Link>
+                <a
+                  href="#overview-section"
+                  title="Overview"
+                  className="w-8 h-8 rounded-full border border-white/20 hover:border-white/50 flex items-center justify-center text-[#8E8E93] hover:text-white transition-all bg-[#0B0B0D]/50"
+                >
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </a>
+              </div>
             </div>
           </div>
         </div>

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { Play, Star, ArrowLeft, Building2, Globe, Bookmark } from 'lucide-react';
+import { Play, ArrowLeft, ArrowRight, Building2, Globe, Bookmark } from 'lucide-react';
 import { getTvDetail } from '../services/tmdb';
 import { Series } from '../types';
 import { useApp } from '../context/AppContext';
@@ -134,165 +134,226 @@ export const SeriesDetailPage: React.FC = () => {
     <div className="min-h-screen bg-[#0B0B0D] text-[#F2F0EC] pb-24 selection:bg-[#E43D3D] selection:text-white">
       
       {/* ==================================================
-          1. TV SERIES HERO — INFORMATION-DENSE IMMERSIVE COVER
+          1. REDESIGNED EDITORIAL TV SERIES HERO
          ================================================== */}
-      <section className="relative min-h-[58vh] sm:min-h-[70vh] lg:min-h-[85vh] flex flex-col justify-between pt-20 sm:pt-24 pb-10 sm:pb-12 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 w-full overflow-hidden">
-        
-        {/* Backdrop Background Field */}
-        <div className="absolute inset-0 z-0">
-          <img
-            src={series.backdrop}
-            alt={series.title}
-            className="w-full h-full object-cover filter brightness-50 contrast-110 scale-105 transition-transform duration-1000"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t md:bg-gradient-to-r from-[#0B0B0D]/50 via-[#0B0B0D]/50 to-transparent" />
-          <div className="absolute inset-0 film-grain pointer-events-none opacity-40" />
+      <section className="relative w-full min-h-[82vh] lg:min-h-[90vh] flex flex-col justify-between pt-6 sm:pt-8 pb-10 sm:pb-14 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 overflow-hidden bg-[#0B0B0D]">
+        {/* Large Cinematic Backdrop Canvas */}
+        <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
+          {series.backdrop ? (
+            <img
+              src={series.backdrop}
+              alt={series.title}
+              className="w-full h-full object-cover object-[60%_35%] filter grayscale contrast-125 opacity-35 sm:opacity-50 lg:opacity-70 scale-100 transition-transform duration-1000 ease-out"
+            />
+          ) : (
+            <div className="w-full h-full bg-[#111114]" />
+          )}
+          {/* Filmic Multi-Directional Gradients */}
+          <div className="absolute inset-0 bg-gradient-to-r from-[#0B0B0D] via-[#0B0B0D]/85 via-45% to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#0B0B0D] via-[#0B0B0D]/60 via-20% to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-b from-[#0B0B0D]/90 via-transparent to-transparent h-24" />
+          <div className="absolute inset-0 film-grain pointer-events-none opacity-30" />
         </div>
 
-        {/* Top Nav Row */}
-        <div className="relative z-10 w-full flex items-center justify-between border-b border-white/10 pb-4">
+        {/* Thin Structural Grid Lines (Asymmetric Architectural Grid) */}
+        <div className="absolute top-[46%] left-0 right-0 h-[1px] bg-white/[0.08] pointer-events-none hidden lg:block" />
+        <div className="absolute top-0 bottom-0 right-[22%] xl:right-[18%] w-[1px] bg-white/[0.08] pointer-events-none hidden lg:block" />
+
+        {/* Top Kicker Row with Red Line Accent */}
+        <div className="relative z-10 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <span className="w-6 h-[2px] bg-[#E43D3D] inline-block" />
+            <span className="text-[10px] sm:text-xs font-mono font-medium tracking-[0.25em] text-[#8E8E93] uppercase">
+              TELEVISION SERIES
+            </span>
+          </div>
+
           <Link
             to="/tv"
-            className="group flex items-center gap-2 text-xs font-mono tracking-wider text-[#8E8E93] hover:text-[#E43D3D] transition-colors"
+            className="group flex items-center gap-1.5 text-[10px] sm:text-xs font-mono tracking-wider text-[#8E8E93] hover:text-[#E43D3D] transition-colors uppercase"
           >
-            <ArrowLeft className="w-3.5 h-3.5 transition-transform group-hover:-translate-x-1" />
-            <span>TV SHOWS</span>
+            <span>TV SHOWS DIRECTORY</span>
+            <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-1" />
           </Link>
         </div>
 
-        {/* Hero Content */}
-        <div className="relative z-10 w-full grid grid-cols-1 lg:grid-cols-12 gap-8 items-end pt-8 sm:pt-10">
-          
-          <div className="lg:col-span-9 space-y-4 sm:space-y-6">
-            
-            {/* Editorial Type Label & Badges */}
-            <div className="flex flex-wrap items-center gap-2 sm:gap-3">
-              <span className="text-[10px] font-mono font-extrabold tracking-[0.2em] px-2.5 py-1 uppercase bg-[#E43D3D] text-white">
-                TV SERIES
-              </span>
-              {series.status && (
-                <span className="text-[10px] font-mono font-semibold tracking-widest px-2.5 py-1 bg-white/10 text-white border border-white/20 uppercase">
-                  {series.status}
-                </span>
+        {/* Mid Row: Minimal Editorial Micro-Columns + Asymmetric Metric Block */}
+        <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 my-auto pt-8 pb-4 items-start">
+          {/* Left Columns */}
+          <div className="lg:col-span-8 xl:col-span-9 flex flex-wrap gap-8 sm:gap-14">
+            {/* Column 1: SERIES SPECS */}
+            <div className="space-y-1.5 min-w-[140px] max-w-[200px]">
+              <div className="text-[10px] font-mono tracking-[0.2em] uppercase text-[#8E8E93]">
+                SERIES SPECS
+              </div>
+              <p className="text-xs sm:text-sm font-sans text-[#F2F0EC]">
+                {series.seasonsCount} {series.seasonsCount === 1 ? 'Season' : 'Seasons'}
+              </p>
+              {series.totalEpisodes > 0 && (
+                <p className="text-[11px] font-mono text-[#8E8E93]">{series.totalEpisodes} Episodes</p>
               )}
-              {series.certification && (
-                <span className="text-[10px] font-mono font-semibold tracking-widest px-2 py-0.5 border border-white/20 text-[#F2F0EC]">
-                  {series.certification}
-                </span>
-              )}
-              {series.rating > 0 && (
-                <div className="flex items-center gap-1.5 bg-black/60 backdrop-blur-md px-3 py-1 border border-white/10 text-xs font-mono text-[#F2F0EC]">
-                  <Star className="w-3.5 h-3.5 fill-[#E43D3D] text-[#E43D3D]" />
-                  <span className="font-bold text-white">{series.rating.toFixed(1)}</span>
-                  <span className="text-[#8E8E93] text-[10px]">/ 10</span>
-                </div>
-              )}
+              <div className="w-5 h-[2px] bg-[#E43D3D] mt-2.5" />
             </div>
 
-            {/* Tagline if available */}
-            {series.tagline && (
-              <p className="text-xs sm:text-sm font-mono tracking-[0.2em] text-[#E43D3D] uppercase font-bold">
-                "{series.tagline}"
+            {/* Column 2: STATUS & RATING */}
+            <div className="space-y-1.5 min-w-[140px]">
+              <div className="text-[10px] font-mono tracking-[0.2em] uppercase text-[#8E8E93]">
+                STATUS
+              </div>
+              <p className="text-xs sm:text-sm font-sans text-[#F2F0EC]">
+                {series.status || 'Active'}
               </p>
-            )}
+              <div className="flex items-center gap-2">
+                {series.year && (
+                  <span className="text-[11px] font-mono text-[#8E8E93]">{series.year}</span>
+                )}
+                {series.certification && (
+                  <span className="text-[10px] font-mono tracking-widest px-1 py-0.2 border border-white/20 text-[#8E8E93] uppercase">
+                    {series.certification}
+                  </span>
+                )}
+              </div>
+              <div className="w-5 h-[2px] bg-[#E43D3D] mt-2.5" />
+            </div>
 
-            {/* Title */}
-            <h1 className="text-3xl sm:text-5xl lg:text-7xl font-display font-bold text-[#F2F0EC] tracking-tight uppercase leading-none">
+            {/* Column 3: GENRES */}
+            {series.genres && series.genres.length > 0 && (
+              <div className="space-y-1.5 min-w-[140px] max-w-[220px] hidden sm:block">
+                <div className="text-[10px] font-mono tracking-[0.2em] uppercase text-[#8E8E93]">
+                  GENRES
+                </div>
+                <p className="text-xs sm:text-sm font-sans text-[#F2F0EC] truncate">
+                  {series.genres.slice(0, 2).join(' • ')}
+                </p>
+                {series.tagline && (
+                  <p className="text-[11px] font-serif italic text-[#8E8E93] truncate">
+                    "{series.tagline}"
+                  </p>
+                )}
+                <div className="w-5 h-[2px] bg-[#E43D3D] mt-2.5" />
+              </div>
+            )}
+          </div>
+
+          {/* Right Asymmetric Metric Block */}
+          <div className="lg:col-span-4 xl:col-span-3 lg:pl-8 space-y-1.5">
+            <div className="text-[10px] font-mono tracking-[0.2em] uppercase text-[#8E8E93]">
+              SEASONS
+            </div>
+            <div className="flex items-baseline gap-2">
+              <span className="text-4xl sm:text-5xl font-display font-light text-white tracking-tight">
+                {series.seasonsCount || 1}
+              </span>
+              {typeof series.rating === 'number' && series.rating > 0 && (
+                <span className="text-xs font-mono text-[#8E8E93]">
+                  (★ {series.rating.toFixed(1)})
+                </span>
+              )}
+            </div>
+            <div className="w-6 h-[2px] bg-[#E43D3D] mt-2.5" />
+          </div>
+        </div>
+
+        {/* Bottom Row: Oversized Title, Actions & Thumbnail Card */}
+        <div className="relative z-10 flex flex-col lg:flex-row lg:items-end justify-between gap-6 pt-4">
+          {/* Oversized Title & Navigation Actions */}
+          <div className="space-y-4 max-w-4xl">
+            <h1 className="text-5xl sm:text-7xl md:text-8xl lg:text-9xl font-display font-bold text-[#F2F0EC] tracking-tight leading-[0.88] uppercase">
               {series.title}
             </h1>
 
-            {/* Metadata Bar */}
-            <div className="flex flex-wrap items-center gap-x-4 sm:gap-x-5 gap-y-1.5 text-xs sm:text-sm font-mono text-[#8E8E93]">
-              <span className="text-[#F2F0EC] font-semibold">{series.year}</span>
-              {series.seasonsCount > 0 && (
-                <>
-                  <span>•</span>
-                  <span className="text-[#F2F0EC] font-semibold">{series.seasonsCount} {series.seasonsCount === 1 ? 'Season' : 'Seasons'}</span>
-                </>
-              )}
-              {series.totalEpisodes > 0 && (
-                <>
-                  <span>•</span>
-                  <span className="text-[#F2F0EC]">{series.totalEpisodes} Episodes</span>
-                </>
-              )}
-              {series.genres.length > 0 && (
-                <>
-                  <span>•</span>
-                  <span className="text-[#F2F0EC] uppercase">{series.genres.join(' / ')}</span>
-                </>
-              )}
-            </div>
-
-            {/* Overview Excerpt */}
-            {series.synopsis && (
-              <p className="text-sm sm:text-base font-light text-[#F2F0EC]/85 max-w-3xl line-clamp-3 leading-relaxed">
-                {series.synopsis}
-              </p>
-            )}
-
-            {/* Primary & Secondary Actions (Touch-friendly min 44px) */}
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4 pt-2">
+            {/* Restrained Navigation / Playback Controls */}
+            <div className="flex flex-wrap items-center gap-3 pt-2">
+              {/* Primary Watch Action */}
               <Link
                 to={`/watch/tv/${series.id}?s=1&e=1`}
-                className="bg-[#E43D3D] hover:bg-[#c02e2e] text-white min-h-[44px] px-7 py-3 text-xs font-mono font-bold tracking-widest uppercase flex items-center justify-center gap-3 transition-all shadow-lg w-full sm:w-auto"
+                className="bg-[#E43D3D] hover:bg-[#c93535] text-white min-h-[44px] px-6 py-2.5 text-xs font-mono font-bold tracking-widest uppercase flex items-center justify-center gap-2.5 transition-all shadow-lg shadow-[#E43D3D]/30"
               >
-                <Play className="w-4 h-4 fill-white" />
+                <Play className="w-3.5 h-3.5 fill-white" />
                 <span>WATCH S1 E1</span>
               </Link>
 
+              {/* Watch Trailer CTA */}
               {primaryVideo && (
                 <button
                   type="button"
                   onClick={() => openVideoPlayer(playableVideos, 0, series.title)}
-                  className="bg-transparent hover:bg-white/5 border border-white/20 text-[#F2F0EC] min-h-[44px] px-7 py-3 text-xs font-mono font-bold tracking-widest uppercase flex items-center justify-center gap-3 transition-all w-full sm:w-auto"
+                  className="bg-[#0B0B0D]/50 hover:bg-white/10 border border-white/20 text-[#F2F0EC] min-h-[44px] px-5 py-2.5 text-xs font-mono font-bold tracking-widest uppercase flex items-center justify-center gap-2 transition-all backdrop-blur-sm"
                 >
-                  <Play className="w-4 h-4 text-[#E43D3D]" />
+                  <Play className="w-3.5 h-3.5 text-[#E43D3D]" />
                   <span>{primaryVideoLabel}</span>
                 </button>
               )}
 
-              {/* Watchlist Toggle CTA */}
-              <button
-                type="button"
-                onClick={() => toggleWatchlist(series)}
-                className={`min-h-[44px] px-6 py-3 text-xs font-mono font-bold tracking-widest uppercase flex items-center justify-center gap-2.5 transition-all border w-full sm:w-auto ${
-                  isSaved
-                    ? 'bg-[#E43D3D] text-white border-[#E43D3D]'
-                    : 'bg-transparent hover:bg-white/5 border-white/20 text-[#F2F0EC]'
-                }`}
-              >
-                <Bookmark className={`w-3.5 h-3.5 ${isSaved ? 'fill-white' : ''}`} />
-                <span>{isSaved ? 'SAVED TO WATCHLIST' : 'ADD TO WATCHLIST'}</span>
-              </button>
-
+              {/* Episodes Anchor Button */}
               {series.seasons && series.seasons.length > 0 && (
                 <button
                   type="button"
                   onClick={() => document.getElementById('episodes-section')?.scrollIntoView({ behavior: 'smooth' })}
-                  className="bg-transparent hover:bg-white/5 border border-white/20 text-[#F2F0EC] min-h-[44px] px-6 py-3 text-xs font-mono font-bold tracking-widest uppercase flex items-center justify-center gap-2 transition-all w-full sm:w-auto"
+                  className="bg-[#0B0B0D]/50 hover:bg-white/10 border border-white/20 text-[#F2F0EC] min-h-[44px] px-5 py-2.5 text-xs font-mono font-bold tracking-widest uppercase flex items-center justify-center gap-2 transition-all backdrop-blur-sm"
                 >
-                  <span>VIEW EPISODES</span>
+                  <span>EPISODES</span>
                 </button>
               )}
-            </div>
 
+              {/* Watchlist Toggle */}
+              <button
+                type="button"
+                onClick={() => toggleWatchlist(series)}
+                aria-label={isSaved ? 'Remove from Watchlist' : 'Add to Watchlist'}
+                className={`w-11 h-11 rounded-full border flex items-center justify-center transition-all ${
+                  isSaved
+                    ? 'bg-[#E43D3D] border-[#E43D3D] text-white'
+                    : 'border-white/20 hover:border-white/50 text-[#8E8E93] hover:text-white bg-[#0B0B0D]/50 backdrop-blur-sm'
+                }`}
+              >
+                <Bookmark className={`w-4 h-4 ${isSaved ? 'fill-white' : ''}`} />
+              </button>
+            </div>
           </div>
 
-          {/* Right Poster Anchor */}
-          <div className="lg:col-span-3 hidden lg:block">
-            <div className="relative aspect-[2/3] max-w-[260px] ml-auto border border-white/10 bg-[#111114] overflow-hidden">
-              <img
-                src={series.poster}
-                alt={series.title}
-                className="w-full h-full object-cover"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-50" />
+          {/* Right Bottom Anchor: Poster Artwork Thumbnail & Numeric Index */}
+          <div className="flex items-end gap-5 lg:ml-auto">
+            {/* Small Artwork Thumbnail */}
+            <div className="relative w-20 h-28 sm:w-24 sm:h-32 border border-white/15 bg-[#111114] shadow-2xl overflow-hidden flex-shrink-0 group">
+              {series.poster ? (
+                <img
+                  src={series.poster}
+                  alt={series.title}
+                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center text-[10px] font-mono text-[#8E8E93]">
+                  POSTER
+                </div>
+              )}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none" />
+            </div>
+
+            {/* Pagination / Seasons / Navigation Arrows */}
+            <div className="space-y-2">
+              <div className="text-[11px] font-mono tracking-widest text-[#8E8E93]">
+                {series.seasonsCount ? `TV / 0${series.seasonsCount}` : '01 / 01'}
+              </div>
+              <div className="flex items-center gap-2">
+                <Link
+                  to="/tv"
+                  title="Back to TV Shows"
+                  className="w-8 h-8 rounded-full border border-white/20 hover:border-white/50 flex items-center justify-center text-[#8E8E93] hover:text-white transition-all bg-[#0B0B0D]/50"
+                >
+                  <ArrowLeft className="w-3.5 h-3.5" />
+                </Link>
+                <a
+                  href="#episodes-section"
+                  title="Episodes"
+                  className="w-8 h-8 rounded-full border border-white/20 hover:border-white/50 flex items-center justify-center text-[#8E8E93] hover:text-white transition-all bg-[#0B0B0D]/50"
+                >
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </a>
+              </div>
             </div>
           </div>
-
         </div>
-
       </section>
 
       {/* ==================================================

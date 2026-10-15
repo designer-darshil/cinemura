@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { Calendar, MapPin, ArrowLeft, ArrowUpRight, ExternalLink } from 'lucide-react';
+import { ArrowLeft, ArrowRight, ArrowUpRight, ExternalLink } from 'lucide-react';
 import { getPersonDetail } from '../services/tmdb';
 import { Person } from '../types';
 import { SectionHeader } from '../components/SectionHeader';
@@ -98,105 +98,218 @@ export const PersonDetailPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-[#0B0B0D] text-[#F2F0EC] pb-24 selection:bg-[#E43D3D] selection:text-white">
       
-      {/* Top Navigation Bar */}
-      <div className="pt-24 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 w-full">
-        <div className="flex items-center justify-between border-b border-white/10 pb-4">
-          <Link
-            to="/people"
-            className="group flex items-center gap-2 text-xs font-mono tracking-wider text-[#8E8E93] hover:text-[#E43D3D] transition-colors"
-          >
-            <ArrowLeft className="w-3.5 h-3.5 transition-transform group-hover:-translate-x-1" />
-            <span>PEOPLE DIRECTORY</span>
-          </Link>
-        </div>
-      </div>
-
       {/* ==================================================
-          1. HERO CONCEPT — PORTRAIT-DRIVEN CALM PROFILE
+          1. HERO SECTION — ARCHITECTURAL EDITORIAL PORTRAIT
          ================================================== */}
-      <section className="mt-8 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 w-full">
-        
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-14 items-center">
-          
-          {/* LEFT: Dominant Portrait Visual Anchor */}
-          <div className="lg:col-span-4 max-w-[220px] sm:max-w-xs lg:max-w-none mx-auto w-full">
-            <div className="relative aspect-[3/4] bg-black border border-white/10 overflow-hidden shadow-2xl">
-              <img
-                src={person.portrait}
-                alt={person.name}
-                className="w-full h-full object-cover transition-transform duration-700 hover:scale-105"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none" />
-              {person.role && (
-                <div className="absolute bottom-3 left-3">
-                  <span className="text-[10px] font-mono font-bold tracking-wider px-2 py-0.5 uppercase bg-white/10 backdrop-blur-sm text-white border border-white/10">
-                    {person.role}
-                  </span>
-                </div>
-              )}
-            </div>
+      <section className="relative w-full min-h-[82vh] lg:min-h-[90vh] flex flex-col justify-between pt-6 sm:pt-8 pb-10 sm:pb-14 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 overflow-hidden bg-[#0B0B0D]">
+        {/* Large Dominant Portrait Canvas */}
+        <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
+          {person.portrait ? (
+            <img
+              src={person.portrait}
+              alt={person.name}
+              className="w-full h-full object-cover object-[65%_25%] sm:object-[70%_25%] filter grayscale contrast-125 opacity-35 sm:opacity-50 lg:opacity-75 scale-100 transition-transform duration-1000 ease-out"
+            />
+          ) : (
+            <div className="w-full h-full bg-[#111114]" />
+          )}
+          {/* Filmic Multi-Directional Gradients for Contrast & Integration */}
+          <div className="absolute inset-0 bg-gradient-to-r from-[#0B0B0D] via-[#0B0B0D]/85 via-45% to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#0B0B0D] via-[#0B0B0D]/60 via-20% to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-b from-[#0B0B0D]/90 via-transparent to-transparent h-24" />
+          <div className="absolute inset-0 film-grain pointer-events-none opacity-30" />
+        </div>
+
+        {/* Thin Structural Grid Lines (Asymmetric Architectural Grid) */}
+        <div className="absolute top-[46%] left-0 right-0 h-[1px] bg-white/[0.08] pointer-events-none hidden lg:block" />
+        <div className="absolute top-0 bottom-0 right-[22%] xl:right-[18%] w-[1px] bg-white/[0.08] pointer-events-none hidden lg:block" />
+
+        {/* Top Kicker Row with Red Line Accent */}
+        <div className="relative z-10 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <span className="w-6 h-[2px] bg-[#E43D3D] inline-block" />
+            <span className="text-[10px] sm:text-xs font-mono font-medium tracking-[0.25em] text-[#8E8E93] uppercase">
+              THE ART OF THE SCREEN
+            </span>
           </div>
 
-          {/* RIGHT: Name & Essential Identity Metadata */}
-          <div className="lg:col-span-8 space-y-5 sm:space-y-6 text-center lg:text-left">
-            
-            <div className="space-y-1">
-              <h1 className="text-3xl sm:text-5xl lg:text-6xl font-display font-bold text-[#F2F0EC] tracking-tight uppercase leading-none">
-                {person.name}
-              </h1>
+          <Link
+            to="/people"
+            className="group flex items-center gap-1.5 text-[10px] sm:text-xs font-mono tracking-wider text-[#8E8E93] hover:text-[#E43D3D] transition-colors uppercase"
+          >
+            <span>PEOPLE DIRECTORY</span>
+            <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-1" />
+          </Link>
+        </div>
+
+        {/* Mid Row: Minimal Editorial Micro-Columns + Asymmetric Metric Block */}
+        <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 my-auto pt-8 pb-4 items-start">
+          {/* Left Columns */}
+          <div className="lg:col-span-8 xl:col-span-9 flex flex-wrap gap-8 sm:gap-14">
+            {/* Column 1: KNOWN FOR */}
+            <div className="space-y-1.5 min-w-[140px] max-w-[220px]">
+              <div className="text-[10px] font-mono tracking-[0.2em] uppercase text-[#8E8E93]">
+                KNOWN FOR
+              </div>
+              <div className="space-y-0.5">
+                {(person.knownFor && person.knownFor.length > 0
+                  ? person.knownFor.slice(0, 3)
+                  : person.filmography ? person.filmography.slice(0, 3).map(f => f.title) : []
+                ).map((title, i) => (
+                  <p key={i} className="text-xs sm:text-sm font-sans text-[#F2F0EC] truncate">
+                    {title}
+                  </p>
+                ))}
+              </div>
+              <div className="w-5 h-[2px] bg-[#E43D3D] mt-2.5" />
             </div>
 
-            {/* Short Identity Metadata Row */}
-            <div className="flex flex-wrap items-center justify-center lg:justify-start gap-x-6 gap-y-3 text-xs sm:text-sm font-mono text-[#8E8E93] border-y border-white/10 py-3.5">
-              {person.birthDate && (
-                <div className="flex items-center gap-2">
-                  <Calendar className="w-3.5 h-3.5 text-[#E43D3D]" />
-                  <span>BORN:</span>
-                  <span className="text-[#F2F0EC] font-medium">{person.birthDate}</span>
+            {/* Column 2: BORN */}
+            {person.birthDate && (
+              <div className="space-y-1.5 min-w-[140px]">
+                <div className="text-[10px] font-mono tracking-[0.2em] uppercase text-[#8E8E93]">
+                  BORN
                 </div>
-              )}
-
-              {person.birthPlace && (
-                <div className="flex items-center gap-2">
-                  <MapPin className="w-3.5 h-3.5 text-[#E43D3D]" />
-                  <span className="text-[#F2F0EC] font-medium">{person.birthPlace}</span>
-                </div>
-              )}
-            </div>
-
-            {/* Also Known As Tags if Available */}
-            {person.alsoKnownAs && person.alsoKnownAs.length > 0 && (
-              <div className="text-xs font-mono text-[#8E8E93] pt-1">
-                <span className="text-[#8E8E93] mr-2">ALSO KNOWN AS:</span>
-                <span className="text-[#F2F0EC]">{person.alsoKnownAs.slice(0, 3).join(' • ')}</span>
+                <p className="text-xs sm:text-sm font-sans text-[#F2F0EC]">
+                  {new Date(person.birthDate).toLocaleDateString('en-US', {
+                    month: 'short',
+                    day: 'numeric',
+                    year: 'numeric'
+                  })}
+                </p>
+                {(() => {
+                  const birth = new Date(person.birthDate);
+                  if (isNaN(birth.getTime())) return null;
+                  const end = person.deathDate ? new Date(person.deathDate) : new Date();
+                  let age = end.getFullYear() - birth.getFullYear();
+                  const m = end.getMonth() - birth.getMonth();
+                  if (m < 0 || (m === 0 && end.getDate() < birth.getDate())) age--;
+                  return age > 0 ? (
+                    <p className="text-[11px] font-mono text-[#8E8E93]">({age} years)</p>
+                  ) : null;
+                })()}
+                <div className="w-5 h-[2px] bg-[#E43D3D] mt-2.5" />
               </div>
             )}
 
-            {/* IMDb Link */}
-            {person.imdbId && (
-              <div className="pt-2">
+            {/* Column 3: ORIGIN */}
+            {person.birthPlace && (
+              <div className="space-y-1.5 min-w-[140px] max-w-[200px] hidden sm:block">
+                <div className="text-[10px] font-mono tracking-[0.2em] uppercase text-[#8E8E93]">
+                  ORIGIN
+                </div>
+                <p className="text-xs sm:text-sm font-sans text-[#F2F0EC] line-clamp-2">
+                  {person.birthPlace}
+                </p>
+                <div className="w-5 h-[2px] bg-[#E43D3D] mt-2.5" />
+              </div>
+            )}
+          </div>
+
+          {/* Right Asymmetric Metric Block */}
+          <div className="lg:col-span-4 xl:col-span-3 lg:pl-8 space-y-1.5">
+            <div className="text-[10px] font-mono tracking-[0.2em] uppercase text-[#8E8E93]">
+              FILMOGRAPHY
+            </div>
+            <div className="text-4xl sm:text-5xl font-display font-light text-white tracking-tight">
+              {person.filmography?.length || 0}
+            </div>
+            <div className="w-6 h-[2px] bg-[#E43D3D] mt-2.5" />
+          </div>
+        </div>
+
+        {/* Bottom Row: Oversized Title, Actions & Thumbnail Card */}
+        <div className="relative z-10 flex flex-col lg:flex-row lg:items-end justify-between gap-6 pt-4">
+          {/* Oversized Title & Circular Navigation */}
+          <div className="space-y-4 max-w-4xl">
+            <h1 className="text-5xl sm:text-7xl md:text-8xl lg:text-9xl font-display font-bold text-[#F2F0EC] tracking-tight leading-[0.88] uppercase">
+              {person.name}
+            </h1>
+
+            {/* Restrained Navigation Controls matching the reference image */}
+            <div className="flex items-center gap-3 pt-2">
+              <Link
+                to="/people"
+                aria-label="Back to People"
+                className="w-10 h-10 rounded-full border border-white/20 hover:border-white/50 flex items-center justify-center text-[#8E8E93] hover:text-white transition-all bg-[#0B0B0D]/50 backdrop-blur-sm"
+              >
+                <ArrowLeft className="w-4 h-4" />
+              </Link>
+
+              <a
+                href="#filmography-section"
+                aria-label="Jump to Filmography"
+                className="w-10 h-10 rounded-full bg-[#E43D3D] hover:bg-[#c93535] flex items-center justify-center text-white transition-all shadow-lg shadow-[#E43D3D]/30"
+              >
+                <ArrowRight className="w-4 h-4" />
+              </a>
+
+              {person.imdbId && (
                 <a
                   href={`https://www.imdb.com/name/${person.imdbId}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 text-xs font-mono tracking-wider text-[#8E8E93] hover:text-[#E43D3D] transition-colors"
+                  className="ml-3 inline-flex items-center gap-1.5 text-[11px] font-mono tracking-widest uppercase text-[#8E8E93] hover:text-[#E43D3D] transition-colors"
                 >
                   <ExternalLink className="w-3.5 h-3.5 text-[#E43D3D]" />
                   <span>IMDb PROFILE</span>
                 </a>
-              </div>
-            )}
-
+              )}
+            </div>
           </div>
 
-        </div>
+          {/* Right Bottom Anchor: Artwork Thumbnail & Numeric Index */}
+          <div className="flex items-end gap-5 lg:ml-auto">
+            {/* Small Artwork Thumbnail */}
+            <div className="relative w-20 h-24 sm:w-24 sm:h-32 border border-white/15 bg-[#111114] shadow-2xl overflow-hidden flex-shrink-0 group">
+              {person.portrait ? (
+                <img
+                  src={person.portrait}
+                  alt={person.name}
+                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center text-[10px] font-mono text-[#8E8E93]">
+                  PORTRAIT
+                </div>
+              )}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none" />
+            </div>
 
+            {/* Pagination / Section Index & Small Control Pair */}
+            <div className="space-y-2">
+              <div className="text-[11px] font-mono tracking-widest text-[#8E8E93]">
+                {person.filmography && person.filmography.length > 0
+                  ? person.filmography.length < 10
+                    ? `01 / 0${person.filmography.length}`
+                    : `01 / ${person.filmography.length}`
+                  : '01 / 01'}
+              </div>
+              <div className="flex items-center gap-2">
+                <a
+                  href="#biography-section"
+                  title="Biography"
+                  className="w-8 h-8 rounded-full border border-white/20 hover:border-white/50 flex items-center justify-center text-[#8E8E93] hover:text-white transition-all bg-[#0B0B0D]/50"
+                >
+                  <ArrowLeft className="w-3.5 h-3.5" />
+                </a>
+                <a
+                  href="#filmography-section"
+                  title="Filmography"
+                  className="w-8 h-8 rounded-full border border-white/20 hover:border-white/50 flex items-center justify-center text-[#8E8E93] hover:text-white transition-all bg-[#0B0B0D]/50"
+                >
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
       </section>
 
       {/* ==================================================
           2. PERSON BIOGRAPHY — ABOUT SECTION
          ================================================== */}
-      <section className="mt-10 sm:mt-16 lg:mt-24 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 w-full space-y-6">
+      <section id="biography-section" className="mt-10 sm:mt-16 lg:mt-24 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 w-full space-y-6 scroll-mt-24">
         
         <div className="border-t border-white/10 pt-8 sm:pt-12">
           <SectionHeader
@@ -271,7 +384,7 @@ export const PersonDetailPage: React.FC = () => {
           4. PERSON FILMOGRAPHY — COMPACT EDITORIAL STREAM
          ================================================== */}
       {person.filmography && person.filmography.length > 0 && (
-        <section className="mt-12 sm:mt-16 lg:mt-24 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 w-full space-y-8">
+        <section id="filmography-section" className="mt-12 sm:mt-16 lg:mt-24 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 w-full space-y-8 scroll-mt-24">
           
           <SectionHeader
             title="FILMOGRAPHY"

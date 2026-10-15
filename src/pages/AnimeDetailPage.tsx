@@ -1,22 +1,42 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useParams, Link } from 'react-router-dom';
-import { ArrowLeft, ArrowRight, Bookmark, ExternalLink } from 'lucide-react';
+import { useParams, useSearchParams, Link } from 'react-router-dom';
+import {
+  ArrowLeft,
+  ArrowRight,
+  Bookmark,
+  ExternalLink,
+  Play,
+  Radio,
+} from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { AnimeItem } from '../types/anime';
-import { getAnimeById, getAnimeList } from '../services/animeDb';
-import { AnimeDetailPageSkeleton, ErrorState } from '../components/StateViews';
+import { HianimeEpisode, HianimeServerItem } from '../types/hianime';
+import { resolveAnimeDetailRecord } from '../services/animeBridge';
+import { getHianimeEpisodes, getHianimeServers, getHianimeList } from '../services/hianime';
+import { AnimeDetailPageSkeleton } from '../components/StateViews';
 import { AnimeCard } from '../components/AnimeCard';
+
 import { SectionHeader } from '../components/SectionHeader';
 import { MediaItem } from '../types';
+import { adaptHianimeCard, UnifiedAnimeCardItem } from '../services/animeBridge';
 
 export const AnimeDetailPage: React.FC = () => {
   const { markAppReady, isInWatchlist, toggleWatchlist } = useApp();
   const { id } = useParams<{ id: string }>();
+  const [searchParams] = useSearchParams();
+  const titleHint = searchParams.get('title') || '';
 
   const [anime, setAnime] = useState<AnimeItem | null>(null);
-  const [relatedAnime, setRelatedAnime] = useState<AnimeItem[]>([]);
+  const [hianimeId, setHianimeId] = useState<string | null>(null);
+  const [episodes, setEpisodes] = useState<HianimeEpisode[]>([]);
+  const [activeEpisode, setActiveEpisode] = useState<HianimeEpisode | null>(null);
+  const [activeServer, setActiveServer] = useState<string | null>(null);
+  const [servers, setServers] = useState<HianimeServerItem[]>([]);
+  const [loadingServers, setLoadingServers] = useState<boolean>(false);
+  const [relatedAnime, setRelatedAnime] = useState<UnifiedAnimeCardItem[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<boolean>(false);
+  const [unmatched, setUnmatched] = useState<boolean>(false);
+  const [unmatchedReason, setUnmatchedReason] = useState<string>('');
 
   const activeIdRef = useRef<string | undefined>(id);
 
@@ -24,49 +44,68 @@ export const AnimeDetailPage: React.FC = () => {
     if (!id) return;
     activeIdRef.current = id;
     setLoading(true);
-    setError(false);
+    setUnmatched(false);
+    setUnmatchedReason('');
 
     try {
-      const data = await getAnimeById(id);
-      if (activeIdRef.current !== id) return; // Stale request guard
+      const resolution = await resolveAnimeDetailRecord(id, titleHint);
+      if (activeIdRef.current !== id) return;
 
-      if (!data) {
-        setError(true);
-      } else {
-        // Preload primary artwork before revealing to avoid visual pop
-        const artworkUrl = data.image || data.thumb;
-        if (artworkUrl) {
-          await new Promise<void>((resolve) => {
-            const preloader = new Image();
-            preloader.src = artworkUrl;
-            preloader.onload = () => resolve();
-            preloader.onerror = () => resolve();
-          });
-        }
-
-        if (activeIdRef.current !== id) return;
-        setAnime(data);
-
-        // Fetch related anime by primary genre if available
-        if (data.genres && data.genres.length > 0) {
-          getAnimeList({ genres: data.genres[0], size: 8 })
-            .then((res) => {
-              if (activeIdRef.current === id) {
-                const filtered = (res.data || [])
-                  .filter((item) => item.id !== data.id)
-                  .slice(0, 6);
-                setRelatedAnime(filtered);
-              }
-            })
-            .catch(() => {
-              if (activeIdRef.current === id) setRelatedAnime([]);
-            });
-        }
+      if (resolution.unmatched || !resolution.record) {
+        setUnmatched(true);
+        setUnmatchedReason(
+          resolution.reason ||
+            'Could not verify a matching canonical record in the primary Anime DB archive.'
+        );
+        return;
       }
+
+      const canonicalData = resolution.record;
+      setHianimeId(resolution.hianimeId || null);
+
+      // Preload primary artwork before revealing
+      const artworkUrl = canonicalData.image || canonicalData.thumb;
+      if (artworkUrl) {
+        await new Promise<void>((resolve) => {
+          const preloader = new Image();
+          preloader.src = artworkUrl;
+          preloader.onload = () => resolve();
+          preloader.onerror = () => resolve();
+        });
+      }
+
+      if (activeIdRef.current !== id) return;
+      setAnime(canonicalData);
+
+      // Fetch episodes from Hianime if hianimeId is known
+      const targetHianimeId = resolution.hianimeId || (id.includes('-') ? id : null);
+      if (targetHianimeId) {
+        getHianimeEpisodes(targetHianimeId)
+          .then((epList) => {
+            if (activeIdRef.current === id && epList && epList.length > 0) {
+              setEpisodes(epList);
+            }
+          })
+          .catch(() => {});
+      }
+
+      // Fetch related anime from Hianime top airing discovery
+      getHianimeList('top-airing', 1)
+        .then((res) => {
+          if (activeIdRef.current === id) {
+            const adapted = (res.response || [])
+              .map(adaptHianimeCard)
+              .filter((item) => item.title !== canonicalData.title)
+              .slice(0, 6);
+            setRelatedAnime(adapted);
+          }
+        })
+        .catch(() => {});
     } catch (err: any) {
       console.error('Failed to load anime detail:', err);
       if (activeIdRef.current === id) {
-        setError(true);
+        setUnmatched(true);
+        setUnmatchedReason(err?.message || 'Anime record could not be loaded.');
       }
     } finally {
       if (activeIdRef.current === id) {
@@ -82,18 +121,76 @@ export const AnimeDetailPage: React.FC = () => {
     window.scrollTo(0, 0);
   }, [id]);
 
+  // Load streaming server when an episode is selected
+  const handleSelectEpisode = async (ep: HianimeEpisode) => {
+    setActiveEpisode(ep);
+    setLoadingServers(true);
+    setActiveServer(null);
+
+    try {
+      const serverRes = await getHianimeServers(ep.id, 'sub');
+      if (serverRes) {
+        const serverList =
+          serverRes.sub ||
+          serverRes.raw ||
+          (serverRes.servers as any) ||
+          [];
+        setServers(serverList);
+        if (serverList.length > 0) {
+          setActiveServer(serverList[0].iframe || null);
+        }
+      }
+    } catch (err) {
+      console.error('Failed to load episode servers:', err);
+    } finally {
+      setLoadingServers(false);
+    }
+  };
+
   if (loading) {
     return <AnimeDetailPageSkeleton />;
   }
 
-  if (error || !anime) {
+  // Graceful unmatched state per Requirement 2:
+  // "If no reliable match exists, show a graceful unavailable state rather than opening the wrong anime."
+  if (unmatched || !anime) {
     return (
-      <div className="min-h-screen bg-[#0B0B0D] text-[#F2F0EC] pt-28 pb-20 px-4 sm:px-8 mx-auto">
-        <ErrorState
-          title="ANIME PROFILE UNRESOLVED"
-          message="Could not load the requested anime series or feature from the database."
-          onRetry={fetchAnimeDetail}
-        />
+      <div className="min-h-screen bg-[#0B0B0D] text-[#F2F0EC] pt-28 pb-20 px-4 sm:px-8 mx-auto flex items-center justify-center">
+        <div className="bg-[#111114] border border-white/10 p-8 sm:p-12 text-center max-w-xl mx-auto space-y-6 shadow-2xl">
+          <div className="w-3 h-3 bg-[#E43D3D] mx-auto" />
+          <div className="space-y-2">
+            <span className="text-[10px] font-mono tracking-[0.25em] text-[#E43D3D] uppercase font-bold">
+              CANONICAL ANIME RECORD UNMATCHED
+            </span>
+            <h2 className="text-xl sm:text-2xl font-display font-bold uppercase tracking-tight text-white">
+              ANIME PROFILE UNAVAILABLE
+            </h2>
+          </div>
+          <p className="text-xs sm:text-sm font-sans text-[#8E8E93] leading-relaxed">
+            Could not find a verified canonical record in the primary Anime DB archive for &ldquo;{titleHint || id}&rdquo;. To preserve data integrity and prevent displaying mismatched records or the wrong series, unverified entries are not loaded.
+          </p>
+          {unmatchedReason && (
+            <div className="p-3 bg-black/40 border border-white/5 text-[11px] font-mono text-[#8E8E93] text-left">
+              <span className="text-white/60 uppercase font-bold block mb-1">Status Report:</span>
+              <span>{unmatchedReason}</span>
+            </div>
+          )}
+          <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
+            <Link
+              to="/anime"
+              className="btn-primary min-h-[44px] px-6 text-xs uppercase inline-flex items-center gap-2"
+            >
+              <ArrowLeft className="w-3.5 h-3.5" />
+              <span>RETURN TO ANIME DIRECTORY</span>
+            </Link>
+            <Link
+              to="/anime/search"
+              className="bg-[#17171B] hover:bg-white/10 border border-white/15 text-[#F2F0EC] min-h-[44px] px-6 text-xs font-mono font-bold uppercase inline-flex items-center gap-2"
+            >
+              <span>SEARCH CATALOG</span>
+            </Link>
+          </div>
+        </div>
       </div>
     );
   }
@@ -131,7 +228,7 @@ export const AnimeDetailPage: React.FC = () => {
           1. HERO SECTION — ARCHITECTURAL EDITORIAL ANIME
          ================================================== */}
       <section className="relative w-full min-h-[82vh] lg:min-h-[90vh] flex flex-col justify-between pt-6 sm:pt-8 pb-10 sm:pb-14 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 overflow-hidden bg-[#0B0B0D]">
-        {/* Large Dominant Artwork Canvas */}
+        {/* Dominant Artwork Canvas */}
         <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
           {heroArtwork ? (
             <img
@@ -149,7 +246,7 @@ export const AnimeDetailPage: React.FC = () => {
           <div className="absolute inset-0 film-grain pointer-events-none opacity-30" />
         </div>
 
-        {/* Thin Structural Grid Lines (Asymmetric Architectural Grid) */}
+        {/* Structural Grid Lines */}
         <div className="absolute top-[46%] left-0 right-0 h-[1px] bg-white/[0.08] pointer-events-none hidden lg:block" />
         <div className="absolute top-0 bottom-0 right-[22%] xl:right-[18%] w-[1px] bg-white/[0.08] pointer-events-none hidden lg:block" />
 
@@ -158,17 +255,23 @@ export const AnimeDetailPage: React.FC = () => {
           <div className="flex items-center gap-3">
             <span className="w-6 h-[2px] bg-[#E43D3D] inline-block" />
             <span className="text-[10px] sm:text-xs font-mono font-medium tracking-[0.25em] text-[#8E8E93] uppercase">
-              JAPANESE ANIMATION
+              CANONICAL ANIME DB PROFILE
             </span>
           </div>
 
-          {/* <Link
-            to="/anime"
-            className="group flex items-center gap-1.5 text-[10px] sm:text-xs font-mono tracking-wider text-[#8E8E93] hover:text-[#E43D3D] transition-colors uppercase"
-          >
-            <span>ANIME DIRECTORY</span>
-            <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-1" />
-          </Link> */}
+          <div className="flex items-center gap-2">
+            <span className="text-[10px] font-mono tracking-widest text-[#8E8E93] uppercase">
+              PROVIDER:
+            </span>
+            <span className="px-2 py-0.5 text-[9px] font-mono bg-[#E43D3D] text-white font-bold uppercase">
+              ANIME-DB
+            </span>
+            {hianimeId && (
+              <span className="px-2 py-0.5 text-[9px] font-mono bg-white/10 text-[#8E8E93] uppercase">
+                HIANIME STREAM
+              </span>
+            )}
+          </div>
         </div>
 
         {/* Mid Row: Minimal Editorial Micro-Columns + Asymmetric Metric Block */}
@@ -225,7 +328,7 @@ export const AnimeDetailPage: React.FC = () => {
           {/* Right Asymmetric Metric Block */}
           <div className="lg:col-span-4 xl:col-span-3 lg:pl-8 space-y-1.5">
             <div className="text-[10px] font-mono tracking-[0.2em] uppercase text-[#8E8E93]">
-              TOP RANK
+              OVERALL RANK
             </div>
             <div className="flex items-baseline gap-2">
               <span className="text-4xl sm:text-5xl font-display font-light text-white tracking-tight">
@@ -260,6 +363,17 @@ export const AnimeDetailPage: React.FC = () => {
                 <span>{isSaved ? 'SAVED TO WATCHLIST' : 'ADD TO WATCHLIST'}</span>
               </button>
 
+              {/* Jump to Episodes if available */}
+              {episodes.length > 0 && (
+                <a
+                  href="#episodes-section"
+                  className="bg-[#E43D3D] hover:bg-[#C93333] text-white min-h-[44px] px-6 py-2.5 text-xs font-mono font-bold tracking-widest uppercase flex items-center justify-center gap-2 transition-all shadow-lg"
+                >
+                  <Play className="w-3.5 h-3.5 fill-white" />
+                  <span>STREAM EPISODES ({episodes.length})</span>
+                </a>
+              )}
+
               {/* External Source Link */}
               {anime.link && (
                 <a
@@ -269,7 +383,7 @@ export const AnimeDetailPage: React.FC = () => {
                   className="bg-[#0B0B0D]/50 hover:bg-white/10 border border-white/20 text-[#F2F0EC] min-h-[44px] px-5 py-2.5 text-xs font-mono font-bold tracking-widest uppercase flex items-center justify-center gap-2 transition-all backdrop-blur-sm"
                 >
                   <ExternalLink className="w-3.5 h-3.5 text-[#E43D3D]" />
-                  <span>VIEW SOURCE</span>
+                  <span>MAL ARCHIVE</span>
                 </a>
               )}
             </div>
@@ -323,7 +437,6 @@ export const AnimeDetailPage: React.FC = () => {
           2. ANIME INFORMATION — OVERVIEW & SPECIFICATIONS
          ================================================== */}
       <section id="overview-section" className="w-full mt-12 sm:mt-16 lg:mt-20 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 scroll-mt-28">
-        
         {/* Section Header */}
         <div className="flex flex-col gap-1 border-b border-white/10 pb-4 mb-8">
           <div className="flex items-center gap-2.5">
@@ -338,7 +451,7 @@ export const AnimeDetailPage: React.FC = () => {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
-          {/* LEFT: ABOUT THE ANIME */}
+          {/* LEFT: ABOUT THE ANIME (Supplied by Anime DB) */}
           <div className="lg:col-span-7 space-y-6">
             <p className="font-sans text-base sm:text-lg leading-relaxed text-[#F2F0EC]/90 font-light whitespace-pre-line">
               {anime.synopsis || 'Full narrative synopsis pending archive update.'}
@@ -376,7 +489,7 @@ export const AnimeDetailPage: React.FC = () => {
             )}
           </div>
 
-          {/* RIGHT: ARCHITECTURAL PRODUCTION FACTS MATRIX */}
+          {/* RIGHT: ARCHITECTURAL PRODUCTION FACTS MATRIX (Supplied by Anime DB) */}
           <div className="lg:col-span-5 bg-[#111114] border border-white/10 shadow-xl overflow-hidden">
             <div className="px-5 py-3.5 border-b border-white/10 bg-[#17171B]/50 flex items-center justify-between">
               <span className="text-[10px] font-mono tracking-[0.25em] text-[#8E8E93] uppercase font-bold">
@@ -413,6 +526,11 @@ export const AnimeDetailPage: React.FC = () => {
                   <span className="text-[#E43D3D] font-bold">#{anime.rank}</span>
                 </div>
               )}
+
+              <div className="px-5 py-3 flex items-center justify-between">
+                <span className="text-[10px] text-[#8E8E93] uppercase tracking-wider">PRIMARY SOURCE</span>
+                <span className="text-white font-mono font-bold">RAPIDAPI ANIME DB</span>
+              </div>
             </div>
 
             {anime.link && (
@@ -424,7 +542,7 @@ export const AnimeDetailPage: React.FC = () => {
                   className="inline-flex items-center gap-2 text-xs font-mono text-[#8E8E93] hover:text-[#E43D3D] transition-colors bg-white/5 border border-white/10 px-3 py-1.5"
                 >
                   <ExternalLink className="w-3.5 h-3.5 text-[#E43D3D]" />
-                  <span>SOURCE ENTRY</span>
+                  <span>MAL SOURCE ENTRY</span>
                 </a>
               </div>
             )}
@@ -433,7 +551,116 @@ export const AnimeDetailPage: React.FC = () => {
       </section>
 
       {/* ==================================================
-          3. RELATED ANIME SECTION — MORE LIKE THIS
+          3. EPISODES & STREAMING PLAYER (Hianime API Integration)
+         ================================================== */}
+      {episodes.length > 0 && (
+        <section id="episodes-section" className="w-full mt-12 sm:mt-16 lg:mt-24 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 space-y-6 scroll-mt-28">
+          <SectionHeader
+            label="HIANIME PROVIDER STREAM"
+            title="EPISODE DIRECTORY & EMBED"
+            description="Stream verified episodes provided by Hianime scraper backend."
+          />
+
+          {/* Active Player if an episode is selected */}
+          {activeEpisode && (
+            <div className="bg-[#111114] border border-white/15 p-4 sm:p-6 space-y-4 shadow-2xl">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-white/10 pb-4">
+                <div>
+                  <span className="text-[10px] font-mono tracking-widest text-[#E43D3D] uppercase font-bold">
+                    EPISODE {activeEpisode.episodeNumber}
+                  </span>
+                  <h3 className="text-lg sm:text-xl font-display font-bold text-white uppercase">
+                    {activeEpisode.title || `Episode ${activeEpisode.episodeNumber}`}
+                  </h3>
+                </div>
+
+                {/* Server Selector Buttons */}
+                {servers.length > 0 && (
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="text-[10px] font-mono text-[#8E8E93] uppercase">SERVER:</span>
+                    {servers.map((srv, idx) => (
+                      <button
+                        key={idx}
+                        type="button"
+                        onClick={() => setActiveServer(srv.iframe || null)}
+                        className={`text-xs px-3 py-1.5 font-mono uppercase transition-colors ${
+                          activeServer === srv.iframe
+                            ? 'bg-[#E43D3D] text-white font-bold'
+                            : 'bg-black/60 border border-white/15 text-[#8E8E93] hover:text-white'
+                        }`}
+                      >
+                        {srv.serverName || `Server ${idx + 1}`}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Player Viewport */}
+              <div className="relative aspect-video w-full bg-black border border-white/10 overflow-hidden">
+                {loadingServers ? (
+                  <div className="w-full h-full flex flex-col items-center justify-center space-y-2 text-[#8E8E93]">
+                    <div className="w-6 h-6 border-2 border-[#E43D3D] border-t-transparent rounded-full animate-spin" />
+                    <span className="text-xs font-mono uppercase tracking-wider">Loading Player Stream...</span>
+                  </div>
+                ) : activeServer ? (
+                  <iframe
+                    src={activeServer}
+                    title={activeEpisode.title}
+                    className="w-full h-full border-0"
+                    allow="autoplay; fullscreen; picture-in-picture"
+                    allowFullScreen
+                  />
+                ) : (
+                  <div className="w-full h-full flex flex-col items-center justify-center p-6 text-center text-[#8E8E93] space-y-2">
+                    <Radio className="w-8 h-8 text-[#8E8E93]/40" />
+                    <p className="text-xs font-mono uppercase">Stream embed currently unavailable for this episode.</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Episode Grid Selector */}
+          <div className="bg-[#111114] border border-white/10 p-5 space-y-4">
+            <div className="flex items-center justify-between text-xs font-mono">
+              <span className="text-[#8E8E93] uppercase font-bold tracking-wider">
+                SELECT EPISODE ({episodes.length} AVAILABLE)
+              </span>
+              <span className="text-[10px] text-[#8E8E93]">SUBBED & DUBBED</span>
+            </div>
+
+            <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-2 max-h-72 overflow-y-auto pr-1">
+              {episodes.map((ep) => {
+                const isCurrent = activeEpisode?.id === ep.id;
+                return (
+                  <button
+                    key={ep.id}
+                    type="button"
+                    onClick={() => handleSelectEpisode(ep)}
+                    className={`p-2.5 text-left border transition-all flex flex-col justify-between min-h-[56px] ${
+                      isCurrent
+                        ? 'bg-[#E43D3D] border-[#E43D3D] text-white'
+                        : 'bg-black/50 border-white/10 hover:border-white/30 text-[#F2F0EC]'
+                    }`}
+                  >
+                    <div className="flex items-center justify-between text-[10px] font-mono">
+                      <span className="font-bold">EP {ep.episodeNumber}</span>
+                      {ep.sub && <span className="opacity-70 text-[9px]">SUB</span>}
+                    </div>
+                    <span className="text-[11px] font-sans truncate block opacity-90 mt-1">
+                      {ep.title || `Episode ${ep.episodeNumber}`}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* ==================================================
+          4. RELATED ANIME SECTION — MORE LIKE THIS
          ================================================== */}
       {relatedAnime.length > 0 && (
         <section className="w-full mt-12 sm:mt-16 lg:mt-24 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 space-y-6">

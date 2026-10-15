@@ -2,24 +2,26 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Tv, Award } from 'lucide-react';
 import { AnimeItem } from '../types/anime';
+import { UnifiedAnimeCardItem } from '../services/animeBridge';
 
 interface AnimeCardProps {
-  item: AnimeItem;
+  item: AnimeItem | UnifiedAnimeCardItem;
 }
 
 export const AnimeCard = React.forwardRef<HTMLAnchorElement, AnimeCardProps>(({ item }, ref) => {
   const [loaded, setLoaded] = useState(false);
   const [imgError, setImgError] = useState(false);
 
-  const imgSrc = item.image || item.thumb;
+  const imgSrc = (item as any).image || (item as any).thumb || (item as any).poster;
 
   return (
     <Link
       ref={ref}
-      to={`/anime/${encodeURIComponent(item.id)}`}
+      to={`/anime/${encodeURIComponent(item.id)}?title=${encodeURIComponent(item.title)}`}
       tabIndex={0}
-      className="group relative bg-[#111114] border border-white/5 hover:border-white/25 focus:outline-none focus-visible:ring-1 focus-visible:ring-[#E43D3D] transition-colors duration-300 flex flex-col justify-between overflow-hidden shadow-lg"
+      className="group relative bg-[#111114] border border-white/10 hover:border-white/30 focus:outline-none focus-visible:ring-1 focus-visible:ring-[#E43D3D] transition-colors duration-300 flex flex-col justify-between overflow-hidden shadow-xl"
     >
+
       {/* 2:3 Poster Image Viewport */}
       <div className="relative w-full aspect-[2/3] overflow-hidden bg-[#141418]">
         {!loaded && !imgError && <div className="absolute inset-0 skeleton-pulse" />}

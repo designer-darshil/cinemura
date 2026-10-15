@@ -53,7 +53,7 @@ function getItemThumbnail(item: Movie | Series | GenericHeroItem): string | unde
   return item.backdrop;
 }
 
-export const HeroBanner: React.FC<HeroBannerProps> = ({ item, badgeLabel, actions }) => {
+export const HeroBanner: React.FC<HeroBannerProps> = ({ item, actions }) => {
   const { openVideoPlayer } = useApp();
 
   const isMovie = item.type === 'movie';
@@ -75,7 +75,7 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({ item, badgeLabel, action
   const artworkThumbnail = getItemThumbnail(item);
 
   return (
-    <section className="relative min-h-[70vh] sm:min-h-[76vh] lg:min-h-[82vh] flex flex-col justify-between pt-16 sm:pt-20 pb-8 sm:pb-12 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 w-full overflow-hidden border-b border-white/10 bg-[#0B0B0D]">
+    <section className="relative min-h-[70vh] sm:min-h-[76vh] lg:min-h-[82vh] flex flex-col items-end justify-end pt-16 sm:pt-20 pb-8 sm:pb-12 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 w-full overflow-hidden border-b border-white/10 bg-[#0B0B0D]">
       {/* Real Backdrop Background Field */}
       <div className="absolute inset-0 z-0 overflow-hidden">
         {item.backdrop && (
@@ -86,55 +86,9 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({ item, badgeLabel, action
           />
         )}
         {/* Editorial Gradients & Fine Grain */}
-        <div className="absolute inset-0 bg-gradient-to-t from-[#0B0B0D] via-[#0B0B0D]/50 to-transparent" />
-        <div className="absolute inset-0 bg-gradient-to-r from-[#0B0B0D]/90 via-[#0B0B0D]/40 to-transparent" />
-        <div className="absolute inset-0 film-grain pointer-events-none opacity-20" />
-      </div>
-
-      {/* Structural Editorial Top Line */}
-      <div className="relative z-10 w-full pt-4 sm:pt-6">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-white/10 pb-4">
-          <div className="flex items-center gap-2.5">
-            <span className="w-4 h-[2px] bg-[#E43D3D] inline-block" />
-            <span className="text-[10px] font-mono tracking-[0.25em] text-[#8E8E93] uppercase font-medium">
-              {badgeLabel || (isMovie ? 'FEATURE FILM' : isSeries ? 'TELEVISION' : 'CINEMURA CURATION')}
-            </span>
-            {item.certification && (
-              <span className="text-[10px] font-mono text-[#8E8E93] border border-white/20 px-1.5 py-0.5 ml-2 font-bold">
-                {item.certification}
-              </span>
-            )}
-          </div>
-
-          {/* Minimal Editorial Micro-Columns */}
-          <div className="hidden md:flex items-center divide-x divide-white/10 border border-white/10 bg-[#111114]/90 backdrop-blur-sm text-xs font-mono">
-            <div className="px-3.5 py-1.5 space-y-0.5">
-              <span className="text-[9px] text-[#8E8E93] block uppercase tracking-wider">RELEASE</span>
-              <span className="text-[#F2F0EC] font-semibold">{item.year || '2024'}</span>
-            </div>
-
-            {durationOrSeasons && (
-              <div className="px-3.5 py-1.5 space-y-0.5">
-                <span className="text-[9px] text-[#8E8E93] block uppercase tracking-wider">FORMAT</span>
-                <span className="text-[#F2F0EC] font-semibold">{durationOrSeasons}</span>
-              </div>
-            )}
-
-            {item.genres && item.genres.length > 0 && (
-              <div className="px-3.5 py-1.5 space-y-0.5 max-w-[140px] truncate">
-                <span className="text-[9px] text-[#8E8E93] block uppercase tracking-wider">GENRE</span>
-                <span className="text-[#F2F0EC] font-semibold truncate block">{item.genres[0]}</span>
-              </div>
-            )}
-
-            {typeof item.rating === 'number' && item.rating > 0 && (
-              <div className="px-3.5 py-1.5 space-y-0.5">
-                <span className="text-[9px] text-[#8E8E93] block uppercase tracking-wider">SCORE</span>
-                <span className="text-[#E43D3D] font-bold">★ {item.rating.toFixed(1)}</span>
-              </div>
-            )}
-          </div>
-        </div>
+        {/* <div className="absolute inset-0 bg-gradient-to-t from-[#0B0B0D] via-[#0B0B0D]/50 to-transparent" /> */}
+        {/* <div className="absolute inset-0 bg-gradient-to-r from-[#0B0B0D]/90 via-[#0B0B0D]/40 to-transparent" /> */}
+        {/* <div className="absolute inset-0 film-grain pointer-events-none opacity-20" /> */}
       </div>
 
       {/* Hero Bottom Anchor Canvas: Oversized Title & Actions */}
@@ -229,6 +183,11 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({ item, badgeLabel, action
 
             {/* Pagination / Section Index & Small Control Pair */}
             <div className="space-y-2">
+              {durationOrSeasons && (
+                <div className="text-[10px] font-mono tracking-wider text-[#8E8E93] uppercase">
+                  {durationOrSeasons}
+                </div>
+              )}
               <div className="text-[11px] font-mono tracking-widest text-[#8E8E93]">
                 01 / 05
               </div>

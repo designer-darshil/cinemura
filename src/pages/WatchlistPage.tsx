@@ -20,7 +20,7 @@ export const WatchlistPage: React.FC = () => {
   });
 
   return (
-    <div className="min-h-screen bg-[#0B0B0D] text-[#F2F0EC] pt-24 pb-20 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 selection:bg-[#E43D3D] selection:text-white space-y-10">
+    <div className="min-h-screen bg-[#0B0B0D] text-[#F2F0EC] pt-8 sm:pt-12 pb-20 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 selection:bg-[#E43D3D] selection:text-white space-y-10">
       
       {/* Header */}
       <div className="border-b border-white/10 pb-6 flex flex-col md:flex-row md:items-end justify-between gap-6">

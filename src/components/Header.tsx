@@ -71,10 +71,10 @@ export const Header: React.FC = () => {
           COMPACT, SOLID CINEMATIC HEADER (DESKTOP & MOBILE)
          ================================================== */}
       <header
-        className={`fixed top-0 left-0 right-0 z-40 transition-colors duration-200 bg-[#0B0B0D] h-14 sm:h-20 ${
+        className={`fixed top-0 left-0 right-0 z-40 transition-colors duration-200 h-14 sm:h-20 border-b border-white/10 ${
           isScrolled
-            ? 'border-b border-white/10 shadow-2xl'
-            : 'border-b border-white/5'
+            ? 'bg-[#0B0B0D] shadow-2xl'
+            : 'bg-[#0B0B0D]/95 backdrop-blur-md'
         }`}
       >
         <div className="w-full px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 h-full flex items-center justify-between">

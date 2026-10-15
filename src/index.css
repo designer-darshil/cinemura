@@ -128,6 +128,22 @@
   font-weight: 600;
 }
 
+.type-micro {
+  font-family: 'Manrope', monospace;
+  font-size: 10px;
+  line-height: 1.4;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  font-weight: 600;
+  color: #8E8E93;
+}
+
+.type-numeral {
+  font-family: 'DM Sans', sans-serif;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.04em;
+}
+
 /* ==================================================
    RESTRAINED BUTTON & INTERACTION SYSTEM
    ================================================== */
@@ -137,21 +153,26 @@
   align-items: center;
   justify-content: center;
   gap: 8px;
-  height: 40px;
-  padding: 0 20px;
+  min-height: 44px;
+  padding: 0 24px;
   background-color: #E43D3D;
   color: #FFFFFF;
   font-family: 'Manrope', sans-serif;
   font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 0.08em;
+  font-weight: 700;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
-  transition: background-color 180ms ease, opacity 180ms ease;
+  transition: all 180ms ease;
   border: 1px solid #E43D3D;
+  box-shadow: 0 4px 14px rgba(228, 61, 61, 0.25);
 }
 .btn-primary:hover {
   background-color: #C02E2E;
   border-color: #C02E2E;
+  box-shadow: 0 6px 20px rgba(228, 61, 61, 0.35);
+}
+.btn-primary:active {
+  transform: translateY(1px);
 }
 
 .btn-secondary {
@@ -159,22 +180,26 @@
   align-items: center;
   justify-content: center;
   gap: 8px;
-  height: 40px;
-  padding: 0 20px;
-  background-color: transparent;
+  min-height: 44px;
+  padding: 0 24px;
+  background-color: rgba(11, 11, 13, 0.5);
   color: #F2F0EC;
   font-family: 'Manrope', sans-serif;
   font-size: 12px;
   font-weight: 600;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  transition: border-color 180ms ease, color 180ms ease, background-color 180ms ease;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(4px);
+  transition: all 180ms ease;
 }
 .btn-secondary:hover {
   border-color: rgba(255, 255, 255, 0.45);
   color: #FFFFFF;
-  background-color: rgba(255, 255, 255, 0.04);
+  background-color: rgba(255, 255, 255, 0.08);
+}
+.btn-secondary:active {
+  transform: translateY(1px);
 }
 
 .btn-link {
@@ -195,13 +220,19 @@
 
 /* Restrained Editorial Borders */
 .editorial-border {
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.10);
 }
 .editorial-border-b {
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.10);
 }
 .editorial-border-t {
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  border-top: 1px solid rgba(255, 255, 255, 0.10);
+}
+
+/* Fluid full-width responsive gutters */
+.cinematic-gutter {
+  padding-left: clamp(1rem, 4vw, 4rem);
+  padding-right: clamp(1rem, 4vw, 4rem);
 }
 
 /* SKELETON LOADING SYSTEM */

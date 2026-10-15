@@ -270,7 +270,7 @@ export const SeriesPage: React.FC = () => {
       : CATEGORY_TITLES[rawCategoryKey] || `${(categoryNameParam || 'TV SHOWS').toUpperCase()}`;
 
     return (
-      <div className="min-h-screen bg-[#0B0B0D] text-[#F2F0EC] pt-24 pb-20 w-full px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 space-y-10">
+      <div className="min-h-screen bg-[#0B0B0D] text-[#F2F0EC] pt-8 sm:pt-12 pb-20 w-full px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 space-y-10">
         {/* Top Back Nav & Heading */}
         <header className="border-b border-white/10 pb-6 space-y-4">
           <Link

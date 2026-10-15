@@ -45,7 +45,7 @@ export const MediaCard = React.forwardRef<any, MediaCardProps>(({
       ref={ref}
       to={detailPath}
       tabIndex={0}
-      className="group relative flex flex-col justify-between overflow-hidden bg-[#111114] border border-white/5 hover:border-white/25 focus:outline-none focus:ring-1 focus:ring-[#E43D3D] transition-all duration-300 ease-out"
+      className="group relative flex flex-col justify-between overflow-hidden bg-[#111114] border border-white/10 hover:border-white/30 focus:outline-none focus:ring-1 focus:ring-[#E43D3D] transition-all duration-300 ease-out shadow-xl"
     >
       {/* Aspect Image Container */}
       <div className={`relative w-full overflow-hidden bg-[#121215] ${effectiveRatio === 'poster' ? 'aspect-[2/3]' : 'aspect-[16/9]'}`}>
@@ -146,7 +146,7 @@ export const CastCard: React.FC<CastCardProps> = ({ name, character, image, slug
     <Link
       to={`/person/${slug}`}
       tabIndex={0}
-      className="group relative flex flex-col justify-between overflow-hidden bg-[#111114] border border-white/5 hover:border-white/25 focus:outline-none focus:ring-1 focus:ring-[#E43D3D] transition-all duration-300 ease-out"
+      className="group relative flex flex-col justify-between overflow-hidden bg-[#111114] border border-white/10 hover:border-white/30 focus:outline-none focus:ring-1 focus:ring-[#E43D3D] transition-all duration-300 ease-out shadow-xl"
     >
       <div className="relative w-full aspect-[2/3] overflow-hidden bg-[#121215]">
         {!loaded && <div className="absolute inset-0 skeleton-pulse" />}
@@ -201,7 +201,7 @@ export const PersonCard = React.forwardRef<HTMLAnchorElement, PersonCardProps>((
       ref={ref}
       to={`/person/${slug}`}
       tabIndex={0}
-      className="group relative flex flex-col justify-between overflow-hidden bg-[#111114] border border-white/5 hover:border-white/25 focus:outline-none focus:ring-1 focus:ring-[#E43D3D] transition-all duration-300 ease-out"
+      className="group relative flex flex-col justify-between overflow-hidden bg-[#111114] border border-white/10 hover:border-white/30 focus:outline-none focus:ring-1 focus:ring-[#E43D3D] transition-all duration-300 ease-out shadow-xl"
     >
       <div className="relative w-full aspect-[2/3] overflow-hidden bg-[#121215]">
         {!loaded && <div className="absolute inset-0 skeleton-pulse" />}

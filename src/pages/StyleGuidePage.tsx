@@ -184,7 +184,7 @@ export const StyleGuidePage: React.FC = () => {
       {/* ==================================================
           STYLE GUIDE HERO HEADER
          ================================================== */}
-      <header className="pt-24 sm:pt-28 pb-8 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 border-b border-white/10 bg-[#111114]">
+      <header className="pt-8 sm:pt-12 pb-8 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 border-b border-white/10 bg-[#111114]">
         <div className="space-y-4">
           <div className="flex items-center gap-2">
             <span className="w-2.5 h-2.5 bg-[#E43D3D] inline-block" />
@@ -208,7 +208,7 @@ export const StyleGuidePage: React.FC = () => {
       {/* ==================================================
           STICKY SECTION JUMP NAVIGATION SUB-BAR
          ================================================== */}
-      <nav aria-label="Style guide sections" className="sticky top-14 z-30 bg-[#0B0B0D]/95 backdrop-blur-md border-b border-white/10 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 py-2.5 overflow-x-auto no-scrollbar">
+      <nav aria-label="Style guide sections" className="sticky top-14 sm:top-20 z-30 bg-[#0B0B0D]/95 backdrop-blur-md border-b border-white/10 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 py-2.5 overflow-x-auto no-scrollbar">
         <div className="flex items-center gap-2 whitespace-nowrap min-w-max">
           {navSections.map((sec) => (
             <a

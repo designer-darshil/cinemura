@@ -182,7 +182,7 @@ export const HomePage: React.FC = () => {
             {heroItem.type === 'movie' ? (
               <Link
                 to={`/watch/movie/${heroItem.id}`}
-                className="btn-primary min-h-[40px] px-6 text-xs font-mono font-semibold tracking-wider uppercase flex items-center justify-center gap-2 w-full sm:w-auto"
+                className="btn-primary w-full sm:w-auto"
               >
                 <Play className="w-3.5 h-3.5 fill-white" />
                 <span>WATCH MOVIE</span>
@@ -190,7 +190,7 @@ export const HomePage: React.FC = () => {
             ) : heroItem.type === 'tv' ? (
               <Link
                 to={`/watch/tv/${heroItem.id}?s=1&e=1`}
-                className="btn-primary min-h-[40px] px-6 text-xs font-mono font-semibold tracking-wider uppercase flex items-center justify-center gap-2 w-full sm:w-auto"
+                className="btn-primary w-full sm:w-auto"
               >
                 <Play className="w-3.5 h-3.5 fill-white" />
                 <span>WATCH TV</span>
@@ -205,7 +205,7 @@ export const HomePage: React.FC = () => {
                   0,
                   heroItem.title
                 )}
-                className="btn-secondary min-h-[40px] px-5 text-xs font-mono font-semibold tracking-wider uppercase flex items-center justify-center gap-2 w-full sm:w-auto"
+                className="btn-secondary w-full sm:w-auto"
               >
                 <Play className="w-3.5 h-3.5 fill-[#E43D3D] text-[#E43D3D]" />
                 <span>{heroTrailerLabel || 'WATCH TRAILER'}</span>
@@ -215,7 +215,7 @@ export const HomePage: React.FC = () => {
             <button
               type="button"
               onClick={scrollToDiscovery}
-              className="btn-secondary min-h-[40px] px-6 text-xs font-mono font-semibold tracking-wider uppercase flex items-center justify-center gap-2 w-full sm:w-auto"
+              className="btn-secondary w-full sm:w-auto"
             >
               <Compass className="w-3.5 h-3.5" />
               <span>EXPLORE</span>

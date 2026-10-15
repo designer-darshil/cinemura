@@ -1,15 +1,27 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { X } from 'lucide-react';
+import { X, TrendingUp } from 'lucide-react';
 import { useApp } from '../context/AppContext';
-import { searchTmdb } from '../services/tmdb';
+import { searchTmdb, getTrendingMovies } from '../services/tmdb';
 import { Movie, Series, Person } from '../types';
 import { MediaCard, PersonCard } from './MediaCard';
 import { CardGridSkeleton } from './StateViews';
+
+const TRENDING_SEARCH_TAGS = [
+  'Dune',
+  'Oppenheimer',
+  'Interstellar',
+  'Blade Runner 2049',
+  'The Batman',
+  'Severance',
+  'Succession',
+  'Christopher Nolan'
+];
 
 export const SearchModal: React.FC = () => {
   const { isSearchOpen, closeSearch } = useApp();
   const [query, setQuery] = useState('');
   const [searching, setSearching] = useState(false);
+  const [suggestions, setSuggestions] = useState<Movie[]>([]);
   const [results, setResults] = useState<{ movies: Movie[]; series: Series[]; people: Person[] }>({
     movies: [],
     series: [],
@@ -19,6 +31,19 @@ export const SearchModal: React.FC = () => {
   const inputRef = useRef<HTMLInputElement | null>(null);
   const modalRef = useRef<HTMLDivElement | null>(null);
   const requestIdRef = useRef<number>(0);
+
+  // Load curated suggestions once
+  useEffect(() => {
+    if (isSearchOpen && suggestions.length === 0) {
+      getTrendingMovies('week')
+        .then(movies => {
+          if (movies && movies.length > 0) {
+            setSuggestions(movies.slice(0, 6));
+          }
+        })
+        .catch(() => {});
+    }
+  }, [isSearchOpen, suggestions.length]);
 
   // Auto-focus input and handle focus restoration
   useEffect(() => {
@@ -118,10 +143,14 @@ export const SearchModal: React.FC = () => {
       role="dialog"
       aria-modal="true"
       aria-label="Search Catalog"
-      className="fixed inset-0 z-50 bg-[#0B0B0D] overflow-y-auto text-[#F2F0EC] px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 py-6 sm:py-10 animate-fadeIn selection:bg-[#E43D3D] selection:text-white"
+      style={{
+        paddingTop: 'max(1.5rem, env(safe-area-inset-top, 1.5rem))',
+        paddingBottom: 'max(2rem, env(safe-area-inset-bottom, 2rem))'
+      }}
+      className="fixed inset-0 z-50 bg-[#0B0B0D] overflow-y-auto text-[#F2F0EC] px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 animate-fadeIn selection:bg-[#E43D3D] selection:text-white"
     >
       
-      <div className="w-full space-y-8 sm:space-y-12">
+      <div className="w-full space-y-6 sm:space-y-12">
         
         {/* Top Minimal Controls Header */}
         <div className="flex items-center justify-between border-b border-white/10 pb-4">
@@ -129,7 +158,7 @@ export const SearchModal: React.FC = () => {
             <span className="text-[10px] font-mono font-extrabold tracking-[0.2em] text-[#E43D3D] uppercase">
               SEARCH
             </span>
-            <kbd className="text-[9px] font-mono bg-white/5 border border-white/10 px-2 py-0.5 text-[#8E8E93]">
+            <kbd className="hidden sm:inline-block text-[9px] font-mono bg-white/5 border border-white/10 px-2 py-0.5 text-[#8E8E93]">
               ESC
             </kbd>
           </div>
@@ -137,7 +166,7 @@ export const SearchModal: React.FC = () => {
           <button
             onClick={closeSearch}
             aria-label="Close search"
-            className="p-2 text-[#8E8E93] hover:text-[#E43D3D] focus-visible:text-[#E43D3D] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#E43D3D] transition-colors"
+            className="w-11 h-11 flex items-center justify-center text-[#8E8E93] hover:text-[#E43D3D] focus-visible:text-[#E43D3D] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#E43D3D] transition-colors -mr-2"
           >
             <X className="w-6 h-6" />
           </button>
@@ -158,7 +187,7 @@ export const SearchModal: React.FC = () => {
               <button
                 onClick={() => setQuery('')}
                 aria-label="Clear search input"
-                className="absolute right-0 top-1/2 -translate-y-1/2 p-2 text-[#8E8E93] hover:text-[#F2F0EC] transition-colors"
+                className="absolute right-0 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center text-[#8E8E93] hover:text-[#F2F0EC] transition-colors"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -166,12 +195,49 @@ export const SearchModal: React.FC = () => {
           </div>
         </div>
 
-        {/* Initial Prompt (Before Query) */}
+        {/* Initial Prompt with Trending Searches & Suggestions */}
         {!query.trim() && (
-          <div className="py-16 text-center space-y-2">
-            <span className="text-xs font-mono tracking-[0.2em] text-[#8E8E93] uppercase">
-              SEARCH MOVIES, TV SHOWS OR PEOPLE
-            </span>
+          <div className="space-y-8 sm:space-y-10 pt-2">
+            {/* Trending Search Keywords */}
+            <div className="space-y-3">
+              <div className="flex items-center gap-2">
+                <TrendingUp className="w-3.5 h-3.5 text-[#E43D3D]" />
+                <span className="text-[11px] font-mono font-bold tracking-[0.2em] text-[#8E8E93] uppercase">
+                  TRENDING SEARCHES
+                </span>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {TRENDING_SEARCH_TAGS.map((tag) => (
+                  <button
+                    key={tag}
+                    type="button"
+                    onClick={() => setQuery(tag)}
+                    className="px-3.5 py-2 sm:py-1.5 min-h-[40px] sm:min-h-0 flex items-center bg-[#17171B] hover:bg-[#E43D3D] text-[#F2F0EC] hover:text-white border border-white/10 hover:border-[#E43D3D] text-xs font-mono tracking-wider uppercase transition-all duration-200"
+                  >
+                    {tag}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Curated Cinema Suggestions */}
+            {suggestions.length > 0 && (
+              <div className="space-y-4 pt-4 border-t border-white/10">
+                <div className="flex items-center justify-between">
+                  <span className="text-[11px] font-mono font-bold tracking-[0.2em] text-[#8E8E93] uppercase">
+                    SUGGESTIONS
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3 sm:gap-4">
+                  {suggestions.map((movie) => (
+                    <div key={movie.id} onClick={closeSearch}>
+                      <MediaCard item={movie} variant="poster" />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         )}
 
@@ -179,7 +245,7 @@ export const SearchModal: React.FC = () => {
         {searching && (
           <div className="space-y-4 pt-4">
             <div className="text-xs font-mono text-[#8E8E93] uppercase animate-pulse">
-              SEARCHING LIVE CATALOG...
+              SEARCHING...
             </div>
             <CardGridSkeleton count={12} />
           </div>
@@ -191,7 +257,7 @@ export const SearchModal: React.FC = () => {
             
             {/* Zero Results State */}
             {totalResults === 0 && (
-              <div className="py-16 text-center space-y-2 border border-white/10 bg-[#111114] p-8">
+              <div className="py-16 text-center space-y-2">
                 <h3 className="font-display font-bold text-xl text-[#F2F0EC] uppercase">
                   NO RESULTS
                 </h3>

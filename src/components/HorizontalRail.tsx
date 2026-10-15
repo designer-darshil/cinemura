@@ -68,14 +68,14 @@ export const HorizontalRail: React.FC<HorizontalRailProps> = ({
         type="button"
         onClick={handleScrollLeft}
         disabled={!canScrollLeft}
-        className={`hidden md:flex absolute -left-3 lg:-left-5 top-1/2 -translate-y-1/2 z-30 w-10 h-10 bg-[#0B0B0D]/95 border border-white/20 text-white items-center justify-center transition-all ${
+        className={`hidden md:flex absolute -left-3 lg:-left-4 top-1/2 -translate-y-1/2 z-30 w-9 h-9 bg-[#0B0B0D]/90 backdrop-blur-sm border border-white/15 rounded-full text-white items-center justify-center transition-all ${
           canScrollLeft
-            ? 'opacity-0 group-hover/rail:opacity-100 hover:bg-[#E43D3D] hover:border-[#E43D3D] cursor-pointer'
+            ? 'opacity-0 group-hover/rail:opacity-100 hover:bg-white/10 hover:border-white/40 cursor-pointer shadow-lg'
             : 'opacity-0 pointer-events-none'
         }`}
         aria-label="Scroll left"
       >
-        <ChevronLeft className="w-5 h-5" />
+        <ChevronLeft className="w-4 h-4" />
       </button>
 
       {/* Rail Items Container */}
@@ -96,7 +96,7 @@ export const HorizontalRail: React.FC<HorizontalRailProps> = ({
           </div>
         ))}
 
-        {/* Explore All Card (matching Jason ListingCarousel pattern) */}
+        {/* Explore All Card (matching editorial rail pattern) */}
         {exploreAllLink && (
           <div
             className={`flex-shrink-0 ${
@@ -107,16 +107,16 @@ export const HorizontalRail: React.FC<HorizontalRailProps> = ({
           >
             <Link
               to={exploreAllLink}
-              className="group/all flex flex-col items-center justify-center h-full aspect-[2/3] bg-[#111114] border border-white/10 hover:border-[#E43D3D] transition-all duration-300 p-6 text-center space-y-3 transform hover:-translate-y-1"
+              className="group/all flex flex-col items-center justify-center h-full aspect-[2/3] bg-[#111114] border border-white/10 hover:border-white/30 transition-colors duration-300 p-6 text-center space-y-3"
             >
-              <div className="w-12 h-12 rounded-full border border-white/20 group-hover/all:border-[#E43D3D] group-hover/all:bg-[#E43D3D] flex items-center justify-center transition-all duration-300">
-                <ArrowRight className="w-5 h-5 text-white transform group-hover/all:translate-x-0.5 transition-transform" />
+              <div className="w-10 h-10 rounded-full border border-white/20 group-hover/all:border-white/40 group-hover/all:bg-white/5 flex items-center justify-center transition-all duration-300">
+                <ArrowRight className="w-4 h-4 text-white" />
               </div>
               <span className="type-label text-xs tracking-wider text-white group-hover/all:text-[#E43D3D] transition-colors font-bold uppercase">
                 {exploreAllText}
               </span>
               <span className="text-[10px] font-mono text-[#8E8E93] tracking-widest uppercase">
-                VIEW FULL LIST →
+                VIEW ALL →
               </span>
             </Link>
           </div>
@@ -128,14 +128,14 @@ export const HorizontalRail: React.FC<HorizontalRailProps> = ({
         type="button"
         onClick={handleScrollRight}
         disabled={!canScrollRight}
-        className={`hidden md:flex absolute -right-3 lg:-right-5 top-1/2 -translate-y-1/2 z-30 w-10 h-10 bg-[#0B0B0D]/95 border border-white/20 text-white items-center justify-center transition-all ${
+        className={`hidden md:flex absolute -right-3 lg:-right-4 top-1/2 -translate-y-1/2 z-30 w-9 h-9 bg-[#0B0B0D]/90 backdrop-blur-sm border border-white/15 rounded-full text-white items-center justify-center transition-all ${
           canScrollRight
-            ? 'opacity-0 group-hover/rail:opacity-100 hover:bg-[#E43D3D] hover:border-[#E43D3D] cursor-pointer'
+            ? 'opacity-0 group-hover/rail:opacity-100 hover:bg-white/10 hover:border-white/40 cursor-pointer shadow-lg'
             : 'opacity-0 pointer-events-none'
         }`}
         aria-label="Scroll right"
       >
-        <ChevronRight className="w-5 h-5" />
+        <ChevronRight className="w-4 h-4" />
       </button>
     </div>
   );

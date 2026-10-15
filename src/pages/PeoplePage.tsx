@@ -93,15 +93,15 @@ export const PeoplePage: React.FC = () => {
     fetchPeopleList(nextPage, true);
   }, [page, loading, loadingMore, hasMore, fetchPeopleList]);
 
-  const sentinelRef = useInfiniteScroll({
+  const { triggerIndex, triggerRef } = useInfiniteScroll({
+    totalItems: people.length,
     loading: loading || loadingMore,
     hasMore,
-    onLoadMore: handleLoadMore,
-    rootMargin: '600px 0px'
+    onLoadMore: handleLoadMore
   });
 
   return (
-    <div className="min-h-screen bg-[#0B0B0D] text-[#F2F0EC] pt-24 pb-20 w-full px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 space-y-10 selection:bg-[#E43D3D] selection:text-white">
+    <div className="min-h-screen bg-[#0B0B0D] text-[#F2F0EC] pt-8 sm:pt-12 pb-20 w-full px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 space-y-10 selection:bg-[#E43D3D] selection:text-white">
       {/* 1. EDITORIAL HEADER */}
       <header className="border-b border-white/10 pb-6 space-y-3">
         <div className="flex flex-wrap items-baseline justify-between gap-4">
@@ -141,7 +141,7 @@ export const PeoplePage: React.FC = () => {
       {!loading && !error && people.length > 0 && (
         <div className="space-y-8">
           <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4">
-            {people.map((person) => (
+            {people.map((person, index) => (
               <PersonCard
                 key={person.id}
                 id={person.id}
@@ -150,6 +150,7 @@ export const PeoplePage: React.FC = () => {
                 knownFor={person.knownFor}
                 portrait={person.portrait}
                 slug={person.slug || person.id}
+                ref={index === triggerIndex ? triggerRef : undefined}
               />
             ))}
           </div>
@@ -164,9 +165,6 @@ export const PeoplePage: React.FC = () => {
 
           {/* End of content indicator */}
           {!hasMore && people.length > 0 && <EndOfContentState />}
-
-          {/* Intersection Observer Sentinel for continuous prefetching */}
-          <div ref={sentinelRef} className="h-10 w-full pointer-events-none" />
         </div>
       )}
     </div>

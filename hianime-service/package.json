@@ -1,0 +1,14 @@
+{
+  "name": "hianime-v2",
+  "version": "2.2.0",
+  "type": "module",
+  "dependencies": {
+    "@hono/node-server": "^1.8.2",
+    "axios": "^1.6.0",
+    "cheerio": "^1.0.0-rc.12",
+    "hono": "^4.0.0"
+  },
+  "devDependencies": {
+    "tsx": "^4.23.15"
+  }
+}

@@ -5,7 +5,8 @@ import {
   getMovieCategory,
   getMovieDetail,
   getMoviesList,
-  getMovieGenres
+  getMovieGenres,
+  getTrendingMovies
 } from '../services/tmdb';
 import { Movie } from '../types';
 import { MediaCard } from '../components/MediaCard';
@@ -18,7 +19,8 @@ import {
   EmptyState,
   InfiniteLoadingSkeleton,
   InfiniteErrorState,
-  EndOfContentState
+  EndOfContentState,
+  IndexHeroSkeleton
 } from '../components/StateViews';
 import { useInfiniteScroll } from '../hooks/useInfiniteScroll';
 import { useApp } from '../context/AppContext';
@@ -75,40 +77,79 @@ export const MoviesPage: React.FC = () => {
     setIndexError(false);
 
     Promise.all([
+      getTrendingMovies('day'),
       getMovieCategory('popular', 1),
       getMovieCategory('top_rated', 1),
       getMovieCategory('upcoming', 1),
       getMovieCategory('now_playing', 1)
     ])
-      .then(async ([pop, top, upc, now]) => {
+      .then(async ([trending, pop, top, upc, now]) => {
         if (!mounted) return;
 
-        if (!pop && !top && !upc && !now) {
+        if (!trending && !pop && !top && !upc && !now) {
           setIndexError(true);
           setIndexLoading(false);
           return;
         }
 
+        const validTrending = trending || [];
         const validPopular = pop || [];
         setPopularMovies(validPopular);
         setTopRatedMovies(top || []);
         setUpcomingMovies(upc || []);
         setNowPlayingMovies(now || []);
 
-        // Pick top popular item with full details for Hero
-        if (validPopular.length > 0) {
+        // Filter eligible candidates with backdrop, title, and synopsis
+        const candidateSource = validTrending.length > 0 ? validTrending : validPopular;
+        const eligibleCandidates = candidateSource.filter(c =>
+          c &&
+          c.id &&
+          c.backdrop &&
+          !c.backdrop.includes('placeholder') &&
+          c.title &&
+          c.synopsis
+        );
+
+        // Avoid selecting the immediately previous title from session on reload
+        const LAST_MOVIE_HERO_KEY = 'cinemura_prev_hero_movie';
+        const prevHeroId = sessionStorage.getItem(LAST_MOVIE_HERO_KEY);
+        let pool = eligibleCandidates.filter(c => c.id !== prevHeroId);
+        if (pool.length === 0) {
+          pool = eligibleCandidates.length > 0 ? eligibleCandidates : candidateSource;
+        }
+
+        const selected = pool.length > 0
+          ? pool[Math.floor(Math.random() * pool.length)]
+          : null;
+
+        if (selected) {
           try {
-            const fullHero = await getMovieDetail(validPopular[0].id);
+            const fullHero = await getMovieDetail(selected.id);
+            const resolvedHero = fullHero || selected;
+
+            // Preload hero backdrop before revealing
+            if (resolvedHero?.backdrop) {
+              await new Promise<void>((resolve) => {
+                const img = new Image();
+                img.src = resolvedHero.backdrop;
+                img.onload = () => resolve();
+                img.onerror = () => resolve();
+              });
+            }
+
             if (mounted) {
-              setHeroMovie(fullHero || validPopular[0]);
+              setHeroMovie(resolvedHero);
+              sessionStorage.setItem(LAST_MOVIE_HERO_KEY, resolvedHero.id);
             }
           } catch {
-            if (mounted) setHeroMovie(validPopular[0]);
+            if (mounted) setHeroMovie(selected);
           }
         }
 
-        setIndexLoading(false);
-        markAppReady();
+        if (mounted) {
+          setIndexLoading(false);
+          markAppReady();
+        }
       })
       .catch((err) => {
         console.error('Failed to load movie categories:', err);
@@ -122,7 +163,7 @@ export const MoviesPage: React.FC = () => {
     return () => {
       mounted = false;
     };
-  }, [isCategoryView]);
+  }, [isCategoryView, markAppReady]);
 
   /* ====================================================
      EFFECT: LOAD FULL CATEGORY LIST (PAGINATED)
@@ -211,11 +252,12 @@ export const MoviesPage: React.FC = () => {
     fetchCategoryData(nextPage, true);
   }, [catPage, catLoading, catLoadingMore, catHasMore, fetchCategoryData]);
 
-  const sentinelRef = useInfiniteScroll({
+  const { triggerIndex, triggerRef } = useInfiniteScroll({
+    totalItems: categoryItems.length,
     loading: catLoading || catLoadingMore,
     hasMore: catHasMore,
     onLoadMore: handleCatLoadMore,
-    rootMargin: '600px 0px'
+    resetDeps: [isCategoryView, categoryNameParam, genreIdParam]
   });
 
   /* ====================================================
@@ -228,7 +270,7 @@ export const MoviesPage: React.FC = () => {
       : CATEGORY_TITLES[rawCategoryKey] || `${(categoryNameParam || 'MOVIES').toUpperCase()}`;
 
     return (
-      <div className="min-h-screen bg-[#0B0B0D] text-[#F2F0EC] pt-24 pb-20 w-full px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 space-y-10">
+      <div className="min-h-screen bg-[#0B0B0D] text-[#F2F0EC] pt-8 sm:pt-12 pb-20 w-full px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 space-y-10">
         {/* Top Back Nav & Heading */}
         <header className="border-b border-white/10 pb-6 space-y-4">
           <Link
@@ -276,8 +318,13 @@ export const MoviesPage: React.FC = () => {
         {!catLoading && !catError && categoryItems.length > 0 && (
           <div className="space-y-8">
             <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4">
-              {categoryItems.map((movie) => (
-                <MediaCard key={movie.id} item={movie} variant="poster" />
+              {categoryItems.map((movie, index) => (
+                <MediaCard
+                  key={movie.id}
+                  item={movie}
+                  variant="poster"
+                  ref={index === triggerIndex ? triggerRef : undefined}
+                />
               ))}
             </div>
 
@@ -291,9 +338,6 @@ export const MoviesPage: React.FC = () => {
 
             {/* End of content indicator */}
             {!catHasMore && categoryItems.length > 0 && <EndOfContentState />}
-
-            {/* Intersection Observer Sentinel for continuous prefetching */}
-            <div ref={sentinelRef} className="h-10 w-full pointer-events-none" />
           </div>
         )}
       </div>
@@ -305,9 +349,13 @@ export const MoviesPage: React.FC = () => {
      Hero -> Popular -> Top Rated -> Upcoming -> Now Playing
      ==================================================== */
   return (
-    <div className="min-h-screen bg-[#0B0B0D] text-[#F2F0EC] space-y-16 lg:space-y-20 pb-20 selection:bg-[#E43D3D] selection:text-white">
+    <div className="min-h-screen bg-[#0B0B0D] text-[#F2F0EC] space-y-12 sm:space-y-16 lg:space-y-20 pb-20 selection:bg-[#E43D3D] selection:text-white">
       {/* 1. HERO BANNER */}
-      {heroMovie && <HeroBanner item={heroMovie} badgeLabel="FEATURE FILM" />}
+      {heroMovie ? (
+        <HeroBanner item={heroMovie} badgeLabel="FEATURE FILM" />
+      ) : (
+        indexLoading && <IndexHeroSkeleton />
+      )}
 
       {/* Loading Skeletons when initial data is arriving */}
       {indexLoading && (

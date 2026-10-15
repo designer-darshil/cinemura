@@ -174,7 +174,7 @@ export const AppLoader: React.FC<AppLoaderProps> = ({ isReady: propIsReady }) =>
         className="absolute inset-0 flex items-center justify-center pointer-events-none"
         style={{ height: `${dimensions.height}px` }}
       >
-        <span className="font-display font-bold text-lg sm:text-xl text-[#F2F0EC] tracking-[0.3em] uppercase">
+        <span className="font-display font-bold text-lg sm:text-3xl text-[#F2F0EC] tracking-[0.3em] uppercase">
           CINEMURA
         </span>
       </div>

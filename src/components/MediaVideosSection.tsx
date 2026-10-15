@@ -55,12 +55,15 @@ export const MediaVideosSection: React.FC<MediaVideosSectionProps> = ({
     <section id={id} className="space-y-6 scroll-mt-28">
       {/* Header and dynamic filter bar */}
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-white/10 pb-4">
-        <div>
-          <span className="text-[10px] font-mono tracking-[0.25em] text-[#E43D3D] uppercase font-bold block mb-1">
-            OFFICIAL MEDIA
-          </span>
+        <div className="space-y-1">
+          <div className="flex items-center gap-2.5">
+            <span className="w-4 h-[2px] bg-[#E43D3D] inline-block" />
+            <span className="text-[10px] font-mono tracking-[0.25em] text-[#8E8E93] uppercase font-medium">
+              MOTION ARCHIVE
+            </span>
+          </div>
           <div className="flex items-baseline gap-3">
-            <h2 className="text-2xl sm:text-3xl font-serif font-bold text-[#F2F0EC] uppercase tracking-tight">
+            <h2 className="text-xl sm:text-2xl font-display font-bold text-[#F2F0EC] uppercase tracking-tight">
               VIDEOS
             </h2>
             <span className="text-xs font-mono text-[#8E8E93] bg-white/5 border border-white/10 px-2 py-0.5">
@@ -122,7 +125,7 @@ export const MediaVideosSection: React.FC<MediaVideosSectionProps> = ({
                   openVideoPlayer(filteredVideos, idx, parentTitle);
                 }
               }}
-              className="group relative bg-[#111114] border border-white/10 hover:border-[#E43D3D] transition-all duration-300 cursor-pointer flex flex-col justify-between overflow-hidden shadow-lg"
+              className="group relative bg-[#111114] border border-white/10 hover:border-white/30 transition-all duration-300 cursor-pointer flex flex-col justify-between overflow-hidden shadow-xl"
             >
               {/* 16:9 Thumbnail Container */}
               <div className="relative aspect-video w-full bg-black overflow-hidden">
@@ -130,20 +133,20 @@ export const MediaVideosSection: React.FC<MediaVideosSectionProps> = ({
                   src={youtubeThumb}
                   alt={video.name}
                   loading="lazy"
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  className="w-full h-full object-cover filter grayscale-[15%] group-hover:grayscale-0 group-hover:scale-105 transition-all duration-500"
                 />
                 <div className="absolute inset-0 bg-black/40 group-hover:bg-black/20 transition-colors" />
 
-                {/* Centered Simple Play Control */}
+                {/* Centered Circular Play Control */}
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="w-10 h-10 bg-[#E43D3D] text-white flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+                  <div className="w-11 h-11 rounded-full bg-[#E43D3D] text-white flex items-center justify-center shadow-xl group-hover:scale-110 transition-transform">
                     <Play className="w-4 h-4 fill-white pl-0.5" />
                   </div>
                 </div>
 
                 {/* Video Badges: Type & Official */}
                 <div className="absolute top-2 left-2 flex items-center gap-1.5">
-                  <span className="text-[9px] font-mono font-extrabold uppercase px-2 py-0.5 bg-black/80 text-white border border-white/20">
+                  <span className="text-[9px] font-mono font-bold uppercase px-2 py-0.5 bg-black/80 text-white border border-white/20">
                     {video.type || 'VIDEO'}
                   </span>
                   {video.official && (
@@ -164,13 +167,13 @@ export const MediaVideosSection: React.FC<MediaVideosSectionProps> = ({
               </div>
 
               {/* Title & Type Metadata */}
-              <div className="p-3 space-y-1">
-                <h3 className="font-serif font-bold text-sm text-[#F2F0EC] group-hover:text-[#E43D3D] transition-colors line-clamp-1">
+              <div className="p-3.5 space-y-1.5">
+                <h3 className="font-sans font-bold text-xs sm:text-sm text-[#F2F0EC] group-hover:text-[#E43D3D] transition-colors line-clamp-1">
                   {video.name}
                 </h3>
-                <div className="text-[11px] font-mono text-[#8E8E93] flex items-center justify-between">
+                <div className="text-[10px] font-mono text-[#8E8E93] flex items-center justify-between uppercase tracking-wider">
                   <span>{video.site || 'YOUTUBE'}</span>
-                  <span className="uppercase text-[#E43D3D] font-bold">{video.type}</span>
+                  <span className="text-[#E43D3D] font-bold">{video.type}</span>
                 </div>
               </div>
             </div>

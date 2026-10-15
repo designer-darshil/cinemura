@@ -233,13 +233,21 @@ export const SeriesDetailPage: React.FC = () => {
 
             {/* Primary & Secondary Actions (Touch-friendly min 44px) */}
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4 pt-2">
+              <Link
+                to={`/watch/tv/${series.id}?s=1&e=1`}
+                className="bg-[#E43D3D] hover:bg-[#c02e2e] text-white min-h-[44px] px-7 py-3 text-xs font-mono font-bold tracking-widest uppercase flex items-center justify-center gap-3 transition-all shadow-lg w-full sm:w-auto"
+              >
+                <Play className="w-4 h-4 fill-white" />
+                <span>WATCH S1 E1</span>
+              </Link>
+
               {primaryVideo && (
                 <button
                   type="button"
                   onClick={() => openVideoPlayer(playableVideos, 0, series.title)}
-                  className="bg-[#E43D3D] hover:bg-[#c02e2e] text-white min-h-[44px] px-7 py-3 text-xs font-mono font-bold tracking-widest uppercase flex items-center justify-center gap-3 transition-all shadow-lg w-full sm:w-auto"
+                  className="bg-transparent hover:bg-white/5 border border-white/20 text-[#F2F0EC] min-h-[44px] px-7 py-3 text-xs font-mono font-bold tracking-widest uppercase flex items-center justify-center gap-3 transition-all w-full sm:w-auto"
                 >
-                  <Play className="w-4 h-4 fill-white" />
+                  <Play className="w-4 h-4 text-[#E43D3D]" />
                   <span>{primaryVideoLabel}</span>
                 </button>
               )}

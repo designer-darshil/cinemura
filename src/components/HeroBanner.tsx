@@ -130,6 +130,24 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({ item, badgeLabel, action
             actions
           ) : (
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 pt-2">
+              {isMovie ? (
+                <Link
+                  to={`/watch/movie/${item.id}`}
+                  className="btn-primary min-h-[40px] px-5 text-xs font-mono font-semibold tracking-wider uppercase flex items-center justify-center gap-2 w-full sm:w-auto"
+                >
+                  <Play className="w-3.5 h-3.5 fill-white" />
+                  <span>WATCH MOVIE</span>
+                </Link>
+              ) : isSeries ? (
+                <Link
+                  to={`/watch/tv/${item.id}?s=1&e=1`}
+                  className="btn-primary min-h-[40px] px-5 text-xs font-mono font-semibold tracking-wider uppercase flex items-center justify-center gap-2 w-full sm:w-auto"
+                >
+                  <Play className="w-3.5 h-3.5 fill-white" />
+                  <span>WATCH TV</span>
+                </Link>
+              ) : null}
+
               {primaryVideo && (
                 <button
                   type="button"
@@ -140,9 +158,9 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({ item, badgeLabel, action
                       item.title
                     )
                   }
-                  className="btn-primary min-h-[40px] px-5 text-xs font-mono font-semibold tracking-wider uppercase flex items-center justify-center gap-2 w-full sm:w-auto"
+                  className={`${isMovie || isSeries ? 'btn-secondary' : 'btn-primary'} min-h-[40px] px-5 text-xs font-mono font-semibold tracking-wider uppercase flex items-center justify-center gap-2 w-full sm:w-auto`}
                 >
-                  <Play className="w-3.5 h-3.5 fill-white" />
+                  <Play className={`w-3.5 h-3.5 ${isMovie || isSeries ? 'text-[#E43D3D]' : 'fill-white'}`} />
                   <span>{trailerLabel}</span>
                 </button>
               )}
@@ -151,7 +169,7 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({ item, badgeLabel, action
                 to={detailPath}
                 className="btn-secondary min-h-[40px] px-5 inline-flex items-center justify-center gap-2 text-xs font-mono font-semibold tracking-wider uppercase w-full sm:w-auto"
               >
-                <span>EXPLORE TITLE</span>
+                <span>EXPLORE</span>
                 <ArrowRight className="w-3.5 h-3.5 text-[#8E8E93]" />
               </Link>
             </div>

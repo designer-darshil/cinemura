@@ -99,7 +99,7 @@ const FALLBACK_PERSON: Person = {
 };
 
 export const StyleGuidePage: React.FC = () => {
-  const { markAppReady, openSearch, openVideoPlayer, openCineSrcMovie } = useApp();
+  const { markAppReady, openSearch, openVideoPlayer } = useApp();
   const [showLoaderDemo, setShowLoaderDemo] = useState(false);
 
   const [realMovie, setRealMovie] = useState<Movie>(FALLBACK_MOVIE);
@@ -893,14 +893,13 @@ export const StyleGuidePage: React.FC = () => {
               <span>OPEN TRAILER LIGHTBOX</span>
             </button>
 
-            <button
-              type="button"
-              onClick={() => openCineSrcMovie(realMovie.id, realMovie.title)}
-              className="btn-secondary min-h-[44px] px-6 text-xs uppercase"
+            <Link
+              to={`/watch/movie/${realMovie.id}`}
+              className="btn-secondary min-h-[44px] px-6 text-xs uppercase flex items-center gap-2"
             >
               <Film className="w-4 h-4 text-[#E43D3D]" />
-              <span>OPEN CINESRC PLAYER MODAL</span>
-            </button>
+              <span>LAUNCH CINESRC WATCH PAGE</span>
+            </Link>
           </div>
         </section>
 

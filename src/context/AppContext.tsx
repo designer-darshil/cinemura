@@ -19,15 +19,6 @@ export interface ActiveVideoSession {
   currentIndex: number;
   parentTitle?: string;
 }
-
-export interface CineSrcSession {
-  type: 'movie' | 'tv';
-  tmdbId: string | number;
-  season?: number;
-  episode?: number;
-  title?: string;
-}
-
 interface AppContextType {
   // Application Boot Readiness
   isAppReady: boolean;
@@ -44,12 +35,6 @@ interface AppContextType {
   prevVideo: () => void;
   selectVideoIndex: (index: number) => void;
 
-  // CineSrc Fullscreen Playback Modal
-  cineSrcSession: CineSrcSession | null;
-  openCineSrcMovie: (tmdbId: string | number, title?: string) => void;
-  openCineSrcTv: (tmdbId: string | number, season: number, episode: number, title?: string) => void;
-  closeCineSrc: () => void;
-  
   // Search Modal
   isSearchOpen: boolean;
   openSearch: () => void;
@@ -117,7 +102,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [videoSession, setVideoSession] = useState<ActiveVideoSession | null>(null);
   const [trailerUrl, setTrailerUrl] = useState<string | null>(null);
   const [trailerTitle, setTrailerTitle] = useState<string | null>(null);
-  const [cineSrcSession, setCineSrcSession] = useState<CineSrcSession | null>(null);
   const [isSearchOpen, setIsSearchOpen] = useState<boolean>(false);
   const [isProfileOpen, setIsProfileOpen] = useState<boolean>(false);
 
@@ -217,7 +201,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         setVideoSession(null);
         setTrailerUrl(null);
         setTrailerTitle(null);
-        setCineSrcSession(null);
       }
     };
     window.addEventListener('keydown', handleKeyDown);
@@ -293,29 +276,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const closeSearch = () => setIsSearchOpen(false);
   const toggleSearch = () => setIsSearchOpen(prev => !prev);
 
-  const openCineSrcMovie = (tmdbId: string | number, title?: string) => {
-    if (!tmdbId) return;
-    setCineSrcSession({
-      type: 'movie',
-      tmdbId,
-      title
-    });
-  };
-
-  const openCineSrcTv = (tmdbId: string | number, season: number, episode: number, title?: string) => {
-    if (!tmdbId || season === undefined || episode === undefined) return;
-    setCineSrcSession({
-      type: 'tv',
-      tmdbId,
-      season,
-      episode,
-      title
-    });
-  };
-
-  const closeCineSrc = () => {
-    setCineSrcSession(null);
-  };
 
   return (
     <AppContext.Provider
@@ -331,10 +291,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         nextVideo,
         prevVideo,
         selectVideoIndex,
-        cineSrcSession,
-        openCineSrcMovie,
-        openCineSrcTv,
-        closeCineSrc,
         isSearchOpen,
         openSearch,
         closeSearch,

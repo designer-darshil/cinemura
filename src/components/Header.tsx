@@ -71,10 +71,10 @@ export const Header: React.FC = () => {
           COMPACT, SOLID CINEMATIC HEADER (DESKTOP & MOBILE)
          ================================================== */}
       <header
-        className={`fixed top-0 left-0 right-0 z-40 transition-colors duration-200 bg-[#0B0B0D] ${
+        className={`fixed top-0 left-0 right-0 z-40 transition-colors duration-200 bg-[#0B0B0D] h-14 sm:h-20 ${
           isScrolled
-            ? 'border-b border-white/10 shadow-2xl h-14'
-            : 'border-b border-white/5 h-14 sm:h-16'
+            ? 'border-b border-white/10 shadow-2xl'
+            : 'border-b border-white/5'
         }`}
       >
         <div className="w-full px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 h-full flex items-center justify-between">
@@ -145,7 +145,7 @@ export const Header: React.FC = () => {
             </Link>
 
             {/* Desktop Profile Button */}
-            <button
+            {/* <button
               onClick={openProfile}
               aria-label="Profile"
               className="hidden md:flex p-2 text-[#8E8E93] hover:text-[#F2F0EC] transition-colors items-center gap-2 border border-transparent hover:border-white/10"
@@ -155,7 +155,7 @@ export const Header: React.FC = () => {
               <span className="hidden lg:inline text-[10px] font-mono tracking-widest text-[#F2F0EC] uppercase">
                 PROFILE
               </span>
-            </button>
+            </button> */}
 
             {/* Mobile-Only Search Trigger (Touch Target >= 44px) */}
             <button
@@ -352,7 +352,7 @@ export const Header: React.FC = () => {
               </button>
 
               {/* Profile */}
-              <button
+              {/* <button
                 type="button"
                 onClick={() => {
                   setMobileMenuOpen(false);
@@ -368,7 +368,7 @@ export const Header: React.FC = () => {
                   </span>
                 </div>
                 <ArrowRight className="w-4 h-4 text-[#8E8E93]" />
-              </button>
+              </button> */}
             </div>
 
           </div>

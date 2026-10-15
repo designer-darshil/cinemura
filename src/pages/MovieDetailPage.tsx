@@ -21,7 +21,7 @@ import { EntityAwardsData } from '../types';
 export const MovieDetailPage: React.FC = () => {
   const { id, slug } = useParams<{ id?: string; slug?: string }>();
   const movieId = id || slug;
-  const { openVideoPlayer, openCineSrcMovie, markAppReady, toggleWatchlist, isInWatchlist } = useApp();
+  const { openVideoPlayer, markAppReady, toggleWatchlist, isInWatchlist } = useApp();
 
   const [movie, setMovie] = useState<Movie | null>(null);
   const [awards, setAwards] = useState<EntityAwardsData | null>(null);
@@ -218,14 +218,13 @@ export const MovieDetailPage: React.FC = () => {
             {/* Actions (Touch targets min 44px) */}
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4 pt-2">
               {isMoviePlayable(movie) && (
-                <button
-                  type="button"
-                  onClick={() => openCineSrcMovie(movie.id, movie.title)}
+                <Link
+                  to={`/watch/movie/${movie.id}`}
                   className="bg-[#E43D3D] hover:bg-[#c02e2e] text-white min-h-[44px] px-7 py-3 text-xs font-mono font-bold tracking-widest uppercase flex items-center justify-center gap-3 transition-all shadow-lg w-full sm:w-auto"
                 >
                   <Play className="w-4 h-4 fill-white" />
                   <span>WATCH MOVIE</span>
-                </button>
+                </Link>
               )}
 
               {primaryVideo && (

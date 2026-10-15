@@ -11,7 +11,7 @@ interface TonightsPickSectionProps {
 }
 
 export const TonightsPickSection: React.FC<TonightsPickSectionProps> = ({ item }) => {
-  const { openVideoPlayer, openCineSrcMovie, toggleWatchlist, isInWatchlist } = useApp();
+  const { openVideoPlayer, toggleWatchlist, isInWatchlist } = useApp();
 
   const detailPath = item.type === 'movie' ? `/movie/${item.id}` : `/tv/${item.id}`;
   const isSaved = isInWatchlist(item.id);
@@ -120,14 +120,21 @@ export const TonightsPickSection: React.FC<TonightsPickSectionProps> = ({ item }
             {/* Action Buttons */}
             <div className="pt-4 border-t border-white/5 flex flex-wrap items-center gap-3">
               {item.type === 'movie' && isMoviePlayable(item as Movie) ? (
-                <button
-                  type="button"
-                  onClick={() => openCineSrcMovie(item.id, item.title)}
+                <Link
+                  to={`/watch/movie/${item.id}`}
                   className="btn-primary min-h-[40px] px-5 text-xs font-mono font-semibold tracking-wider uppercase flex items-center gap-2"
                 >
                   <Play className="w-3.5 h-3.5 fill-white" />
                   <span>WATCH MOVIE</span>
-                </button>
+                </Link>
+              ) : item.type === 'tv' ? (
+                <Link
+                  to={`/watch/tv/${item.id}?s=1&e=1`}
+                  className="btn-primary min-h-[40px] px-5 text-xs font-mono font-semibold tracking-wider uppercase flex items-center gap-2"
+                >
+                  <Play className="w-3.5 h-3.5 fill-white" />
+                  <span>WATCH TV</span>
+                </Link>
               ) : primaryVideo ? (
                 <button
                   type="button"

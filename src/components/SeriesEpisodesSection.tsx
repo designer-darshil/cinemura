@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { Link } from 'react-router-dom';
 import { Star, Clock, Calendar, Film, Play } from 'lucide-react';
 import { Season, Episode } from '../types';
 import { getTvSeasonDetail } from '../services/tmdb';
 import { EpisodeCardSkeleton } from './StateViews';
-import { useApp } from '../context/AppContext';
 import { isEpisodePlayable } from '../utils/cinesrc';
 
 interface SeriesEpisodesSectionProps {
@@ -19,7 +19,6 @@ export const SeriesEpisodesSection: React.FC<SeriesEpisodesSectionProps> = ({
   seasons,
   id = 'episodes-section'
 }) => {
-  const { openCineSrcTv } = useApp();
   // Client-side cache keyed by `seriesId_season_seasonNumber`
   const episodeCache = useRef<Map<string, Episode[]>>(new Map());
 
@@ -214,14 +213,13 @@ export const SeriesEpisodesSection: React.FC<SeriesEpisodesSectionProps> = ({
                   {/* Playback Action */}
                   {isEpisodePlayable(ep) && (
                     <div className="pt-2.5 mt-auto border-t border-white/10">
-                      <button
-                        type="button"
-                        onClick={() => openCineSrcTv(seriesId, ep.seasonNumber, ep.episodeNumber, `${seriesTitle} S${ep.seasonNumber}E${ep.episodeNumber}: ${ep.title}`)}
+                      <Link
+                        to={`/watch/tv/${seriesId}?s=${ep.seasonNumber}&e=${ep.episodeNumber}`}
                         className="w-full bg-[#18181D] hover:bg-[#E43D3D] text-[#F2F0EC] hover:text-white border border-white/15 hover:border-[#E43D3D] min-h-[44px] py-2 px-3 text-[11px] font-mono font-bold tracking-widest uppercase flex items-center justify-center gap-2 transition-all duration-200 group/btn"
                       >
                         <Play className="w-3 h-3 fill-current text-[#E43D3D] group-hover/btn:text-white group-hover/btn:fill-white" />
                         <span>WATCH EPISODE</span>
-                      </button>
+                      </Link>
                     </div>
                   )}
                 </div>

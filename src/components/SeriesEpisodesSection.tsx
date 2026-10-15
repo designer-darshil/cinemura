@@ -70,12 +70,15 @@ export const SeriesEpisodesSection: React.FC<SeriesEpisodesSectionProps> = ({
     <section id={id} className="space-y-6 scroll-mt-28">
       {/* Header Bar */}
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-white/10 pb-4">
-        <div>
-          <span className="text-[10px] font-mono tracking-[0.25em] text-[#E43D3D] uppercase font-bold block mb-1">
-            TELEVISION EPISODES
-          </span>
+        <div className="space-y-1">
+          <div className="flex items-center gap-2.5">
+            <span className="w-4 h-[2px] bg-[#E43D3D] inline-block" />
+            <span className="text-[10px] font-mono tracking-[0.25em] text-[#8E8E93] uppercase font-medium">
+              EPISODIC ARCHIVE
+            </span>
+          </div>
           <div className="flex items-baseline gap-3">
-            <h2 className="text-2xl sm:text-3xl font-serif font-bold text-[#F2F0EC] uppercase tracking-tight">
+            <h2 className="text-xl sm:text-2xl font-display font-bold text-[#F2F0EC] uppercase tracking-tight">
               EPISODES
             </h2>
             <span className="text-xs font-mono text-[#8E8E93] bg-white/5 border border-white/10 px-2 py-0.5">
@@ -96,7 +99,7 @@ export const SeriesEpisodesSection: React.FC<SeriesEpisodesSectionProps> = ({
                 className={`px-3.5 py-2 sm:py-1.5 min-h-[40px] sm:min-h-[36px] text-xs font-mono tracking-wider uppercase transition-all whitespace-nowrap border flex items-center shrink-0 ${
                   isActive
                     ? 'bg-[#E43D3D] border-[#E43D3D] text-white font-bold'
-                    : 'bg-[#111114] border-white/15 text-[#8E8E93] hover:text-[#F2F0EC] hover:border-white/30'
+                    : 'bg-[#111114] border-white/10 text-[#8E8E93] hover:text-[#F2F0EC] hover:border-white/30'
                 }`}
               >
                 <span>{season.title || `Season ${season.seasonNumber}`}</span>
@@ -134,7 +137,7 @@ export const SeriesEpisodesSection: React.FC<SeriesEpisodesSectionProps> = ({
             return (
               <div
                 key={ep.id}
-                className="group relative bg-[#111114] border border-white/10 hover:border-[#E43D3D] transition-all duration-300 flex flex-col justify-between overflow-hidden shadow-md"
+                className="group relative bg-[#111114] border border-white/10 hover:border-white/30 transition-all duration-300 flex flex-col justify-between overflow-hidden shadow-xl"
               >
                 {/* 16:9 Episode Still */}
                 <div className="relative aspect-video w-full bg-[#141418] overflow-hidden flex items-center justify-center">
@@ -143,7 +146,7 @@ export const SeriesEpisodesSection: React.FC<SeriesEpisodesSectionProps> = ({
                       src={ep.stillImage}
                       alt={`${seriesTitle} ${epNumFormatted}: ${ep.title}`}
                       loading="lazy"
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      className="w-full h-full object-cover filter grayscale-[15%] group-hover:grayscale-0 group-hover:scale-105 transition-all duration-500"
                     />
                   ) : (
                     <div className="flex flex-col items-center justify-center text-[#8E8E93] gap-1 p-4">
@@ -177,7 +180,7 @@ export const SeriesEpisodesSection: React.FC<SeriesEpisodesSectionProps> = ({
                 <div className="p-3.5 space-y-2 flex-grow flex flex-col justify-between">
                   <div className="space-y-1.5">
                     {/* Title */}
-                    <h3 className="font-serif font-bold text-sm text-[#F2F0EC] group-hover:text-[#E43D3D] transition-colors leading-snug line-clamp-1">
+                    <h3 className="font-sans font-bold text-sm text-[#F2F0EC] group-hover:text-[#E43D3D] transition-colors leading-snug line-clamp-1">
                       {ep.title}
                     </h3>
 
@@ -215,7 +218,7 @@ export const SeriesEpisodesSection: React.FC<SeriesEpisodesSectionProps> = ({
                     <div className="pt-2.5 mt-auto border-t border-white/10">
                       <Link
                         to={`/watch/tv/${seriesId}?s=${ep.seasonNumber}&e=${ep.episodeNumber}`}
-                        className="w-full bg-[#18181D] hover:bg-[#E43D3D] text-[#F2F0EC] hover:text-white border border-white/15 hover:border-[#E43D3D] min-h-[44px] py-2 px-3 text-[11px] font-mono font-bold tracking-widest uppercase flex items-center justify-center gap-2 transition-all duration-200 group/btn"
+                        className="w-full bg-[#17171B] hover:bg-[#E43D3D] text-[#F2F0EC] hover:text-white border border-white/10 hover:border-[#E43D3D] min-h-[42px] py-2 px-3 text-[10px] font-mono font-bold tracking-widest uppercase flex items-center justify-center gap-2 transition-all duration-200 group/btn"
                       >
                         <Play className="w-3 h-3 fill-current text-[#E43D3D] group-hover/btn:text-white group-hover/btn:fill-white" />
                         <span>WATCH EPISODE</span>

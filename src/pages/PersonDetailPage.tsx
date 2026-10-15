@@ -309,36 +309,34 @@ export const PersonDetailPage: React.FC = () => {
       {/* ==================================================
           2. PERSON BIOGRAPHY — ABOUT SECTION
          ================================================== */}
-      <section id="biography-section" className="mt-10 sm:mt-16 lg:mt-24 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 w-full space-y-6 scroll-mt-24">
-        
-        <div className="border-t border-white/10 pt-8 sm:pt-12">
-          <SectionHeader
-            title="BIOGRAPHY"
-          />
+      <section id="biography-section" className="mt-12 sm:mt-16 lg:mt-24 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 w-full space-y-6 scroll-mt-28">
+        <SectionHeader
+          label="BIOGRAPHICAL ARCHIVE"
+          title="BIOGRAPHY"
+        />
 
-          <div className="mt-6 max-w-4xl text-base sm:text-lg font-light text-[#F2F0EC]/90 leading-relaxed space-y-4 font-serif">
-            {person.biography ? (
-              person.biography.split('\n\n').map((paragraph, idx) => (
-                <p key={idx}>{paragraph}</p>
-              ))
-            ) : (
-              <p className="italic text-[#8E8E93] font-sans text-sm">
-                No biography record provided in the database.
-              </p>
-            )}
-          </div>
+        <div className="max-w-4xl text-base sm:text-lg font-light text-[#F2F0EC]/90 leading-relaxed space-y-5 font-sans">
+          {person.biography ? (
+            person.biography.split('\n\n').map((paragraph, idx) => (
+              <p key={idx}>{paragraph}</p>
+            ))
+          ) : (
+            <p className="text-[#8E8E93] font-mono text-xs uppercase tracking-wider">
+              No biographical record archived for this individual.
+            </p>
+          )}
         </div>
-
       </section>
 
       {/* ==================================================
           3. KNOWN FOR — VISUALLY PROMINENT SECTION
          ================================================== */}
       {person.knownFor && person.knownFor.length > 0 && (
-        <section className="mt-10 sm:mt-16 lg:mt-24 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 w-full space-y-6">
-          
+        <section className="mt-12 sm:mt-16 lg:mt-24 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 w-full space-y-6">
           <SectionHeader
+            label="SIGNATURE WORKS"
             title="KNOWN FOR"
+            description="Primary works establishing cinematic presence and recognition."
           />
 
           {/* Render Known For titles using credit items matching the titles */}
@@ -347,29 +345,28 @@ export const PersonDetailPage: React.FC = () => {
               <Link
                 key={`known-${credit.id}`}
                 to={credit.type === 'movie' ? `/movie/${credit.id}` : `/tv/${credit.id}`}
-                className="group bg-[#111114] border border-white/10 hover:border-white/30 transition-all duration-300 overflow-hidden flex flex-col justify-between"
+                className="group bg-[#111114] border border-white/10 hover:border-white/30 transition-all duration-300 overflow-hidden flex flex-col justify-between shadow-xl"
               >
                 <div className="aspect-[2/3] bg-black overflow-hidden relative">
                   <img
                     src={credit.poster}
                     alt={credit.title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    className="w-full h-full object-cover filter grayscale-[15%] group-hover:grayscale-0 group-hover:scale-105 transition-all duration-500"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-[#111114] via-transparent to-transparent opacity-60 pointer-events-none" />
                 </div>
 
                 <div className="p-3 space-y-1">
-                  <h4 className="font-serif font-bold text-sm text-[#F2F0EC] group-hover:text-[#E43D3D] transition-colors truncate">
+                  <h4 className="font-sans font-bold text-sm text-[#F2F0EC] group-hover:text-[#E43D3D] transition-colors truncate">
                     {credit.title}
                   </h4>
-                  <p className="text-[11px] font-mono text-[#8E8E93]">
+                  <p className="text-[10px] font-mono text-[#8E8E93] uppercase tracking-wider">
                     {credit.year} • {credit.role || 'Credit'}
                   </p>
                 </div>
               </Link>
             ))}
           </div>
-
         </section>
       )}
 
@@ -384,9 +381,9 @@ export const PersonDetailPage: React.FC = () => {
           4. PERSON FILMOGRAPHY — COMPACT EDITORIAL STREAM
          ================================================== */}
       {person.filmography && person.filmography.length > 0 && (
-        <section id="filmography-section" className="mt-12 sm:mt-16 lg:mt-24 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 w-full space-y-8 scroll-mt-24">
-          
+        <section id="filmography-section" className="mt-12 sm:mt-16 lg:mt-24 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 w-full space-y-6 scroll-mt-28">
           <SectionHeader
+            label="COMPLETE RECORD"
             title="FILMOGRAPHY"
             rightElement={
               <div className="flex items-center gap-1 bg-[#111114] border border-white/10 p-1">
@@ -400,7 +397,11 @@ export const PersonDetailPage: React.FC = () => {
                         : 'text-[#8E8E93] hover:text-[#F2F0EC]'
                     }`}
                   >
-                    {tab === 'all' ? 'ALL CREDITS' : tab === 'movie' ? 'MOVIES' : 'TV SHOWS'}
+                    {tab === 'all'
+                      ? `ALL (${person.filmography.length})`
+                      : tab === 'movie'
+                      ? `MOVIES (${person.filmography.filter(c => c.type === 'movie').length})`
+                      : `TV SHOWS (${person.filmography.filter(c => c.type === 'tv').length})`}
                   </button>
                 ))}
               </div>
@@ -408,44 +409,42 @@ export const PersonDetailPage: React.FC = () => {
           />
 
           {/* Credit Stream Container */}
-          <div className="bg-[#111114] border border-white/10 divide-y divide-white/10">
+          <div className="bg-[#111114] border border-white/10 divide-y divide-white/10 shadow-xl overflow-hidden">
             {filteredCredits.map(credit => (
               <Link
                 key={credit.id}
                 to={credit.type === 'movie' ? `/movie/${credit.id}` : `/tv/${credit.id}`}
-                className="group p-4 sm:p-5 flex items-center justify-between gap-4 hover:bg-white/[0.03] transition-colors"
+                className="group p-4 sm:p-5 flex items-center justify-between gap-4 hover:bg-[#17171B]/50 transition-colors"
               >
                 {/* Poster Thumbnail + Hierarchy Details */}
                 <div className="flex items-center gap-4 sm:gap-6 min-w-0">
-                  
                   {/* Poster Thumbnail */}
-                  <div className="w-12 h-16 sm:w-14 sm:h-20 flex-shrink-0 bg-black overflow-hidden border border-white/10 relative">
+                  <div className="w-12 h-16 sm:w-14 sm:h-20 flex-shrink-0 bg-black overflow-hidden border border-white/10 relative shadow-md">
                     <img
                       src={credit.poster}
                       alt={credit.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      className="w-full h-full object-cover filter grayscale-[15%] group-hover:grayscale-0 group-hover:scale-105 transition-all duration-300"
                     />
                   </div>
 
                   {/* Title -> Year/Type -> Role Hierarchy */}
                   <div className="space-y-1 min-w-0">
-                    
                     {/* TITLE */}
-                    <h4 className="font-serif font-bold text-base sm:text-lg text-[#F2F0EC] group-hover:text-[#E43D3D] transition-colors truncate">
+                    <h4 className="font-sans font-bold text-base sm:text-lg text-[#F2F0EC] group-hover:text-[#E43D3D] transition-colors truncate">
                       {credit.title}
                     </h4>
 
                     {/* YEAR / TYPE */}
                     <div className="flex items-center gap-2 text-xs font-mono text-[#8E8E93]">
-                      <span className="text-[#F2F0EC] font-bold">{credit.year}</span>
+                      <span className="text-[#F2F0EC] font-semibold">{credit.year}</span>
                       <span>•</span>
                       <span className="uppercase text-[#8E8E93]">
-                        {credit.type === 'movie' ? 'Feature Film' : 'TV Series'}
+                        {credit.type === 'movie' ? 'Feature Film' : 'Television'}
                       </span>
                       {credit.rating && credit.rating > 0 && (
                         <>
                           <span>•</span>
-                          <span>★ {credit.rating.toFixed(1)}</span>
+                          <span className="text-[#E43D3D]">★ {credit.rating.toFixed(1)}</span>
                         </>
                       )}
                     </div>
@@ -453,19 +452,16 @@ export const PersonDetailPage: React.FC = () => {
                     {/* ROLE */}
                     {credit.role && (
                       <p className="text-xs font-mono text-[#8E8E93]/80 truncate">
-                        as <span className="text-[#F2F0EC]">{credit.role}</span>
+                        as <span className="text-[#F2F0EC] font-medium">{credit.role}</span>
                       </p>
                     )}
-
                   </div>
-
                 </div>
 
                 {/* Arrow Icon Affordance */}
                 <div className="flex items-center gap-2 text-xs font-mono text-[#8E8E93] group-hover:text-[#E43D3D] transition-colors flex-shrink-0">
                   <ArrowUpRight className="w-4 h-4 text-[#8E8E93] group-hover:text-[#E43D3D] transition-colors" />
                 </div>
-
               </Link>
             ))}
 
@@ -475,7 +471,6 @@ export const PersonDetailPage: React.FC = () => {
               </div>
             )}
           </div>
-
         </section>
       )}
 

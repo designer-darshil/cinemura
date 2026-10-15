@@ -211,7 +211,7 @@ export const PersonCard = React.forwardRef<HTMLAnchorElement, PersonCardProps>((
           loading="lazy"
           onLoad={() => setLoaded(true)}
           onError={handleError}
-          className={`w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-[1.03] ${
+          className={`w-full h-full object-cover filter grayscale-[15%] group-hover:grayscale-0 transition-all duration-500 ease-out group-hover:scale-[1.03] ${
             loaded ? 'opacity-100' : 'opacity-0'
           }`}
         />

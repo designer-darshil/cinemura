@@ -22,22 +22,23 @@ export const SectionHeader: React.FC<SectionHeaderProps> = ({
   rightElement,
 }) => {
   return (
-    <div className="flex items-baseline justify-between gap-4 mb-3 sm:mb-4">
+    <div className="flex items-end justify-between gap-4 mb-4 sm:mb-6 border-b border-white/10 pb-3">
       <div className="space-y-1">
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2.5">
+          <span className="w-4 h-[2px] bg-[#E43D3D] inline-block" />
           {number && (
-            <span className="text-[11px] font-mono text-[#8E8E93]">
+            <span className="text-[10px] font-mono text-[#8E8E93]">
               {number}
             </span>
           )}
           {label && (
-            <span className="text-[11px] font-mono tracking-widest text-[#8E8E93] uppercase">
+            <span className="text-[10px] font-mono tracking-[0.25em] text-[#8E8E93] uppercase font-medium">
               {label}
             </span>
           )}
         </div>
 
-        <h2 className="text-base sm:text-lg lg:text-xl font-bold tracking-tight text-[#F2F0EC] uppercase">
+        <h2 className="text-xl sm:text-2xl font-display font-bold tracking-tight text-[#F2F0EC] uppercase">
           {title}
         </h2>
 
@@ -54,10 +55,10 @@ export const SectionHeader: React.FC<SectionHeaderProps> = ({
           {viewAllLink && (
             <Link
               to={viewAllLink}
-              className="text-xs font-mono tracking-wider text-[#8E8E93] hover:text-[#F2F0EC] transition-colors inline-flex items-center gap-1.5 uppercase"
+              className="text-xs font-mono tracking-wider text-[#8E8E93] hover:text-[#E43D3D] transition-colors inline-flex items-center gap-1.5 uppercase group"
             >
               <span>{viewAllText}</span>
-              <ArrowRight className="w-3 h-3 text-[#E43D3D]" />
+              <ArrowRight className="w-3.5 h-3.5 text-[#E43D3D] transition-transform group-hover:translate-x-1" />
             </Link>
           )}
         </div>

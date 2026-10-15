@@ -162,13 +162,13 @@ export const AnimeDetailPage: React.FC = () => {
             </span>
           </div>
 
-          <Link
+          {/* <Link
             to="/anime"
             className="group flex items-center gap-1.5 text-[10px] sm:text-xs font-mono tracking-wider text-[#8E8E93] hover:text-[#E43D3D] transition-colors uppercase"
           >
             <span>ANIME DIRECTORY</span>
             <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-1" />
-          </Link>
+          </Link> */}
         </div>
 
         {/* Mid Row: Minimal Editorial Micro-Columns + Asymmetric Metric Block */}
@@ -322,23 +322,33 @@ export const AnimeDetailPage: React.FC = () => {
       {/* ==================================================
           2. ANIME INFORMATION — OVERVIEW & SPECIFICATIONS
          ================================================== */}
-      <section id="overview-section" className="w-full mt-10 sm:mt-12 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 scroll-mt-24">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start border-t border-white/5 pt-8">
-          {/* LEFT: ABOUT THE ANIME */}
-          <div className="lg:col-span-7 space-y-5">
-            <h2 className="text-lg sm:text-xl font-bold text-[#F2F0EC] uppercase tracking-wide">
-              ABOUT THE ANIME
-            </h2>
+      <section id="overview-section" className="w-full mt-12 sm:mt-16 lg:mt-20 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 scroll-mt-28">
+        
+        {/* Section Header */}
+        <div className="flex flex-col gap-1 border-b border-white/10 pb-4 mb-8">
+          <div className="flex items-center gap-2.5">
+            <span className="w-4 h-[2px] bg-[#E43D3D] inline-block" />
+            <span className="text-[10px] font-mono tracking-[0.25em] text-[#8E8E93] uppercase font-medium">
+              ARCHIVE DOSSIER & SPECIFICATIONS
+            </span>
+          </div>
+          <h2 className="text-xl sm:text-2xl font-display font-bold text-[#F2F0EC] uppercase tracking-tight">
+            ANIME SYNOPSIS & SPECS
+          </h2>
+        </div>
 
-            <p className="font-sans text-base leading-relaxed text-[#F2F0EC]/90 font-light whitespace-pre-line">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
+          {/* LEFT: ABOUT THE ANIME */}
+          <div className="lg:col-span-7 space-y-6">
+            <p className="font-sans text-base sm:text-lg leading-relaxed text-[#F2F0EC]/90 font-light whitespace-pre-line">
               {anime.synopsis || 'Full narrative synopsis pending archive update.'}
             </p>
 
             {/* Alternative Titles if available */}
             {anime.alternativeTitles && anime.alternativeTitles.length > 0 && (
-              <div className="space-y-1.5 pt-2">
-                <span className="text-xs font-mono text-[#8E8E93] uppercase font-semibold">
-                  ALSO KNOWN AS:
+              <div className="p-4 bg-[#111114] border border-white/10 space-y-1.5">
+                <span className="text-[10px] font-mono tracking-[0.2em] text-[#8E8E93] uppercase font-bold block">
+                  ALTERNATIVE TITLES
                 </span>
                 <p className="text-xs font-mono text-[#F2F0EC]/80 leading-relaxed">
                   {anime.alternativeTitles.join(' • ')}
@@ -348,62 +358,70 @@ export const AnimeDetailPage: React.FC = () => {
 
             {/* Genres Tag Row */}
             {anime.genres && anime.genres.length > 0 && (
-              <div className="flex flex-wrap gap-1.5 pt-2">
-                {anime.genres.map((genre, idx) => (
-                  <span
-                    key={idx}
-                    className="px-2.5 py-1 text-xs font-mono bg-white/5 border border-white/10 text-[#F2F0EC]"
-                  >
-                    {genre}
-                  </span>
-                ))}
+              <div className="pt-2">
+                <span className="text-[10px] font-mono tracking-widest text-[#8E8E93] uppercase font-bold block mb-2.5">
+                  GENRE ARCHIVE
+                </span>
+                <div className="flex flex-wrap gap-2">
+                  {anime.genres.map((genre, idx) => (
+                    <span
+                      key={idx}
+                      className="px-2.5 py-1 text-[11px] font-mono bg-[#111114] border border-white/10 text-[#8E8E93] hover:text-[#F2F0EC] hover:border-white/20 transition-colors"
+                    >
+                      {genre}
+                    </span>
+                  ))}
+                </div>
               </div>
             )}
           </div>
 
-          {/* RIGHT: COMPACT KEY PRODUCTION FACTS (matching Movie/TV layout) */}
-          <div className="lg:col-span-5 bg-[#111114] border border-white/5 p-5 sm:p-6 space-y-4">
-            <h3 className="text-xs font-mono tracking-widest text-[#8E8E93] uppercase font-semibold">
-              SPECIFICATIONS
-            </h3>
+          {/* RIGHT: ARCHITECTURAL PRODUCTION FACTS MATRIX */}
+          <div className="lg:col-span-5 bg-[#111114] border border-white/10 shadow-xl overflow-hidden">
+            <div className="px-5 py-3.5 border-b border-white/10 bg-[#17171B]/50 flex items-center justify-between">
+              <span className="text-[10px] font-mono tracking-[0.25em] text-[#8E8E93] uppercase font-bold">
+                SPECIFICATIONS
+              </span>
+              <span className="w-1.5 h-1.5 rounded-full bg-[#E43D3D]" />
+            </div>
 
-            <dl className="grid grid-cols-2 gap-y-4 gap-x-6 text-xs font-mono">
+            <div className="divide-y divide-white/10 text-xs font-mono">
               {anime.status && (
-                <div>
-                  <dt className="text-[#8E8E93] uppercase">STATUS</dt>
-                  <dd className="text-[#F2F0EC] font-semibold mt-0.5">{anime.status}</dd>
+                <div className="px-5 py-3 flex items-center justify-between">
+                  <span className="text-[10px] text-[#8E8E93] uppercase tracking-wider">STATUS</span>
+                  <span className="text-[#F2F0EC] font-semibold">{anime.status}</span>
                 </div>
               )}
 
               {anime.type && (
-                <div>
-                  <dt className="text-[#8E8E93] uppercase">FORMAT</dt>
-                  <dd className="text-[#F2F0EC] font-semibold mt-0.5 uppercase">{anime.type}</dd>
+                <div className="px-5 py-3 flex items-center justify-between">
+                  <span className="text-[10px] text-[#8E8E93] uppercase tracking-wider">FORMAT</span>
+                  <span className="text-[#F2F0EC] font-semibold uppercase">{anime.type}</span>
                 </div>
               )}
 
               {typeof anime.episodes === 'number' && anime.episodes > 0 && (
-                <div>
-                  <dt className="text-[#8E8E93] uppercase">TOTAL EPISODES</dt>
-                  <dd className="text-[#F2F0EC] font-semibold mt-0.5">{anime.episodes}</dd>
+                <div className="px-5 py-3 flex items-center justify-between">
+                  <span className="text-[10px] text-[#8E8E93] uppercase tracking-wider">TOTAL EPISODES</span>
+                  <span className="text-[#F2F0EC] font-semibold">{anime.episodes}</span>
                 </div>
               )}
 
               {typeof anime.rank === 'number' && anime.rank > 0 && (
-                <div>
-                  <dt className="text-[#8E8E93] uppercase">OVERALL RANK</dt>
-                  <dd className="text-[#E43D3D] font-bold mt-0.5">#{anime.rank}</dd>
+                <div className="px-5 py-3 flex items-center justify-between">
+                  <span className="text-[10px] text-[#8E8E93] uppercase tracking-wider">OVERALL RANK</span>
+                  <span className="text-[#E43D3D] font-bold">#{anime.rank}</span>
                 </div>
               )}
-            </dl>
+            </div>
 
             {anime.link && (
-              <div className="pt-4 border-t border-white/10">
+              <div className="p-4 border-t border-white/10 bg-[#17171B]/30">
                 <a
                   href={anime.link}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 text-xs font-mono text-[#8E8E93] hover:text-[#E43D3D] transition-colors"
+                  className="inline-flex items-center gap-2 text-xs font-mono text-[#8E8E93] hover:text-[#E43D3D] transition-colors bg-white/5 border border-white/10 px-3 py-1.5"
                 >
                   <ExternalLink className="w-3.5 h-3.5 text-[#E43D3D]" />
                   <span>SOURCE ENTRY</span>
@@ -418,8 +436,12 @@ export const AnimeDetailPage: React.FC = () => {
           3. RELATED ANIME SECTION — MORE LIKE THIS
          ================================================== */}
       {relatedAnime.length > 0 && (
-        <section className="w-full mt-14 sm:mt-20 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 space-y-6">
-          <SectionHeader title="MORE LIKE THIS" />
+        <section className="w-full mt-12 sm:mt-16 lg:mt-24 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 space-y-6">
+          <SectionHeader
+            label="RECOMMENDATIONS"
+            title="MORE LIKE THIS"
+            description="Related animation works sharing thematic depth and style."
+          />
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4">
             {relatedAnime.map((item) => (
               <AnimeCard key={item.id} item={item} />

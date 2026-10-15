@@ -364,77 +364,95 @@ export const SeriesDetailPage: React.FC = () => {
       {/* ==================================================
           2. NARRATIVE SYNOPSIS & SPECIFICATIONS
          ================================================== */}
-      <section id="overview-section" className="w-full mt-10 sm:mt-12 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 scroll-mt-24">
+      <section id="overview-section" className="w-full mt-12 sm:mt-16 lg:mt-20 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 scroll-mt-28">
         
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start border-t border-white/5 pt-8">
+        {/* Section Header */}
+        <div className="flex flex-col gap-1 border-b border-white/10 pb-4 mb-8">
+          <div className="flex items-center gap-2.5">
+            <span className="w-4 h-[2px] bg-[#E43D3D] inline-block" />
+            <span className="text-[10px] font-mono tracking-[0.25em] text-[#8E8E93] uppercase font-medium">
+              ARCHIVE DOSSIER & SPECIFICATIONS
+            </span>
+          </div>
+          <h2 className="text-xl sm:text-2xl font-display font-bold text-[#F2F0EC] uppercase tracking-tight">
+            SERIES OVERVIEW & SPECS
+          </h2>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
           
           {/* LEFT: SYNOPSIS */}
-          <div className="lg:col-span-7 space-y-5">
-            <h2 className="text-lg sm:text-xl font-bold text-[#F2F0EC] uppercase tracking-wide">
-              SERIES OVERVIEW
-            </h2>
+          <div className="lg:col-span-7 space-y-6">
+            {series.tagline && (
+              <p className="font-serif italic text-lg sm:text-xl text-[#F2F0EC]/80 border-l-2 border-[#E43D3D] pl-4 py-0.5">
+                "{series.tagline}"
+              </p>
+            )}
 
-            <p className="text-base font-light text-[#F2F0EC]/90 leading-relaxed">
-              {series.synopsis}
+            <p className="font-sans text-base sm:text-lg font-light text-[#F2F0EC]/90 leading-relaxed">
+              {series.synopsis || 'Full series synopsis pending archive update.'}
             </p>
 
             {series.spokenLanguages && series.spokenLanguages.length > 0 && (
-              <div className="pt-3 border-t border-white/5 flex flex-wrap items-center gap-2 text-xs font-mono text-[#8E8E93]">
+              <div className="pt-3 border-t border-white/10 flex flex-wrap items-center gap-2 text-xs font-mono text-[#8E8E93]">
                 <Globe className="w-3.5 h-3.5 text-[#E43D3D]" />
-                <span>SPOKEN LANGUAGES:</span>
-                <span className="text-[#F2F0EC]">{series.spokenLanguages.join(', ')}</span>
+                <span className="text-[10px] uppercase tracking-wider">SPOKEN LANGUAGES:</span>
+                <span className="text-[#F2F0EC] font-semibold">{series.spokenLanguages.join(', ')}</span>
               </div>
             )}
           </div>
 
-          {/* RIGHT: SERIES SPECIFICATIONS */}
-          <div className="lg:col-span-5 bg-[#111114] border border-white/5 p-5 sm:p-6 space-y-4">
-            <h3 className="text-xs font-mono tracking-widest text-[#8E8E93] uppercase font-semibold">
-              SPECIFICATIONS
-            </h3>
+          {/* RIGHT: ARCHITECTURAL SERIES SPECIFICATIONS MATRIX */}
+          <div className="lg:col-span-5 bg-[#111114] border border-white/10 shadow-xl overflow-hidden">
+            <div className="px-5 py-3.5 border-b border-white/10 bg-[#17171B]/50 flex items-center justify-between">
+              <span className="text-[10px] font-mono tracking-[0.25em] text-[#8E8E93] uppercase font-bold">
+                SPECIFICATIONS
+              </span>
+              <span className="w-1.5 h-1.5 rounded-full bg-[#E43D3D]" />
+            </div>
 
             <div className="divide-y divide-white/10 text-xs font-mono">
-              <div className="py-3 flex items-center justify-between">
-                <span className="text-[#8E8E93]">FIRST AIR DATE</span>
-                <span className="text-[#F2F0EC] font-bold">{series.firstAirDate || 'N/A'}</span>
+              <div className="px-5 py-3 flex items-center justify-between">
+                <span className="text-[10px] text-[#8E8E93] uppercase tracking-wider">FIRST AIR DATE</span>
+                <span className="text-[#F2F0EC] font-semibold">{series.firstAirDate || 'N/A'}</span>
               </div>
 
               {series.lastAirDate && (
-                <div className="py-3 flex items-center justify-between">
-                  <span className="text-[#8E8E93]">LAST AIR DATE</span>
-                  <span className="text-[#F2F0EC] font-bold">{series.lastAirDate}</span>
+                <div className="px-5 py-3 flex items-center justify-between">
+                  <span className="text-[10px] text-[#8E8E93] uppercase tracking-wider">LAST AIR DATE</span>
+                  <span className="text-[#F2F0EC] font-semibold">{series.lastAirDate}</span>
                 </div>
               )}
 
-              <div className="py-3 flex items-center justify-between">
-                <span className="text-[#8E8E93]">STATUS</span>
+              <div className="px-5 py-3 flex items-center justify-between">
+                <span className="text-[10px] text-[#8E8E93] uppercase tracking-wider">STATUS</span>
                 <span className="text-[#E43D3D] font-bold uppercase">{series.status || 'Ended'}</span>
               </div>
 
-              <div className="py-3 flex items-center justify-between">
-                <span className="text-[#8E8E93]">EPISODE RUNTIME</span>
-                <span className="text-[#F2F0EC] font-bold">{series.episodeRuntime || 'N/A'}</span>
+              <div className="px-5 py-3 flex items-center justify-between">
+                <span className="text-[10px] text-[#8E8E93] uppercase tracking-wider">EPISODE RUNTIME</span>
+                <span className="text-[#F2F0EC] font-semibold">{series.episodeRuntime || 'N/A'}</span>
               </div>
 
-              <div className="py-3 flex items-center justify-between">
-                <span className="text-[#8E8E93]">SEASONS COUNT</span>
-                <span className="text-[#F2F0EC] font-bold">{series.seasonsCount} Seasons</span>
+              <div className="px-5 py-3 flex items-center justify-between">
+                <span className="text-[10px] text-[#8E8E93] uppercase tracking-wider">SEASONS COUNT</span>
+                <span className="text-[#F2F0EC] font-semibold">{series.seasonsCount} Seasons</span>
               </div>
 
-              <div className="py-3 flex items-center justify-between">
-                <span className="text-[#8E8E93]">TOTAL EPISODES</span>
-                <span className="text-[#F2F0EC] font-bold">{series.totalEpisodes} Episodes</span>
+              <div className="px-5 py-3 flex items-center justify-between">
+                <span className="text-[10px] text-[#8E8E93] uppercase tracking-wider">TOTAL EPISODES</span>
+                <span className="text-[#F2F0EC] font-semibold">{series.totalEpisodes} Episodes</span>
               </div>
 
-              <div className="py-3 flex items-center justify-between">
-                <span className="text-[#8E8E93]">ORIGINAL LANGUAGE</span>
-                <span className="text-[#F2F0EC] font-bold uppercase">{series.language}</span>
+              <div className="px-5 py-3 flex items-center justify-between">
+                <span className="text-[10px] text-[#8E8E93] uppercase tracking-wider">ORIGINAL LANGUAGE</span>
+                <span className="text-[#F2F0EC] font-semibold uppercase">{series.language}</span>
               </div>
 
               {series.certification && (
-                <div className="py-3 flex items-center justify-between">
-                  <span className="text-[#8E8E93]">CONTENT RATING</span>
-                  <span className="text-[#F2F0EC] border border-white/20 px-2 py-0.5 text-[10px]">
+                <div className="px-5 py-3 flex items-center justify-between">
+                  <span className="text-[10px] text-[#8E8E93] uppercase tracking-wider">CONTENT RATING</span>
+                  <span className="text-[#F2F0EC] border border-white/20 px-2 py-0.5 text-[10px] font-bold">
                     {series.certification}
                   </span>
                 </div>
@@ -452,9 +470,9 @@ export const SeriesDetailPage: React.FC = () => {
       {((series.creatorDetails && series.creatorDetails.length > 0) || (series.creators && series.creators.length > 0)) && (
         <section className="w-full mt-12 sm:mt-16 lg:mt-24 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 space-y-6">
           <SectionHeader
-            label="SHOWRUNNERS"
-            title="CREATED BY"
-            description="Visionary showrunners and series creators behind the show."
+            label="SHOWRUNNERS & CREATORS"
+            title="SERIES ARCHITECTS"
+            description="Visionary showrunners and creators behind this television production."
           />
 
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4">
@@ -472,8 +490,8 @@ export const SeriesDetailPage: React.FC = () => {
             ) : (
               series.creators.map((name, idx) => (
                 <div key={idx} className="bg-[#111114] border border-white/10 p-4 space-y-1">
-                  <span className="text-[9px] font-mono tracking-widest text-[#E43D3D] uppercase block">CREATOR</span>
-                  <h4 className="font-serif font-bold text-sm text-[#F2F0EC] truncate">{name}</h4>
+                  <span className="text-[9px] font-mono tracking-widest text-[#E43D3D] uppercase font-bold block">CREATOR</span>
+                  <h4 className="font-sans font-bold text-sm text-[#F2F0EC] truncate">{name}</h4>
                 </div>
               ))
             )}

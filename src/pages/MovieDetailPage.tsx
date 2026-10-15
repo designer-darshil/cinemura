@@ -166,13 +166,13 @@ export const MovieDetailPage: React.FC = () => {
             </span>
           </div>
 
-          <Link
+          {/* <Link
             to="/movies"
             className="group flex items-center gap-1.5 text-[10px] sm:text-xs font-mono tracking-wider text-[#8E8E93] hover:text-[#E43D3D] transition-colors uppercase"
           >
             <span>MOVIES DIRECTORY</span>
             <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-1" />
-          </Link>
+          </Link> */}
         </div>
 
         {/* Mid Row: Minimal Editorial Micro-Columns + Asymmetric Metric Block */}
@@ -348,86 +348,109 @@ export const MovieDetailPage: React.FC = () => {
       <DetailMediaNav sections={navSections} />
 
       {/* ==================================================
-          2. MOVIE INFORMATION — OVERVIEW
+          2. MOVIE INFORMATION — OVERVIEW & SPECIFICATIONS
          ================================================== */}
-      <section id="overview-section" className="w-full mt-10 sm:mt-12 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 scroll-mt-24">
+      <section id="overview-section" className="w-full mt-12 sm:mt-16 lg:mt-20 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 scroll-mt-28">
         
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start border-t border-white/5 pt-8">
+        {/* Section Header */}
+        <div className="flex flex-col gap-1 border-b border-white/10 pb-4 mb-8">
+          <div className="flex items-center gap-2.5">
+            <span className="w-4 h-[2px] bg-[#E43D3D] inline-block" />
+            <span className="text-[10px] font-mono tracking-[0.25em] text-[#8E8E93] uppercase font-medium">
+              ARCHIVE DOSSIER & SPECIFICATIONS
+            </span>
+          </div>
+          <h2 className="text-xl sm:text-2xl font-display font-bold text-[#F2F0EC] uppercase tracking-tight">
+            NARRATIVE & PRODUCTION
+          </h2>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
           
           {/* LEFT: ABOUT THE MOVIE */}
-          <div className="lg:col-span-7 space-y-5">
-            <h2 className="text-lg sm:text-xl font-bold text-[#F2F0EC] uppercase tracking-wide">
-              ABOUT THE MOVIE
-            </h2>
+          <div className="lg:col-span-7 space-y-6">
+            {movie.tagline && (
+              <p className="font-serif italic text-lg sm:text-xl text-[#F2F0EC]/80 border-l-2 border-[#E43D3D] pl-4 py-0.5">
+                "{movie.tagline}"
+              </p>
+            )}
 
-            <p className="font-sans text-base leading-relaxed text-[#F2F0EC]/90 font-light">
+            <p className="font-sans text-base sm:text-lg leading-relaxed text-[#F2F0EC]/90 font-light">
               {movie.synopsis || 'Full narrative overview pending archive update.'}
             </p>
 
-            {/* Keywords */}
+            {/* Keywords / Thematic Tags */}
             {movie.keywords && movie.keywords.length > 0 && (
-              <div className="flex flex-wrap gap-1.5 pt-1">
-                {movie.keywords.map((kw, i) => (
-                  <span
-                    key={i}
-                    className="px-2 py-0.5 text-xs font-mono bg-white/5 text-[#8E8E93]"
-                  >
-                    #{kw}
-                  </span>
-                ))}
+              <div className="pt-2">
+                <span className="text-[10px] font-mono tracking-widest text-[#8E8E93] uppercase font-bold block mb-2.5">
+                  THEMATIC METADATA
+                </span>
+                <div className="flex flex-wrap gap-2">
+                  {movie.keywords.map((kw, i) => (
+                    <span
+                      key={i}
+                      className="px-2.5 py-1 text-[11px] font-mono bg-[#111114] border border-white/10 text-[#8E8E93] hover:text-[#F2F0EC] hover:border-white/20 transition-colors"
+                    >
+                      #{kw}
+                    </span>
+                  ))}
+                </div>
               </div>
             )}
           </div>
 
-          {/* RIGHT: COMPACT KEY PRODUCTION FACTS */}
-          <div className="lg:col-span-5 bg-[#111114] border border-white/5 p-5 sm:p-6 space-y-4">
-            <h3 className="text-xs font-mono tracking-widest text-[#8E8E93] uppercase font-semibold">
-              SPECIFICATIONS
-            </h3>
+          {/* RIGHT: ARCHITECTURAL PRODUCTION FACTS MATRIX */}
+          <div className="lg:col-span-5 bg-[#111114] border border-white/10 shadow-xl overflow-hidden">
+            <div className="px-5 py-3.5 border-b border-white/10 bg-[#17171B]/50 flex items-center justify-between">
+              <span className="text-[10px] font-mono tracking-[0.25em] text-[#8E8E93] uppercase font-bold">
+                SPECIFICATIONS
+              </span>
+              <span className="w-1.5 h-1.5 rounded-full bg-[#E43D3D]" />
+            </div>
 
-            <dl className="grid grid-cols-2 gap-y-4 gap-x-6 text-xs font-mono">
-              <div>
-                <dt className="text-[#8E8E93] uppercase">STATUS</dt>
-                <dd className="text-[#F2F0EC] font-semibold mt-0.5">{movie.status || 'Released'}</dd>
+            <div className="divide-y divide-white/10 text-xs font-mono">
+              <div className="px-5 py-3 flex items-center justify-between">
+                <span className="text-[10px] text-[#8E8E93] uppercase tracking-wider">STATUS</span>
+                <span className="text-[#F2F0EC] font-semibold">{movie.status || 'Released'}</span>
               </div>
 
-              <div>
-                <dt className="text-[#8E8E93] uppercase">ORIGINAL AUDIO</dt>
-                <dd className="text-[#F2F0EC] font-semibold mt-0.5">{movie.language}</dd>
+              <div className="px-5 py-3 flex items-center justify-between">
+                <span className="text-[10px] text-[#8E8E93] uppercase tracking-wider">ORIGINAL AUDIO</span>
+                <span className="text-[#F2F0EC] font-semibold uppercase">{movie.language}</span>
               </div>
 
-              <div>
-                <dt className="text-[#8E8E93] uppercase">PREMIERE DATE</dt>
-                <dd className="text-[#F2F0EC] font-semibold mt-0.5">{movie.releaseDate}</dd>
+              <div className="px-5 py-3 flex items-center justify-between">
+                <span className="text-[10px] text-[#8E8E93] uppercase tracking-wider">PREMIERE DATE</span>
+                <span className="text-[#F2F0EC] font-semibold">{movie.releaseDate}</span>
               </div>
 
-              <div>
-                <dt className="text-[#8E8E93] uppercase">RUNTIME</dt>
-                <dd className="text-[#F2F0EC] font-semibold mt-0.5">{movie.runtime}</dd>
+              <div className="px-5 py-3 flex items-center justify-between">
+                <span className="text-[10px] text-[#8E8E93] uppercase tracking-wider">RUNTIME</span>
+                <span className="text-[#F2F0EC] font-semibold">{movie.runtime}</span>
               </div>
 
-              <div>
-                <dt className="text-[#8E8E93] uppercase">PRODUCTION BUDGET</dt>
-                <dd className="text-[#F2F0EC] font-semibold mt-0.5">{formattedBudget}</dd>
+              <div className="px-5 py-3 flex items-center justify-between">
+                <span className="text-[10px] text-[#8E8E93] uppercase tracking-wider">BUDGET</span>
+                <span className="text-[#F2F0EC] font-semibold">{formattedBudget}</span>
               </div>
 
-              <div>
-                <dt className="text-[#8E8E93] uppercase">WORLDWIDE GROSS</dt>
-                <dd className="text-[#F2F0EC] font-semibold mt-0.5">{formattedRevenue}</dd>
+              <div className="px-5 py-3 flex items-center justify-between">
+                <span className="text-[10px] text-[#8E8E93] uppercase tracking-wider">WORLDWIDE GROSS</span>
+                <span className="text-[#F2F0EC] font-semibold">{formattedRevenue}</span>
               </div>
-            </dl>
+            </div>
 
-            {/* External Links */}
+            {/* External Reference Links */}
             {(movie.homepage || movie.imdbId) && (
-              <div className="pt-4 border-t border-white/10 flex items-center gap-4">
+              <div className="p-4 border-t border-white/10 bg-[#17171B]/30 flex flex-wrap items-center gap-3">
                 {movie.homepage && (
                   <a
                     href={movie.homepage}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 text-xs font-mono text-[#8E8E93] hover:text-[#E43D3D] transition-colors"
+                    className="inline-flex items-center gap-2 text-xs font-mono text-[#8E8E93] hover:text-[#E43D3D] transition-colors bg-white/5 border border-white/10 px-3 py-1.5"
                   >
-                    <Globe className="w-3.5 h-3.5" />
+                    <Globe className="w-3.5 h-3.5 text-[#E43D3D]" />
                     <span>HOMEPAGE</span>
                   </a>
                 )}
@@ -436,10 +459,10 @@ export const MovieDetailPage: React.FC = () => {
                     href={`https://www.imdb.com/title/${movie.imdbId}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1.5 text-xs font-mono text-[#8E8E93] hover:text-[#E43D3D] transition-colors"
+                    className="inline-flex items-center gap-1.5 text-xs font-mono text-[#8E8E93] hover:text-white transition-colors bg-white/5 border border-white/10 px-3 py-1.5"
                   >
-                    <span className="font-bold bg-[#E43D3D] text-white px-1.5 py-0.5 text-[10px]">IMDb</span>
-                    <span>VIEW ON IMDB</span>
+                    <span className="font-bold bg-[#E43D3D] text-white px-1.5 py-0.5 text-[9px] tracking-widest">IMDb</span>
+                    <span>VIEW PROFILE</span>
                   </a>
                 )}
               </div>
@@ -486,21 +509,25 @@ export const MovieDetailPage: React.FC = () => {
           6. MOVIE COLLECTION / FRANCHISE
          ================================================== */}
       {movie.collection && (
-        <section className="w-full mt-12 sm:mt-16 lg:mt-20 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 space-y-4">
+        <section className="w-full mt-12 sm:mt-16 lg:mt-24 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 space-y-6">
           
           <SectionHeader
-            title="COLLECTION"
+            label="CINEMATIC UNIVERSE"
+            title="FRANCHISE ARCHIVE"
+            description="Complete anthology and connected titles within this universe."
           />
 
-          <div className="relative bg-[#111114] border border-white/5 p-6 sm:p-8 flex flex-col md:flex-row items-center gap-6 overflow-hidden">
+          <div className="relative bg-[#111114] border border-white/10 p-6 sm:p-8 flex flex-col md:flex-row items-center gap-6 overflow-hidden shadow-xl">
             {movie.collection.backdrop && (
               <img
                 src={movie.collection.backdrop}
                 alt={movie.collection.name}
-                className="absolute inset-0 w-full h-full object-cover opacity-20 filter brightness-50"
+                className="absolute inset-0 w-full h-full object-cover opacity-20 filter grayscale contrast-125"
               />
             )}
-            <div className="relative z-10 w-24 h-36 flex-shrink-0 bg-black border border-white/10">
+            <div className="absolute inset-0 bg-gradient-to-r from-[#111114] via-[#111114]/90 to-transparent pointer-events-none" />
+            
+            <div className="relative z-10 w-24 h-36 flex-shrink-0 bg-black border border-white/15 shadow-2xl">
               <img
                 src={movie.collection.poster || movie.poster}
                 alt={movie.collection.name}
@@ -508,11 +535,14 @@ export const MovieDetailPage: React.FC = () => {
               />
             </div>
             <div className="relative z-10 space-y-2 text-center md:text-left">
-              <h3 className="text-lg sm:text-xl font-bold text-[#F2F0EC] uppercase">
+              <span className="text-[10px] font-mono tracking-[0.25em] text-[#E43D3D] uppercase font-bold block">
+                ANTHOLOGY
+              </span>
+              <h3 className="text-xl sm:text-2xl font-display font-bold text-[#F2F0EC] uppercase">
                 {movie.collection.name}
               </h3>
               {movie.collection.overview && (
-                <p className="text-xs font-mono text-[#8E8E93] max-w-2xl line-clamp-3">
+                <p className="text-xs sm:text-sm font-sans font-light text-[#8E8E93] max-w-2xl line-clamp-3 leading-relaxed">
                   {movie.collection.overview}
                 </p>
               )}

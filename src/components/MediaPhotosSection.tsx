@@ -50,18 +50,21 @@ export const MediaPhotosSection: React.FC<MediaPhotosSectionProps> = ({
   };
 
   return (
-    <section id={id} className="space-y-12 scroll-mt-28">
+    <section id={id} className={`space-y-12 ${lightboxOpen ? '' : 'scroll-mt-28'}`}>
       {/* ==================================================
           1. BACKDROPS GALLERY (LANDSCAPE 16:9 PROPORTIONS)
          ================================================== */}
       {hasBackdrops && (
         <div className="space-y-4">
-          <div className="flex items-baseline justify-between border-b border-white/10 pb-3">
-            <div className="flex items-baseline gap-3">
-              <span className="text-[10px] font-mono tracking-[0.25em] text-[#E43D3D] uppercase font-bold">
-                GALLERY
-              </span>
-              <h2 className="text-xl sm:text-2xl font-serif font-bold text-[#F2F0EC] tracking-tight uppercase">
+          <div className="flex items-end justify-between border-b border-white/10 pb-3">
+            <div className="space-y-1">
+              <div className="flex items-center gap-2.5">
+                <span className="w-4 h-[2px] bg-[#E43D3D] inline-block" />
+                <span className="text-[10px] font-mono tracking-[0.25em] text-[#8E8E93] uppercase font-medium">
+                  VISUAL ARCHIVE
+                </span>
+              </div>
+              <h2 className="text-xl sm:text-2xl font-display font-bold text-[#F2F0EC] tracking-tight uppercase">
                 BACKDROPS
               </h2>
             </div>
@@ -83,13 +86,13 @@ export const MediaPhotosSection: React.FC<MediaPhotosSectionProps> = ({
                     openBackdropAt(idx);
                   }
                 }}
-                className="group relative aspect-video bg-[#111114] border border-white/10 hover:border-[#E43D3D] transition-all duration-300 cursor-pointer overflow-hidden shadow-md"
+                className="group relative aspect-video bg-[#111114] border border-white/10 hover:border-white/30 transition-all duration-300 cursor-pointer overflow-hidden shadow-xl"
               >
                 <img
                   src={img}
                   alt={`${parentTitle} backdrop ${idx + 1}`}
                   loading="lazy"
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  className="w-full h-full object-cover filter grayscale-[15%] group-hover:grayscale-0 group-hover:scale-105 transition-all duration-500"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-50 group-hover:opacity-75 transition-opacity" />
                 <span className="absolute bottom-2 left-2 text-[9px] font-mono tracking-widest bg-black/80 text-[#8E8E93] px-2 py-0.5 border border-white/10">
@@ -106,12 +109,15 @@ export const MediaPhotosSection: React.FC<MediaPhotosSectionProps> = ({
          ================================================== */}
       {hasPosters && (
         <div className="space-y-4">
-          <div className="flex items-baseline justify-between border-b border-white/10 pb-3">
-            <div className="flex items-baseline gap-3">
-              <span className="text-[10px] font-mono tracking-[0.25em] text-[#E43D3D] uppercase font-bold">
-                PROMOTIONAL
-              </span>
-              <h2 className="text-xl sm:text-2xl font-serif font-bold text-[#F2F0EC] tracking-tight uppercase">
+          <div className="flex items-end justify-between border-b border-white/10 pb-3">
+            <div className="space-y-1">
+              <div className="flex items-center gap-2.5">
+                <span className="w-4 h-[2px] bg-[#E43D3D] inline-block" />
+                <span className="text-[10px] font-mono tracking-[0.25em] text-[#8E8E93] uppercase font-medium">
+                  PROMOTIONAL ART
+                </span>
+              </div>
+              <h2 className="text-xl sm:text-2xl font-display font-bold text-[#F2F0EC] tracking-tight uppercase">
                 POSTERS
               </h2>
             </div>
@@ -133,13 +139,13 @@ export const MediaPhotosSection: React.FC<MediaPhotosSectionProps> = ({
                     openPosterAt(idx);
                   }
                 }}
-                className="group relative aspect-[2/3] bg-[#111114] border border-white/10 hover:border-[#E43D3D] transition-all duration-300 cursor-pointer overflow-hidden shadow-md"
+                className="group relative aspect-[2/3] bg-[#111114] border border-white/10 hover:border-white/30 transition-all duration-300 cursor-pointer overflow-hidden shadow-xl"
               >
                 <img
                   src={img}
                   alt={`${parentTitle} poster ${idx + 1}`}
                   loading="lazy"
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  className="w-full h-full object-cover filter grayscale-[15%] group-hover:grayscale-0 group-hover:scale-105 transition-all duration-500"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-50 group-hover:opacity-75 transition-opacity" />
                 <span className="absolute bottom-2 left-2 text-[9px] font-mono tracking-widest bg-black/80 text-[#8E8E93] px-2 py-0.5 border border-white/10">

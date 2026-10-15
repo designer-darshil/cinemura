@@ -222,7 +222,7 @@ export const PersonDetailPage: React.FC = () => {
         <div className="relative z-10 flex flex-col lg:flex-row lg:items-end justify-between gap-6 pt-4">
           {/* Oversized Title & Circular Navigation */}
           <div className="space-y-4 max-w-4xl">
-            <h1 className="text-5xl sm:text-7xl md:text-8xl lg:text-9xl font-display font-bold text-[#F2F0EC] tracking-tight leading-[0.88] uppercase">
+            <h1 className="text-5xl sm:text-7xl md:text-8xl font-display font-bold text-[#F2F0EC] tracking-tight leading-[0.88] uppercase">
               {person.name}
             </h1>
 

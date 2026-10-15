@@ -27,21 +27,22 @@ export const TonightsPickSection: React.FC<TonightsPickSectionProps> = ({ item }
   const artworkImage = item.backdrop || item.poster;
 
   return (
-    <div className="w-full space-y-4">
+    <div className="w-full space-y-6">
       {/* Section Header */}
-      <div className="flex items-baseline justify-between gap-4">
-        <div>
-          <span className="text-[11px] font-mono tracking-widest text-[#E43D3D] uppercase block">
+      <div className="flex flex-col gap-1 border-b border-white/10 pb-4 mb-2">
+        <div className="flex items-center gap-2.5">
+          <span className="w-4 h-[2px] bg-[#E43D3D] inline-block" />
+          <span className="text-[10px] font-mono tracking-[0.25em] text-[#8E8E93] uppercase font-medium">
             CURATED SPOTLIGHT
           </span>
-          <h2 className="text-base sm:text-lg lg:text-xl font-bold tracking-tight text-[#F2F0EC] uppercase">
-            TONIGHT'S SELECTION
-          </h2>
         </div>
+        <h2 className="text-xl sm:text-2xl font-display font-bold text-[#F2F0EC] uppercase tracking-tight">
+          TONIGHT'S SELECTION
+        </h2>
       </div>
 
       {/* Presentation Card */}
-      <div className="relative bg-[#111114] border border-white/5 overflow-hidden group">
+      <div className="relative bg-[#111114] border border-white/10 overflow-hidden shadow-2xl group">
         <div className="grid grid-cols-1 lg:grid-cols-12 items-stretch">
           
           {/* Artwork Side */}
@@ -50,7 +51,7 @@ export const TonightsPickSection: React.FC<TonightsPickSectionProps> = ({ item }
               src={artworkImage}
               alt={item.title}
               loading="lazy"
-              className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.02] filter brightness-95 contrast-105"
+              className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.02] filter grayscale-[15%] group-hover:grayscale-0 brightness-95 contrast-105"
             />
             {/* Vignette */}
             <div className="absolute inset-0 bg-gradient-to-t from-[#111114] via-transparent to-transparent lg:bg-gradient-to-r lg:from-transparent lg:via-[#111114]/30 lg:to-[#111114]" />
@@ -65,7 +66,7 @@ export const TonightsPickSection: React.FC<TonightsPickSectionProps> = ({ item }
                   item.title
                 )}
                 aria-label={`Play trailer for ${item.title}`}
-                className="absolute inset-0 m-auto w-12 h-12 bg-black/70 hover:bg-[#E43D3D] text-white flex items-center justify-center transition-all duration-200 cursor-pointer"
+                className="absolute inset-0 m-auto w-12 h-12 rounded-full bg-[#E43D3D] hover:bg-[#c93535] text-white flex items-center justify-center transition-all duration-200 cursor-pointer shadow-2xl group-hover:scale-110"
               >
                 <Play className="w-5 h-5 fill-white pl-0.5" />
               </button>
